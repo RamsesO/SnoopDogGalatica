@@ -1,5 +1,5 @@
 # Snoop Dogg Galatica
-The dankest universe that no one has ever seen.
+>The dankest solar system that no one has ever seen.
 
 ## Warbird Simulation Overview
 
@@ -10,7 +10,7 @@ The dankest universe that no one has ever seen.
     * Planet #1 (Unum)
         * Missile Site #1
     * Planet #2 (Duo)
-        * Moon #1
+        * Moon #1 (Primus)
         * Moon #2 (Secundus)
             * Missile Site #2
     * Spaceship
@@ -30,6 +30,40 @@ The dankest universe that no one has ever seen.
             * Unum should rotate every 8 seconds around Ruber
 
 * Cameras
+    * Static Cameras
+        * Front
+        * Top
+    * Dynamic Cameras
+        * Ship View
+        * Unum View
+            * Unum will rotate towards the camera
+        * Duo View
+            * Duo will rotate towards the camera
+        
+* Shaders
+    * Use "simpleVertex.glsl" and the "simpleFragment.glsl" shader programs
+    * You will create your own shaders in Phase #3
 
+* Missles
+    * Ship has 9 missles
+    * Each missle defense site has 5 missles
+    * Missles must be contained in a bounding sphere radius of 25
+    * Models can't be spherical
+    * Are homing missles and can track
+
+* Information Display
+    * Must contain
+        * Missle Counts
+        * Update rate (U/S)
+        * Frame rate (F/S)
+        * Current view (camera)
+    * Example
+        * `Warbird 7 Unum 5 Secundus 0 U/S 25 F/S 321 View Duo`
 
 ## Phase #1
+
+###To Do
+
+* Have planets and moons orbiting Ruber
+* Have the Front, Top, Unum and Duo cameras
+* You should have warbird and 1 missle at (4900, 1000, 4850)
