@@ -62,7 +62,7 @@
 
 ## Phase #1
 
-###To Do
+### To Do
 
 * Have planets and moons orbiting Ruber
 * Have the Front, Top, Unum and Duo cameras
