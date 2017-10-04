@@ -21,7 +21,6 @@ protected:
     int numOfVert;
     char * fileName;
     float size;
-    float modelSize; 
 
     GLuint vPosition;
     GLuint vColor;
@@ -35,30 +34,32 @@ protected:
     
 public:
 
-    Shape(int id, int numOfVert, char * fileName, float size, float modelSize) {
+    Shape(int id, int numOfVert, char * fileName, float size) {
         this->id = id;
         this->numOfVert = numOfVert;
         this->fileName = fileName;
         this->boundRad = boundRad;
         this->modelSize = modelSize;
 
-        scaleMatrix = glm::scale(glm::mat4(), glm::vec3(size * 1.0f / modelSize));
         translationMatrix = glm::translate(glm::mat4(), glm::vec3(0));
         rotationAxis = glm::vec3(0);
         radians = glm::radians(1.0f);
     }
 
-    Shape(int id, int numOfVert, char * fileName, float size, float modelSize, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians) {
+    Shape(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians) {
         this->id = id;
         this->numOfVert = numOfVert;
         this->fileName = fileName;
         this->boundRad = boundRad;
         this->modelSize = modelSize;
 
-        this->scaleMatrix = glm::scale(glm::mat4(), glm::vec3(size * 1.0f / modelSize));
         this->translationMatrix = glm::translate(glm::mat4(), translationMatrix);
         this->rotationAxis = rotationAxis;
         this->radians = glm::radians(radians);
+    }
+
+    void setScaleMatrix(float modelSize) {
+        scaleMatrix = glm::scale(glm::mat4(), glm::vec3(size * 1.0f / modelSize));
     }
 
     glm::mat4 getModelMatrix() {
