@@ -43,14 +43,13 @@ public:
         this->modelSize = modelSize;
 
         scaleMatrix = glm::scale(glm::mat4(), glm::vec3(modelSize * 1.0f / boundRad));
-        translationMatrix = glm::translate(glm::mat4(), glm::vec3(1));
+        translationMatrix = glm::translate(glm::mat4(), glm::vec3(0));
         rotationAxis = glm::vec3(1);
         radians = glm::radians(1.0f);
     }
 
     glm::mat4 getModelMatrix() {
-        //center rotation
-        return (translationMatrix * rotationMatrix * scaleMatrix);
+        return (translationMatrix * scaleMatrix);
     }
 
     void update() {
