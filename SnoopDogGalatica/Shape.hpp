@@ -18,8 +18,10 @@ class Shape {
 private:
 
     int id;
-    int numOfVerts;
+    int numOfVert;
     char * fileName;
+    float boundRad;
+    float modelSize; 
 
     GLuint vPosition;
     GLuint vColor;
@@ -33,9 +35,12 @@ private:
     
 public:
 
-    Shape() {
-
+    Shape(int id, int numOfVert, char * fileName, float boundRad, float modelSize) {
+        this->id = id;
+        this->numOfVert = numOfVert;
+        this->fileName = fileName;
+        this->boundRad = boundRad;
+        this->modelSize = modelSize;
     }
     
-
 }
