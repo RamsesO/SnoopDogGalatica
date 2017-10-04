@@ -6,6 +6,13 @@
     10/2/2017
 */
 
+# ifndef __INCLUDES465__
+# include "../includes465/include465.hpp"
+# define __INCLUDES465__
+# endif
+
+# define __SUN__
+
 class Sun: public Shape {
 
 public:
