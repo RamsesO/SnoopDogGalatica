@@ -48,5 +48,13 @@ public:
         radians = glm::radians(1.0f);
     }
 
-    
+    glm::mat4 getModelMatrix() {
+        //center rotation
+        return (translationMatrix * rotationMatrix * scaleMatrix);
+    }
+
+    void update() {
+        rotationMatrix = glm::rotate(rotationMatrix, radians, rotationAxis);
+    }
+
 }
