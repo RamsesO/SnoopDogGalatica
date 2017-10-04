@@ -27,10 +27,10 @@ private:
     GLuint vColor;
     GLuint vNormal;
 
-	glm::mat4 rotationMatrix;
-	glm::mat4 scaleMatrix;
+    glm::mat4 scaleMatrix;
 	glm::mat4 translationMatrix;
-	glm::vec3 rotationAxis;
+    glm::vec3 rotationAxis;
+	glm::mat4 rotationMatrix;    
     float radians;
     
 public:
@@ -41,6 +41,12 @@ public:
         this->fileName = fileName;
         this->boundRad = boundRad;
         this->modelSize = modelSize;
+
+        scaleMatrix = glm::scale(glm::mat4(), glm::vec3(modelSize * 1.0f / boundRad));
+        translationMatrix = glm::translate(glm::mat4(), glm::vec3(1));
+        rotationAxis = glm::vec3(1);
+        radians = glm::radians(1.0f);
     }
+
     
 }
