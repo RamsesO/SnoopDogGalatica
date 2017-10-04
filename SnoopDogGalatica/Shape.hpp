@@ -14,8 +14,8 @@
 # define __SHAPE__
 
 class Shape {
-
-protected:
+    
+public:
 
     int id;
     int numOfVert;
@@ -31,8 +31,6 @@ protected:
     glm::vec3 rotationAxis;
 	glm::mat4 rotationMatrix;    
     float radians;
-    
-public:
 
     Shape(int id, int numOfVert, char * fileName, float size) {
         this->id = id;
