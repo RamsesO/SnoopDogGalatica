@@ -13,9 +13,12 @@
 
 # define __SUN__
 
-class Sun: public Shape {
+class Sun : public Shape {
 
 public:
+
+	using Shape::Shape;
+
     glm::mat4 getModelMatrix() {
         return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
     }
@@ -24,4 +27,4 @@ public:
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
     }
 
-}
+};

@@ -21,6 +21,7 @@ public:
     int numOfVert;
     char * fileName;
     float size;
+	float modelSize;
 
     GLuint vPosition;
     GLuint vColor;
@@ -32,12 +33,15 @@ public:
 	glm::mat4 rotationMatrix;    
     float radians;
 
+	Shape() {
+
+	}
+
     Shape(int id, int numOfVert, char * fileName, float size) {
         this->id = id;
         this->numOfVert = numOfVert;
         this->fileName = fileName;
-        this->boundRad = boundRad;
-        this->modelSize = modelSize;
+        this->size = size;
 
         translationMatrix = glm::translate(glm::mat4(), glm::vec3(0));
         rotationAxis = glm::vec3(0);
@@ -48,8 +52,7 @@ public:
         this->id = id;
         this->numOfVert = numOfVert;
         this->fileName = fileName;
-        this->boundRad = boundRad;
-        this->modelSize = modelSize;
+        this->size = size;
 
         this->translationMatrix = glm::translate(glm::mat4(), translationMatrix);
         this->rotationAxis = rotationAxis;
@@ -57,11 +60,12 @@ public:
     }
 
     void setScaleMatrix(float modelSize) {
-        scaleMatrix = glm::scale(glm::mat4(), glm::vec3(size * 1.0f / modelSize));
+		this->modelSize = modelSize;
+        this->scaleMatrix = glm::scale(glm::mat4(), glm::vec3(size * 1.0f / modelSize));
     }
 
     glm::mat4 getModelMatrix() {
         return (translationMatrix * scaleMatrix);
     }
 
-}
+};
