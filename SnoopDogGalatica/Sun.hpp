@@ -1,5 +1,5 @@
 /*
-    Sun.hpp (non-rotating planet)
+    Sun.hpp (non-orbiting planet)
 
     Lemuel Dizon
     Ramses Ordonez

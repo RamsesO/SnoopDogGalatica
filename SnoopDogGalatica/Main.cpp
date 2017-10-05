@@ -9,10 +9,14 @@
 # include "../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Sun.hpp"
+# include "Planet.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
 const int nModels = 7;
-Sun * ruber = new Sun(0, 1740 * 3, "./assets/Ruber.tri", 2000.0f, glm::vec3(0), glm::vec3(0, 1, 0), 1.0f);
+Sun * ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0), 
+	glm::vec3(0, 1, 0), 1.0f);
+Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0), 
+	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.004f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
 //const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
@@ -60,8 +64,14 @@ void display(void) {
 	modelMatrix = ruber->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[0]);
+	glBindVertexArray(VAO[ruber->id]);
 	glDrawArrays(GL_TRIANGLES, 0, ruber->numOfVert);
+
+	modelMatrix = unum->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[unum->id]);
+	glDrawArrays(GL_TRIANGLES, 0, unum->numOfVert);
 
 	glutSwapBuffers();
 	frameCount++;
@@ -84,9 +94,13 @@ void init(void) {
 	glGenVertexArrays(nModels, VAO);
 	glGenBuffers(nModels, buffer);
 
-	float modelSize = loadModelBuffer(ruber->fileName, ruber->numOfVert, VAO[0], buffer[0], shaderProgram, 
+	float modelSize = loadModelBuffer(ruber->fileName, ruber->numOfVert, VAO[ruber->id], buffer[ruber->id], shaderProgram,
 		ruber->vPosition, ruber->vColor, ruber->vNormal, "vPosition", "vColor", "vNormal");
 	ruber->setScaleMatrix(modelSize);
+
+	modelSize = loadModelBuffer(unum->fileName, unum->numOfVert, VAO[unum->id], buffer[unum->id], shaderProgram,
+		unum->vPosition, unum->vColor, unum->vNormal,"vPosition", "vColor", "vNormal");
+	unum->setScaleMatrix(modelSize);
 
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
@@ -115,13 +129,14 @@ void reshape(int width, int height) {
 void update(int i) {
 	glutTimerFunc(timerDelay, update, 1);
 	ruber->update();
+	unum->update();
 }
 
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 033: case 'q':  case 'Q': exit(EXIT_SUCCESS); break;
 	case 'f': case 'F':  // front view
-		eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
+		eye = glm::vec3(0.0f, 10000.0f, 10000.0f);   // eye is 2000 "out of screen" from origin
 		at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
 		up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
 		strcpy(viewStr, " Front View,"); break;
