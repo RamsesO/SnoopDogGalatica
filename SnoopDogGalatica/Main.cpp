@@ -24,6 +24,8 @@ Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(200
 	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, 1, 0), 0.05f, glm::vec3(0, 0, 1), 0.4f);
 Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
 	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
+Shape * warbird = new Shape(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
+	glm::vec3(0, 1, 0), 1.0f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
 //const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
@@ -98,6 +100,12 @@ void display(void) {
 	glBindVertexArray(VAO[secundus->id]);
 	glDrawArrays(GL_TRIANGLES, 0, secundus->numOfVert);
 
+	modelMatrix = warbird->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[warbird->id]);
+	glDrawArrays(GL_TRIANGLES, 0, warbird->numOfVert);
+
 	glutSwapBuffers();
 	frameCount++;
 
@@ -138,6 +146,10 @@ void init(void) {
 	modelSize = loadModelBuffer(secundus->fileName, secundus->numOfVert, VAO[secundus->id], buffer[secundus->id], shaderProgram,
 		secundus->vPosition, secundus->vColor, secundus->vNormal, "vPosition", "vColor", "vNormal");
 	secundus->setScaleMatrix(modelSize);
+
+	modelSize = loadModelBuffer(warbird->fileName, warbird->numOfVert, VAO[warbird->id], buffer[warbird->id], shaderProgram,
+		warbird->vPosition, warbird->vColor, warbird->vNormal, "vPosition", "vColor", "vNormal");
+	warbird->setScaleMatrix(modelSize);
 
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
@@ -184,9 +196,9 @@ void keyboard(unsigned char key, int x, int y) {
 		strcpy(viewStr, " Front View,"); 
 		break;
 	case 't': case 'T':  // top view
-		eye = glm::vec3(0.0f, 20000.0f, 0.0f);   // eye is 3000 up from origin
-		at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin  
-		up = glm::vec3(0.0f, 0.0f, -1.0f);   // camera's up is looking towards -Z vector
+		eye = glm::vec3(0.0f, 20000.0f, 0.0f);   
+		at = glm::vec3(0.0f, 0.0f, 0.0f);   
+		up = glm::vec3(0.0f, 0.0f, -1.0f);   
 		strcpy(viewStr, " Top View,"); 
 		break;
 	}
