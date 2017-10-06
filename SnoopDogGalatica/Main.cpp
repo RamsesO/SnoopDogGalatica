@@ -22,6 +22,8 @@ Planet * duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000
 	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.002f, glm::vec3(0, 0, 1), -0.3f);
 Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(2000, 0, 0),
 	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, 1, 0), 0.05f, glm::vec3(0, 0, 1), 0.4f);
+Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
+	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
 //const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
@@ -90,6 +92,12 @@ void display(void) {
 	glBindVertexArray(VAO[primus->id]);
 	glDrawArrays(GL_TRIANGLES, 0, primus->numOfVert);
 
+	modelMatrix = secundus->getModelMatrix(duo->getPlanetMatrix());
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[secundus->id]);
+	glDrawArrays(GL_TRIANGLES, 0, secundus->numOfVert);
+
 	glutSwapBuffers();
 	frameCount++;
 
@@ -127,6 +135,10 @@ void init(void) {
 		primus->vPosition, primus->vColor, primus->vNormal, "vPosition", "vColor", "vNormal");
 	primus->setScaleMatrix(modelSize);
 
+	modelSize = loadModelBuffer(secundus->fileName, secundus->numOfVert, VAO[secundus->id], buffer[secundus->id], shaderProgram,
+		secundus->vPosition, secundus->vColor, secundus->vNormal, "vPosition", "vColor", "vNormal");
+	secundus->setScaleMatrix(modelSize);
+
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
 	eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 1000 "out of screen" from origin
@@ -157,6 +169,7 @@ void update(int i) {
 	unum->update();
 	duo->update();
 	primus->update();
+	secundus->update();
 }
 
 void keyboard(unsigned char key, int x, int y) {
