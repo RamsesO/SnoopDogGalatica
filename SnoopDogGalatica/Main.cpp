@@ -20,8 +20,8 @@ Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(400
 	glm::vec3(0, 1, 0), 9.0f, glm::vec3(0, 1, 0), 0.004f, glm::vec3(0, 0, 1), 0.5f);
 Planet * duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000, 0, 0),
 	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.002f, glm::vec3(0, 0, 1), -0.3f);
-Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(9000, 0, 0),
-	glm::vec3(0, 1, 0), 8.0f, glm::vec3(0, 1, 0), 0.002f, glm::vec3(0, 0, 1), 0.4f, glm::vec3(2000, 0, 0));
+Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(2000, 0, 0),
+	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, 1, 0), 0.05f, glm::vec3(0, 0, 1), 0.4f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
 //const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
@@ -84,7 +84,7 @@ void display(void) {
 	glBindVertexArray(VAO[duo->id]);
 	glDrawArrays(GL_TRIANGLES, 0, duo->numOfVert);
 
-	modelMatrix = primus->getModelMatrix();
+	modelMatrix = primus->getModelMatrix(duo->getPlanetMatrix());
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
 	glBindVertexArray(VAO[primus->id]);
@@ -165,7 +165,7 @@ void keyboard(unsigned char key, int x, int y) {
 		exit(EXIT_SUCCESS); 
 		break;
 	case 'f': case 'F':  // front view
-		eye = glm::vec3(0.0f, 10000.0f, 10000.0f);   // eye is 2000 "out of screen" from origin
+		eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
 		at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
 		up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
 		strcpy(viewStr, " Front View,"); 

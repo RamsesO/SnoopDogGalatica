@@ -38,6 +38,10 @@ public:
 			this->axialTilt * this->rotationMatrix * this->scaleMatrix);
 	}
 
+	glm::mat4 getPlanetMatrix() {
+		return (this->orbitalMatrix * this->translationMatrix * glm::inverse(this->orbitalMatrix));
+	}
+
 	void update() {
 		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
 		this->orbitalMatrix = glm::rotate(this->orbitalMatrix, this->orbitalRadians, this->orbitalAxis);
