@@ -16,7 +16,7 @@ const int nModels = 7;
 Sun * ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0), 
 	glm::vec3(0, 1, 0), 1.0f);
 Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0), 
-	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.004f);
+	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.004f, glm::vec3(0, 0, 1), 0.5f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
 //const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
