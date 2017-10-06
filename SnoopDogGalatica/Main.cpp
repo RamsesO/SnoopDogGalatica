@@ -16,7 +16,9 @@ const int nModels = 7;
 Sun * ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0), 
 	glm::vec3(0, 1, 0), 1.0f);
 Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0), 
-	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.004f, glm::vec3(0, 0, 1), 0.5f);
+	glm::vec3(0, 1, 0), 9.0f, glm::vec3(0, 1, 0), 0.004f, glm::vec3(0, 0, 1), 0.5f);
+Planet * duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000, 0, 0),
+	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.002f, glm::vec3(0, 0, 1), -0.3f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
 //const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
@@ -73,6 +75,12 @@ void display(void) {
 	glBindVertexArray(VAO[unum->id]);
 	glDrawArrays(GL_TRIANGLES, 0, unum->numOfVert);
 
+	modelMatrix = duo->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[duo->id]);
+	glDrawArrays(GL_TRIANGLES, 0, duo->numOfVert);
+
 	glutSwapBuffers();
 	frameCount++;
 
@@ -102,6 +110,10 @@ void init(void) {
 		unum->vPosition, unum->vColor, unum->vNormal,"vPosition", "vColor", "vNormal");
 	unum->setScaleMatrix(modelSize);
 
+	modelSize = loadModelBuffer(duo->fileName, duo->numOfVert, VAO[duo->id], buffer[duo->id], shaderProgram,
+		duo->vPosition, duo->vColor, duo->vNormal, "vPosition", "vColor", "vNormal");
+	duo->setScaleMatrix(modelSize);
+
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
 	eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 1000 "out of screen" from origin
@@ -130,6 +142,7 @@ void update(int i) {
 	glutTimerFunc(timerDelay, update, 1);
 	ruber->update();
 	unum->update();
+	duo->update();
 }
 
 void keyboard(unsigned char key, int x, int y) {
