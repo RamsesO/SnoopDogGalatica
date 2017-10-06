@@ -21,6 +21,7 @@ public:
 	glm::vec3 orbitalAxis;
 	float orbitalRadians;
 	glm::mat4 orbitalMatrix;
+
 	glm::mat4 axialTilt;
 
 	Planet(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians, 
