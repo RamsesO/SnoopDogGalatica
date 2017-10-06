@@ -26,13 +26,15 @@ Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3
 	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
 Sun * warbird = new Sun(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
+Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
+	glm::vec3(0, 1, 0), 1.0f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
 //const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
 
 
 //Title Information
-char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w): ";
+char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
 char viewStr[15] = " Front View,";
 char fpsStr[15];
 char titleStr[150];
@@ -106,6 +108,12 @@ void display(void) {
 	glBindVertexArray(VAO[warbird->id]);
 	glDrawArrays(GL_TRIANGLES, 0, warbird->numOfVert);
 
+	modelMatrix = missle->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[missle->id]);
+	glDrawArrays(GL_TRIANGLES, 0, missle->numOfVert);
+
 	glutSwapBuffers();
 	frameCount++;
 
@@ -151,6 +159,10 @@ void init(void) {
 		warbird->vPosition, warbird->vColor, warbird->vNormal, "vPosition", "vColor", "vNormal");
 	warbird->setScaleMatrix(modelSize);
 
+	modelSize = loadModelBuffer(missle->fileName, missle->numOfVert, VAO[missle->id], buffer[missle->id], shaderProgram,
+		missle->vPosition, missle->vColor, missle->vNormal, "vPosition", "vColor", "vNormal");
+	missle->setScaleMatrix(modelSize);
+
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
 	eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 1000 "out of screen" from origin
@@ -183,6 +195,7 @@ void update(int i) {
 	primus->update();
 	secundus->update();
 	warbird->update();
+	missle->update();
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -203,10 +216,16 @@ void keyboard(unsigned char key, int x, int y) {
 			strcpy(viewStr, " Top View,"); 
 			break;
 		case 'w': case 'W':  // warbird view
-			eye = glm::vec3(15000.0f, 500.0f, 500.0f);
+			eye = glm::vec3(15000.0f, 250.0f, 250.0f);
 			at = glm::vec3(15000.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
 			strcpy(viewStr, " WarBird View,");
+			break;
+		case 'm': case 'M':  // missle view
+			eye = glm::vec3(14500.0f, 250.0f, 250.0f);
+			at = glm::vec3(14500.0f, 0.0f, 0.0f);
+			up = glm::vec3(0.0f, 1.0f, 0.0f);
+			strcpy(viewStr, " Missle View,");
 			break;
 	}
 	viewMatrix = glm::lookAt(eye, at, up);
