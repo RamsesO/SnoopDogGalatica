@@ -24,7 +24,7 @@ Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(200
 	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, 1, 0), 0.05f, glm::vec3(0, 0, 1), 0.4f);
 Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
 	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
-Shape * warbird = new Shape(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
+Sun * warbird = new Sun(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
@@ -32,10 +32,10 @@ Shape * warbird = new Shape(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3
 
 
 //Title Information
-char baseStr[50] = "Snoop Dogg Galatica: ";
-char viewStr[15] = "front view";
+char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w): ";
+char viewStr[15] = " Front View,";
 char fpsStr[15];
-char titleStr[100];
+char titleStr[150];
 
 char * vertexShaderFile = "simpleVertex.glsl";
 char * fragmentShaderFile = "simpleFragment.glsl";
@@ -182,25 +182,32 @@ void update(int i) {
 	duo->update();
 	primus->update();
 	secundus->update();
+	warbird->update();
 }
 
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-	case 033: case 'q':  case 'Q': 
-		exit(EXIT_SUCCESS); 
-		break;
-	case 'f': case 'F':  // front view
-		eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
-		at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
-		up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
-		strcpy(viewStr, " Front View,"); 
-		break;
-	case 't': case 'T':  // top view
-		eye = glm::vec3(0.0f, 20000.0f, 0.0f);   
-		at = glm::vec3(0.0f, 0.0f, 0.0f);   
-		up = glm::vec3(0.0f, 0.0f, -1.0f);   
-		strcpy(viewStr, " Top View,"); 
-		break;
+		case 033: case 'q':  case 'Q': 
+			exit(EXIT_SUCCESS); 
+			break;
+		case 'f': case 'F':  // front view
+			eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
+			at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
+			up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
+			strcpy(viewStr, " Front View,"); 
+			break;
+		case 't': case 'T':  // top view
+			eye = glm::vec3(0.0f, 20000.0f, 0.0f);   
+			at = glm::vec3(0.0f, 0.0f, 0.0f);   
+			up = glm::vec3(0.0f, 0.0f, -1.0f);   
+			strcpy(viewStr, " Top View,"); 
+			break;
+		case 'w': case 'W':  // warbird view
+			eye = glm::vec3(15000.0f, 500.0f, 500.0f);
+			at = glm::vec3(15000.0f, 0.0f, 0.0f);
+			up = glm::vec3(0.0f, 1.0f, 0.0f);
+			strcpy(viewStr, " WarBird View,");
+			break;
 	}
 	viewMatrix = glm::lookAt(eye, at, up);
 	updateTitle();
