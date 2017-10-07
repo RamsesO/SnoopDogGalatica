@@ -199,10 +199,23 @@ void update(int i) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
+	glm::mat4 duoModelMatrix = duo->getModelMatrix();
+	const float * duoPos = (const float*)glm::value_ptr(duoModelMatrix);
+
+	glm::mat4 unumModelMatrix = unum->getModelMatrix();
+	const float * unumPos = (const float*)glm::value_ptr(unumModelMatrix);
+
 	switch (key) {
 		case 033: case 'q':  case 'Q': 
 			exit(EXIT_SUCCESS); 
 			break;
+		case 'd': case 'D': // duo view 
+
+			eye = glm::vec3(-4000.0f, 0.0f, -4000.0f);
+	      	at = glm::vec3(duoPos[12], duoPos[13], duoPos[14]);
+	        up = glm::vec3(0.0f, 1.0f, 0.0f);
+	        strcpy(viewStr, "Duo view"); 
+	        break;	
 		case 'f': case 'F':  // front view
 			eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
@@ -226,6 +239,12 @@ void keyboard(unsigned char key, int x, int y) {
 			at = glm::vec3(14500.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
 			strcpy(viewStr, " Missle View,");
+			break;
+		case 'u': case 'U': // unum view
+			eye = glm::vec3(-4000.0f, 0.0, -4000.0f);
+			at = glm::vec3(unumPos[12], unumPos[13], unumPos[14]);
+			up = glm::vec3(0.0f, 1.0f, 0.0f);
+			strcpy(viewStr, "Unum view"); 
 			break;
 	}
 	viewMatrix = glm::lookAt(eye, at, up);
