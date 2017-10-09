@@ -223,6 +223,10 @@ void keyboard(unsigned char key, int x, int y) {
 
 	if(key == 'v' || key == 'V'){
 		currCam++;
+		if(currCam == 6){
+			currCam = 0;
+		}
+
 	}
 	else if(key == 'x' || key == 'X'){
 		if (currCam == 0) {
