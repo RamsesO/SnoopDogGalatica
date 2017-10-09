@@ -65,6 +65,7 @@ double timeInterval;
 
 //special camera modes
 int flag = 0;
+int currCam = 20; //arbritary value 
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -219,52 +220,57 @@ void update(int i) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
-	switch (key) {
-		case 033: case 'q':  case 'Q': 
-			exit(EXIT_SUCCESS); 
-			break;
-		case 'f': case 'F':  // front view
+
+	if(key == 'v' || key == 'V'){
+		currCam++;
+	}
+	else if(key == 'x' || key == 'X'){
+		currCam--;
+	}
+	else if(key == 033 || key == 'q' || key == 'Q'){
+		exit(EXIT_SUCCESS);
+	}
+
+	switch (currCam % 6) {
+		case 0:  // front view
 			flag = 0;
 			eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
 			up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
 			strcpy(viewStr, " Front View,"); 
-			viewMatrix = glm::lookAt(eye, at, up);
 			break;
-		case 't': case 'T':  // top view
+		case 1:  // top view
 			flag = 0;
 			eye = glm::vec3(0.0f, 20000.0f, 0.0f);   
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   
 			up = glm::vec3(0.0f, 0.0f, -1.0f);   
 			strcpy(viewStr, " Top View,"); 
-			viewMatrix = glm::lookAt(eye, at, up);
 			break;
-		case 'w': case 'W':  // warbird view
+		case 2:  // warbird view
 			flag = 0;
 			eye = glm::vec3(15000.0f, 250.0f, 250.0f);
 			at = glm::vec3(15000.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
 			strcpy(viewStr, " WarBird View,");
-			viewMatrix = glm::lookAt(eye, at, up);
 			break;
-		case 'm': case 'M':  // missle view
+		case 3:  // missle view
 			flag = 0;
 			eye = glm::vec3(14500.0f, 250.0f, 250.0f);
 			at = glm::vec3(14500.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
 			strcpy(viewStr, " Missle View,");
-			viewMatrix = glm::lookAt(eye, at, up);
 			break;
-		case 'u': case 'U': // unum view
+		case 4: // unum view
 			flag = 1;
 			strcpy(viewStr, " Unum view,"); 
 			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
 			break;
-		case 'd': case 'D': // duo view 
+		case 5: // duo view 
 			flag = 2;
 			strcpy(viewStr, " Duo View,");
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
-			break;
+			break;	
+
 	}
 	updateTitle();
 }
