@@ -12,6 +12,7 @@
 # include "Planet.hpp"
 # include "Moon.hpp"
 # include "PlanetCam.hpp"
+# include "WarBird.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
 const int nModels = 7;
@@ -25,8 +26,8 @@ Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(200
 	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, 1, 0), 0.05f, glm::vec3(0, 0, 1), 0.4f);
 Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
 	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
-Sun * warbird = new Sun(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
-	glm::vec3(0, 1, 0), 1.0f);
+WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
+	glm::vec3(0, 1, 0), 0.0f);
 Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
@@ -67,6 +68,11 @@ int currCam = 0;
 double currentTime;
 double lastTime;
 double timeInterval;
+
+
+//ship variables
+bool gravity = false;
+int shipSpeed = 10;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -219,24 +225,59 @@ void update(int i) {
 	}
 }
 
+void arrowInput(int key, int x, int y){
+	switch(key){
+		case GLUT_KEY_UP: //positive step on "at" vector
+
+			break;
+		case GLUT_KEY_DOWN: //negative step on "at" vector
+
+			break;
+		case GLUT_KEY_LEFT: //rotate -0.02 radians on "up" vector
+			warbird->rotateThrusterNegative();
+			break;
+		case GLUT_KEY_RIGHT: //rotate +0.02 radians on "up" vector
+			warbird->rotateThrusterPositive();
+			break;
+	}
+}
 void keyboard(unsigned char key, int x, int y) {
 
-	if(key == 'v' || key == 'V'){
-		currCam++;
-		if(currCam == 6){
-			currCam = 0;
-		}
+	switch(key){
+		case 'w': case 'W': // warp ship
 
+			break;
+		case 'f': case 'F': // fire missile
+
+			break;
+		case 'g': case 'G': // toggle gravity
+			gravity = !gravity;
+			break;
+		case 't': case 'T': // next TQ value
+
+			break;
+		case 's': case 'S': // next ship speed
+			if(shipSpeed == 10)
+				shipSpeed = 50;
+			else if(shipSpeed == 50)
+				shipSpeed = 200;
+			else if(shipSpeed == 200)
+				shipSpeed = 10;
+			break;
+		case 'v': case 'V': // next camera
+			currCam++;
+			if(currCam == 6)
+				currCam = 0;
+			break;
+		case 'x': case 'X':// prev camera
+			currCam--;
+			if(currCam == -1)
+				currCam = 5;
+			break;
+		case 033: case 'q': case 'Q':
+			exit(EXIT_SUCCESS);
 	}
-	else if(key == 'x' || key == 'X'){
-		currCam--;
-		if(currCam == -1){
-			currCam = 5;
-		}
-	}
-	else if(key == 033 || key == 'q' || key == 'Q'){
-		exit(EXIT_SUCCESS);
-	}
+
 
 	switch (currCam % 6) {
 		case 0:  // front view
@@ -326,6 +367,7 @@ int main(int argc, char* argv[]) {
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(arrowInput);
 	glutTimerFunc(timerDelay, update, 1);  // keep the window up
 	glutIdleFunc(display);
 	glutMainLoop();
