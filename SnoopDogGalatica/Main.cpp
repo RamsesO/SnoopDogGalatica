@@ -5,8 +5,8 @@
 	Ordonez, Ramses
 */
 
-# define __Windows__ // define your target operating system
-# include "../includes465/include465.hpp"
+# define __Mac__ // define your target operating system
+# include "../../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Sun.hpp"
 # include "Planet.hpp"
@@ -22,25 +22,27 @@ Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(400
 Planet * duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000, 0, 0),
 	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.002f, glm::vec3(0, 0, 1), -0.3f);
 Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(2000, 0, 0),
-	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), 0.4f);
+	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, 1, 0), 0.05f, glm::vec3(0, 0, 1), 0.4f);
 Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
-	glm::vec3(0, 1, 0), 6.0f, glm::vec3(0, 1, 0), 0.012f, glm::vec3(0, 0, 1), -0.5f);
+	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
 Sun * warbird = new Sun(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
 Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
+//char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
+//	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
+//const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
 PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.002f);
 
 //Title Information
-char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m, u, d)";
+char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
 char viewStr[15] = " Front View,";
 char fpsStr[15];
 char titleStr[150];
 
-//Shaders
 char * vertexShaderFile = "simpleVertex.glsl";
 char * fragmentShaderFile = "simpleFragment.glsl";
 GLuint shaderProgram;
@@ -59,13 +61,12 @@ GLfloat aspectRatio;
 int timerDelay = 40; // 40 millisecond delay approximates 35 fps
 int frameCount = 0;
 
+int flag = 0;
+int currCam = 0;
+
 double currentTime;
 double lastTime;
 double timeInterval;
-
-//special camera modes
-int flag = 0;
-int currCam = 0; //arbritary value 
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -132,7 +133,6 @@ void display(void) {
 		frameCount = 0;
 		updateTitle();
 	}
-
 }
 
 void init(void) {
@@ -206,7 +206,7 @@ void update(int i) {
 	unumCam->update();
 	duoCam->update();
 
-	//camera updates
+		//camera updates
 	switch (flag) {
 		case 1:
 			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
@@ -283,18 +283,33 @@ void keyboard(unsigned char key, int x, int y) {
 			break;	
 
 	}
+
 	updateTitle();
 }
 
 int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
+	// glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	// glutInitWindowSize(800, 600);
+	// // Uncomment the following line to force OpenGL & GLSL 3.3
+	// // glutInitContextVersion(3, 3);
+	// glutInitContextProfile(GLUT_CORE_PROFILE);
+	// glutCreateWindow("Starter source file for 465L");
+	// // initialize and verify glew
+	# ifdef __Mac__
+	// Can't change the version in the GLUT_3_2_CORE_PROFILE
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_3_2_CORE_PROFILE);
+# endif
+# ifndef __Mac__
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(800, 600);
-	// Uncomment the following line to force OpenGL & GLSL 3.3
-	// glutInitContextVersion(3, 3);
+# endif
+  glutInitWindowSize(800, 600);
+	// set OpenGL and GLSL versions to 3.3 for Comp 465/L, comment to see highest versions
+# ifndef __Mac__
+	glutInitContextVersion(3, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
-	glutCreateWindow("Starter source file for 465L");
-	// initialize and verify glew
+# endif
+  glutCreateWindow("lit solar system");
 	glewExperimental = GL_TRUE;  // needed my home system 
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
