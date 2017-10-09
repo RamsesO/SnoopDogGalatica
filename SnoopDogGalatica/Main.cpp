@@ -35,7 +35,7 @@ PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(
 PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.002f);
 
 //Title Information
-char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m, u, d)";
+char baseStr[75] = "Snoop Dogg Galatica (keys: x, v)";
 char viewStr[15] = " Front View,";
 char fpsStr[15];
 char titleStr[150];
@@ -65,7 +65,7 @@ double timeInterval;
 
 //special camera modes
 int flag = 0;
-int currCam = 20; //arbritary value 
+int currCam = 0; //arbritary value 
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -225,7 +225,12 @@ void keyboard(unsigned char key, int x, int y) {
 		currCam++;
 	}
 	else if(key == 'x' || key == 'X'){
-		currCam--;
+		if (currCam == 0) {
+			currCam = 5;
+		}
+		else {
+			currCam--;
+		}
 	}
 	else if(key == 033 || key == 'q' || key == 'Q'){
 		exit(EXIT_SUCCESS);
@@ -238,6 +243,7 @@ void keyboard(unsigned char key, int x, int y) {
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
 			up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
 			strcpy(viewStr, " Front View,"); 
+			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 1:  // top view
 			flag = 0;
@@ -245,6 +251,7 @@ void keyboard(unsigned char key, int x, int y) {
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   
 			up = glm::vec3(0.0f, 0.0f, -1.0f);   
 			strcpy(viewStr, " Top View,"); 
+			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 2:  // warbird view
 			flag = 0;
@@ -252,6 +259,7 @@ void keyboard(unsigned char key, int x, int y) {
 			at = glm::vec3(15000.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
 			strcpy(viewStr, " WarBird View,");
+			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 3:  // missle view
 			flag = 0;
@@ -259,6 +267,7 @@ void keyboard(unsigned char key, int x, int y) {
 			at = glm::vec3(14500.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
 			strcpy(viewStr, " Missle View,");
+			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 4: // unum view
 			flag = 1;
@@ -270,7 +279,6 @@ void keyboard(unsigned char key, int x, int y) {
 			strcpy(viewStr, " Duo View,");
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
 			break;	
-
 	}
 	updateTitle();
 }
