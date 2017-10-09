@@ -28,13 +28,9 @@ Sun * warbird = new Sun(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(150
 	glm::vec3(0, 1, 0), 1.0f);
 Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
-//char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
-//	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
-//const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
-
 
 //Title Information
-char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
+char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m, u, d)";
 char viewStr[15] = " Front View,";
 char fpsStr[15];
 char titleStr[150];
@@ -60,6 +56,13 @@ int frameCount = 0;
 double currentTime;
 double lastTime;
 double timeInterval;
+
+//special camera modes
+int flag = 0;
+glm::mat4 unumModelMatrix;
+float * unumPos;
+glm::mat4 duoModelMatrix;
+float * duoPos;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -126,6 +129,7 @@ void display(void) {
 		frameCount = 0;
 		updateTitle();
 	}
+
 }
 
 void init(void) {
@@ -196,55 +200,86 @@ void update(int i) {
 	secundus->update();
 	warbird->update();
 	missle->update();
+
+	//camera updates
+	switch (flag) {
+		case 1:
+			unumModelMatrix = unum->getModelMatrix();
+			unumPos = (float*)glm::value_ptr(unumModelMatrix);
+
+			eye = glm::vec3(unumPos[12]-4000.0f, 0.0f, unumPos[14]-4000.0f);
+			at = glm::vec3(unumPos[12], unumPos[13], unumPos[14]);
+			up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+			viewMatrix = glm::lookAt(eye, at, up);
+			break;
+		case 2:
+			duoModelMatrix = duo->getModelMatrix();
+			duoPos = (float*)glm::value_ptr(duoModelMatrix);
+
+			eye = glm::vec3(duoPos[12]-4000.0f, 0.0f, duoPos[14]-4000.0f);
+			at = glm::vec3(duoPos[12], duoPos[13], duoPos[14]);
+			up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+			viewMatrix = glm::lookAt(eye, at, up);
+			break;
+		default:
+			break;
+	}
 }
 
 void keyboard(unsigned char key, int x, int y) {
-	glm::mat4 duoModelMatrix = duo->getModelMatrix();
-	const float * duoPos = (const float*)glm::value_ptr(duoModelMatrix);
+	duoModelMatrix = duo->getModelMatrix();
+	duoPos = (float*)glm::value_ptr(duoModelMatrix);
 
-	glm::mat4 unumModelMatrix = unum->getModelMatrix();
-	const float * unumPos = (const float*)glm::value_ptr(unumModelMatrix);
+	unumModelMatrix = unum->getModelMatrix();
+	unumPos = (float*)glm::value_ptr(unumModelMatrix);
 
 	switch (key) {
 		case 033: case 'q':  case 'Q': 
 			exit(EXIT_SUCCESS); 
 			break;
-		case 'd': case 'D': // duo view 
-
-			eye = glm::vec3(-4000.0f, 0.0f, -4000.0f);
-	      	at = glm::vec3(duoPos[12], duoPos[13], duoPos[14]);
-	        up = glm::vec3(0.0f, 1.0f, 0.0f);
-	        strcpy(viewStr, "Duo view"); 
-	        break;	
 		case 'f': case 'F':  // front view
+			flag = 0;
 			eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
 			up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
 			strcpy(viewStr, " Front View,"); 
 			break;
 		case 't': case 'T':  // top view
+			flag = 0;
 			eye = glm::vec3(0.0f, 20000.0f, 0.0f);   
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   
 			up = glm::vec3(0.0f, 0.0f, -1.0f);   
 			strcpy(viewStr, " Top View,"); 
 			break;
 		case 'w': case 'W':  // warbird view
+			flag = 0;
 			eye = glm::vec3(15000.0f, 250.0f, 250.0f);
 			at = glm::vec3(15000.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
 			strcpy(viewStr, " WarBird View,");
 			break;
 		case 'm': case 'M':  // missle view
+			flag = 0;
 			eye = glm::vec3(14500.0f, 250.0f, 250.0f);
 			at = glm::vec3(14500.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
 			strcpy(viewStr, " Missle View,");
 			break;
 		case 'u': case 'U': // unum view
-			eye = glm::vec3(-4000.0f, 0.0, -4000.0f);
+			flag = 1;
+			eye = glm::vec3(unumPos[12] - 4000.0f, 0.0f, unumPos[14] - 4000.0f);
 			at = glm::vec3(unumPos[12], unumPos[13], unumPos[14]);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
-			strcpy(viewStr, "Unum view"); 
+			strcpy(viewStr, " Unum view,"); 
+			break;
+		case 'd': case 'D': // duo view 
+			flag = 2;
+			eye = glm::vec3(duoPos[12] - 4000.0f, 0.0f, duoPos[14] - 4000.0f);
+			at = glm::vec3(duoPos[12], duoPos[13], duoPos[14]);
+			up = glm::vec3(0.0f, 1.0f, 0.0f);
+			strcpy(viewStr, " Duo View,");
 			break;
 	}
 	viewMatrix = glm::lookAt(eye, at, up);
