@@ -62,8 +62,34 @@
 
 ## Phase #1
 
-### To Do
-
 * Have planets and moons orbiting Ruber
 * Have the Front, Top, Unum and Duo cameras
 * You should have warbird and 1 missle at (4900, 1000, 4850)
+
+## Phase #2
+
+* Missle Sites
+    * Model for missle sites should be created
+    * Missle sites should be located at the top (highest Y value) of the planet
+    * Missle sites should have a bounding radius of about 30
+
+* Cameras
+    * Warbird's camera should move with the ship
+    * Shows the ship from behind
+
+* Ship Movement
+    * Ship can move frontward and backward
+    * Ship has 3 speeds that can be toggled with key s
+        * 10
+        * 50
+        * 200
+    * Ship has 3 rotation thrusters with rotation speed 0.02f 
+        * at
+        * up
+        * right
+    * Ship can also warp to planets to one of the 2 planetary cameras
+        * unum
+        * duo
+
+* Missle Movement
+
