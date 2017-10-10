@@ -92,4 +92,10 @@
         * duo
 
 * Missle Movement
+    * Should have a radius of 25
+    * Ship has 9 missles
+        * Fired by the f key
+    * Missle site has 5 missles
+        * Missles fire in the direction of the rotation
+    * Missle's tracking system does not activate until 200 updates
 
