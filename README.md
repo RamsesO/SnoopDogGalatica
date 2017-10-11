@@ -44,16 +44,16 @@
     * Use "simpleVertex.glsl" and the "simpleFragment.glsl" shader programs
     * You will create your own shaders in Phase #3
 
-* Missles
-    * Ship has 9 missles
-    * Each missle defense site has 5 missles
-    * Missles must be contained in a bounding sphere radius of 25
+* Missiles
+    * Ship has 9 missiles
+    * Each missile defense site has 5 missiles
+    * Missiles must be contained in a bounding sphere radius of 25
     * Models can't be spherical
-    * Are homing missles and can track
+    * Are homing missiles and can track
 
 * Information Display
     * Must contain
-        * Missle Counts
+        * Missile Counts
         * Update rate (U/S)
         * Frame rate (F/S)
         * Current view (camera)
@@ -64,14 +64,14 @@
 
 * Have planets and moons orbiting Ruber
 * Have the Front, Top, Unum and Duo cameras
-* You should have warbird and 1 missle at (4900, 1000, 4850)
+* You should have warbird and 1 missile at (4900, 1000, 4850)
 
 ## Phase #2
 
-* Missle Sites
-    * Model for missle sites should be created
-    * Missle sites should be located at the top (highest Y value) of the planet
-    * Missle sites should have a bounding radius of about 30
+* Missile Sites
+    * Model for missile sites should be created
+    * Missile sites should be located at the top (highest Y value) of the planet
+    * Missile sites should have a bounding radius of about 30
 
 * Cameras
     * Warbird's camera should move with the ship
@@ -91,11 +91,15 @@
         * unum
         * duo
 
-* Missle Movement
+* Missile Movement
     * Should have a radius of 25
-    * Ship has 9 missles
+    * Ship has 9 missiles
         * Fired by the f key
-    * Missle site has 5 missles
-        * Missles fire in the direction of the rotation
-    * Missle's tracking system does not activate until 200 updates
-
+        * Cadet can't fire another missile until the current missile is detonated
+    * Missile site has 5 missiles
+        * Missiles fire in the direction of the rotation
+        * Missiles are fired when the ship is in the detection range
+    * Missile's tracking system does not activate until 200 updates
+    * All missiles that do not hit exit for 2000 update frames
+    * Missiles detonate on collision
+        * You do not have to simulate/visualize the explosion
