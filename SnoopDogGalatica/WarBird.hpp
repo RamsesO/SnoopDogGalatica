@@ -26,9 +26,18 @@ public:
     	this->doRotateThruster = false;
     }
 
-	
+	void moveForward(GLfloat step){
+        glm::vec3 newAt = glm::vec3(0.0f, 0.0f, -step);
+        this->translationMatrix = glm::translate(this->translationMatrix, newAt);
+    }
+
+    void moveBackward(GLfloat step){
+        glm::vec3 newAt = glm::vec3(0.0f, 0.0f, step);
+        this->translationMatrix = glm::translate(this->translationMatrix, newAt);
+    }
+
 	void rotateThruster(int rotate){
-		if(rotate != 0 || rotate != 1 || rotate != 2)
+		if(rotate > 2 || rotate < 0)
 			return;
 		doRotateThruster = rotate;
 	}

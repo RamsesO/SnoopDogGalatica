@@ -72,7 +72,7 @@ double timeInterval;
 
 //ship variables
 bool gravity = false;
-int shipSpeed = 10;
+GLfloat shipSpeed = 10;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -223,15 +223,16 @@ void update(int i) {
 		default:
 			break;
 	}
+
 }
 
 void arrowInput(int key, int x, int y){
 	switch(key){
 		case GLUT_KEY_UP: //positive step on "at" vector
-
+			warbird->moveForward(shipSpeed);
 			break;
 		case GLUT_KEY_DOWN: //negative step on "at" vector
-
+			warbird->moveBackward(shipSpeed);
 			break;
 		case GLUT_KEY_LEFT: //rotate -0.02 radians on "up" vector
 			warbird->rotateThruster(1);
