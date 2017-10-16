@@ -18,37 +18,42 @@ class WarBird : public Shape {
 
 public:
 
-	float rotateThruster;
-	bool doRotateThruster;
+	int doRotateThruster; //0 is dont rotate. 1 is rotate left. 2 is rotate right
 	glm::vec3 direction;
 
     WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians): Shape(id, numOfVert, fileName, size, translationMatrix, rotationAxis, radians) {
-    	this->rotateThruster = 0.0;
     	this->direction = glm::vec3(0);
     	this->doRotateThruster = false;
     }
 
 	
-	void rotateThrusterPositive(){
-		rotateThruster += 0.02;
-		doRotateThruster = true;
+	void rotateThruster(int rotate){
+		if(rotate != 0 || rotate != 1 || rotate != 2)
+			return;
+		doRotateThruster = rotate;
 	}
 
-	void rotateThrusterNegative(){
-		rotateThruster -= 0.02;
-		doRotateThruster = true;
-	}
 
 	glm::mat4 getModelMatrix() {
         return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
     }
 
     void update() {
-    	if(doRotateThruster){
-        	this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateThruster, this->rotationAxis);
-        	doRotateThruster = false;
+    	if(doRotateThruster == 1){
+    		this->radians -= 0.02;
+        	this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
+        	printf("%f \n", this->radians);
+        	doRotateThruster = 0;
     	}
-        this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
+    	else if(doRotateThruster == 2){
+    		this->radians += 0.02;
+    		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
+        	doRotateThruster = 0;
+        	printf("%f \n", this->radians);    	}
+    	else{
+    		this->radians = 0;
+        	this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
+    	}
     }
 
 };

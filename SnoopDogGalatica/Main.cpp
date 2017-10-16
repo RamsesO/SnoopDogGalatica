@@ -234,10 +234,10 @@ void arrowInput(int key, int x, int y){
 
 			break;
 		case GLUT_KEY_LEFT: //rotate -0.02 radians on "up" vector
-			warbird->rotateThrusterNegative();
+			warbird->rotateThruster(1);
 			break;
 		case GLUT_KEY_RIGHT: //rotate +0.02 radians on "up" vector
-			warbird->rotateThrusterPositive();
+			warbird->rotateThruster(2);
 			break;
 	}
 }
