@@ -103,6 +103,7 @@
     * All missiles that do not hit exit for 2000 update frames
     * Missiles detonate on collision
         * You do not have to simulate/visualize the explosion
+    * All missiles kill in one hit
 
 * Time Quantum
     * Should have a "stepped" update
@@ -117,3 +118,23 @@
         * "Cadet passes flight training"
     * If cadet resigns
         * "Cadet resigns from War College"
+
+### Controls
+Key(s) | Action    
+------ | ---------
+w      | warp ship
+f      | fire
+g      | gravity
+v      | next camera
+x      | previous camera
+t      | next TQ
+s      | next ship speed
+up     | forward
+down   | reverse
+left   | turn left
+right  | turn right
+ctrl up | turn up
+ctrl down | turn down
+ctrl left | barrel roll left
+ctrl right | barrel roll right
+ 
