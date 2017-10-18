@@ -103,3 +103,17 @@
     * All missiles that do not hit exit for 2000 update frames
     * Missiles detonate on collision
         * You do not have to simulate/visualize the explosion
+
+* Time Quantum
+    * Should have a "stepped" update
+    * The TQ (cadet type) should be  and have 4 values
+        * TQ very large (debug)
+        * TQ large (trainee)
+        * TQ average (pilot)
+        * TQ fast (ace)
+
+* Pass or resign
+    * Cadet passes flight training by destroying both missile sites
+        * "Cadet passes flight training"
+    * If cadet resigns
+        * "Cadet resigns from War College"
