@@ -13,6 +13,7 @@
 # include "Moon.hpp"
 # include "PlanetCam.hpp"
 # include "WarBird.hpp"
+# include "WarBirdCam.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
 const int nModels = 7;
@@ -37,6 +38,9 @@ Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
 PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.002f);
+
+//Warbird Camera
+WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(0,300,1000), glm::vec3(15000, 300, 0), 0.0f);
 
 //Title Information
 char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
@@ -72,7 +76,6 @@ double timeInterval;
 
 //ship variables
 bool gravity = false;
-GLfloat shipSpeed = 10;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -207,7 +210,7 @@ void update(int i) {
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update();
+	//warbird->update();
 	missle->update();
 	unumCam->update();
 	duoCam->update();
@@ -227,21 +230,37 @@ void update(int i) {
 }
 
 void arrowInput(int key, int x, int y){
+	int mod = glutGetModifiers();
+
+
 	switch(key){
 		case GLUT_KEY_UP: //positive step on "at" vector
-			warbird->moveForward(shipSpeed);
+			if (mod == GLUT_ACTIVE_SHIFT) 
+				warbird->pitchUp();
+			else
+				warbird->moveForward();
 			break;
 		case GLUT_KEY_DOWN: //negative step on "at" vector
-			warbird->moveBackward(shipSpeed);
+			if (mod == GLUT_ACTIVE_SHIFT) 
+					warbird->pitchDown();
+			else
+				warbird->moveBackward();
 			break;
-		case GLUT_KEY_LEFT: //rotate -0.02 radians on "up" vector
-			warbird->rotateThruster(1);
+		case GLUT_KEY_LEFT: //yaw +0.02 radians on "up" vector
+			if (mod == GLUT_ACTIVE_SHIFT) 
+				warbird->rollLeft();
+			else
+				warbird->yawLeft();
 			break;
-		case GLUT_KEY_RIGHT: //rotate +0.02 radians on "up" vector
-			warbird->rotateThruster(2);
+		case GLUT_KEY_RIGHT: //yaw -0.02 radians on "up" vector
+			if (mod == GLUT_ACTIVE_SHIFT) 
+				warbird->rollRight();
+			else
+				warbird->yawRight();
 			break;
 	}
 }
+
 void keyboard(unsigned char key, int x, int y) {
 
 	switch(key){
@@ -258,12 +277,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 			break;
 		case 's': case 'S': // next ship speed
-			if(shipSpeed == 10)
-				shipSpeed = 50;
-			else if(shipSpeed == 50)
-				shipSpeed = 200;
-			else if(shipSpeed == 200)
-				shipSpeed = 10;
+			warbird->changeStep();
 			break;
 		case 'v': case 'V': // next camera
 			currCam++;
@@ -302,8 +316,10 @@ void keyboard(unsigned char key, int x, int y) {
 			eye = glm::vec3(15000.0f, 250.0f, 250.0f);
 			at = glm::vec3(15000.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
-			strcpy(viewStr, " WarBird View,");
 			viewMatrix = glm::lookAt(eye, at, up);
+			// viewMatrix = warbirdCam->getCamMatrix(warbird->getModelMatrix());
+			// strcpy(viewStr, " WarBird View,");
+			
 			break;
 		case 3:  // missle view
 			flag = 0;
