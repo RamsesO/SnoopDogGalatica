@@ -210,7 +210,7 @@ void update(int i) {
 	duo->update();
 	primus->update();
 	secundus->update();
-	//warbird->update();
+	warbird->update();
 	missle->update();
 	unumCam->update();
 	duoCam->update();
@@ -236,27 +236,27 @@ void arrowInput(int key, int x, int y){
 	switch(key){
 		case GLUT_KEY_UP: //positive step on "at" vector
 			if (mod == GLUT_ACTIVE_SHIFT) 
-				warbird->pitchUp();
+				warbird->movement(4);
 			else
-				warbird->moveForward();
+				warbird->movement(0);
 			break;
 		case GLUT_KEY_DOWN: //negative step on "at" vector
 			if (mod == GLUT_ACTIVE_SHIFT) 
-					warbird->pitchDown();
+					warbird->movement(5);
 			else
-				warbird->moveBackward();
+				warbird->movement(1);
 			break;
 		case GLUT_KEY_LEFT: //yaw +0.02 radians on "up" vector
 			if (mod == GLUT_ACTIVE_SHIFT) 
-				warbird->rollLeft();
+				warbird->movement(6);
 			else
-				warbird->yawLeft();
+				warbird->movement(2);
 			break;
 		case GLUT_KEY_RIGHT: //yaw -0.02 radians on "up" vector
 			if (mod == GLUT_ACTIVE_SHIFT) 
-				warbird->rollRight();
+				warbird->movement(7);
 			else
-				warbird->yawRight();
+				warbird->movement(3);
 			break;
 	}
 }

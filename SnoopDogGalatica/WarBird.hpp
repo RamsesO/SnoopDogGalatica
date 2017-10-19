@@ -23,12 +23,14 @@ public:
     float step;
 	int doRotateThruster; //0 is dont rotate. 1 is rotate left. 2 is rotate right
 	glm::vec3 direction;
+    int key; // 1-8 designates the kind of movement
 
     WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians): Shape(id, numOfVert, fileName, size, translationMatrix, rotationAxis, radians) {
     	this->direction = glm::vec3(0);
     	this->doRotateThruster = false;
         this->step = 10;
         this->rotateBy = 0;
+        this->key = -1;
     }
 
     void changeStep(){
@@ -41,6 +43,10 @@ public:
         else{
             step = 10;
         }
+    }
+
+    void movement(int i){
+        key = i;
     }
 
 	void moveForward(){
@@ -89,18 +95,35 @@ public:
        // this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, this->rotationAxis);
       //  rotateBy = 0;
 
-        /*
-        if(pitch != 0)
-            this->rotationMatrix = glm::rotate(this->rotationMatrix, pitch, rotateBy, glm::vec3(1,0,0));
-        else if(yaw != 0)
-            this->rotationMatrix = glm::rotate(this->rotationMatrix, yaw, rotateBy, glm::vec3(0,1,0));
-        else if(roll != 0)
-            this->rotationMatrix = glm::rotate(this->rotationMatrix, roll, rotateBy, glm::vec3(0,0,1));
-        
-        forward = glm::getIn(orientationMatrix) * step * stepDistance;
-        this->translationMatrix = glm::translate(translationMatrix, forward);
+        switch(key){
+            case 0:
+                moveForward();
+            break;
+            case 1:
+                moveBackward();
+            break;
+            case 2:
+                yawLeft();
+            break;
+            case 3:
+                yawRight();
+            break;
+            case 4:
+                pitchDown();
+            break;
+            case 5:
+                pitchUp();
+            break;
+            case 6:
+                rollLeft();
+            break;
+            case 7:
+                rollRight();
+            break;
+        }
 
-        */
+        key = -1;
+
 
     }
 
