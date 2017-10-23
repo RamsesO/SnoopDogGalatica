@@ -5,8 +5,8 @@
 	Ordonez, Ramses
 */
 
-# define __Mac__ // define your target operating system
-# include "../../includes465/include465.hpp"
+#define __Windows__
+# include "../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Sun.hpp"
 # include "Planet.hpp"
@@ -31,9 +31,6 @@ WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::
 	glm::vec3(0, 1, 0), 0.0f);
 Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
-//char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
-//	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
-//const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
@@ -346,27 +343,20 @@ void keyboard(unsigned char key, int x, int y) {
 
 int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
-	// glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	// glutInitWindowSize(800, 600);
-	// // Uncomment the following line to force OpenGL & GLSL 3.3
-	// // glutInitContextVersion(3, 3);
-	// glutInitContextProfile(GLUT_CORE_PROFILE);
-	// glutCreateWindow("Starter source file for 465L");
-	// // initialize and verify glew
 	# ifdef __Mac__
-	// Can't change the version in the GLUT_3_2_CORE_PROFILE
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_3_2_CORE_PROFILE);
-# endif
-# ifndef __Mac__
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-# endif
-  glutInitWindowSize(800, 600);
+		// Can't change the version in the GLUT_3_2_CORE_PROFILE
+		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_3_2_CORE_PROFILE);
+	# endif
+	# ifndef __Mac__
+		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	# endif
+	glutInitWindowSize(800, 600);
 	// set OpenGL and GLSL versions to 3.3 for Comp 465/L, comment to see highest versions
-# ifndef __Mac__
-	glutInitContextVersion(3, 3);
-	glutInitContextProfile(GLUT_CORE_PROFILE);
-# endif
-  glutCreateWindow("lit solar system");
+	# ifndef __Mac__
+		glutInitContextVersion(3, 3);
+		glutInitContextProfile(GLUT_CORE_PROFILE);
+	# endif
+	glutCreateWindow("lit solar system");
 	glewExperimental = GL_TRUE;  // needed my home system 
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
