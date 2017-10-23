@@ -40,7 +40,7 @@ PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(
 PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.002f);
 
 //Warbird Camera
-WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(15000,0 + 300, 0 + 1000), glm::vec3(15000, 300, 0));
+WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(15000,0 + 300, 0 + 1000));
 
 //Title Information
 char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
@@ -224,7 +224,7 @@ void update(int i) {
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
 			break;
 		case 3:
-			viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix(), warbird->getRotationMatrix());
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix());
 		default:
 			break;
 	}
@@ -327,7 +327,7 @@ void keyboard(unsigned char key, int x, int y) {
 			// at = glm::vec3(15000.0f, 0.0f, 0.0f);
 			// up = glm::vec3(0.0f, 1.0f, 0.0f);
 			// viewMatrix = glm::lookAt(eye, at, up);
-			viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix(), warbird->getRotationMatrix());
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix());
 			strcpy(viewStr, " WarBird View,");
 			
 			break;
