@@ -224,7 +224,7 @@ void update(int i) {
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
 			break;
 		case 3:
-			viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix());
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
 		default:
 			break;
 	}
@@ -327,7 +327,7 @@ void keyboard(unsigned char key, int x, int y) {
 			// at = glm::vec3(15000.0f, 0.0f, 0.0f);
 			// up = glm::vec3(0.0f, 1.0f, 0.0f);
 			// viewMatrix = glm::lookAt(eye, at, up);
-			viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix());
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
 			strcpy(viewStr, " WarBird View,");
 			
 			break;
