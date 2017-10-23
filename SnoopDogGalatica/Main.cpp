@@ -5,13 +5,15 @@
 	Ordonez, Ramses
 */
 
-# define __Windows__ // define your target operating system
-# include "../includes465/include465.hpp"
+# define __Mac__ // define your target operating system
+# include "../../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Sun.hpp"
 # include "Planet.hpp"
 # include "Moon.hpp"
 # include "PlanetCam.hpp"
+# include "WarBird.hpp"
+# include "WarBirdCam.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
 const int nModels = 7;
@@ -22,17 +24,23 @@ Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(400
 Planet * duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000, 0, 0),
 	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.002f, glm::vec3(0, 0, 1), -0.3f);
 Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(2000, 0, 0),
-	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), 0.4f);
+	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, 1, 0), 0.05f, glm::vec3(0, 0, 1), 0.4f);
 Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
-	glm::vec3(0, 1, 0), 6.0f, glm::vec3(0, 1, 0), 0.012f, glm::vec3(0, 0, 1), -0.5f);
-Sun * warbird = new Sun(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
-	glm::vec3(0, 1, 0), 1.0f);
+	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
+WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
+	glm::vec3(0, 1, 0), 0.0f);
 Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
+//char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
+//	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
+//const GLuint modelVert[nModels] = { 1740 * 3, 16020 * 3, 1740 * 3, 1740 * 3, 1740 * 3, 4852 * 3, 918 * 3};
 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
 PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.002f);
+
+//Warbird Camera
+WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(0,300,1000), glm::vec3(15000, 300, 0), 0.0f);
 
 //Title Information
 char baseStr[75] = "Snoop Dogg Galatica (keys: x, v)";
@@ -40,7 +48,6 @@ char viewStr[15] = " Front View,";
 char fpsStr[15];
 char titleStr[150];
 
-//Shaders
 char * vertexShaderFile = "simpleVertex.glsl";
 char * fragmentShaderFile = "simpleFragment.glsl";
 GLuint shaderProgram;
@@ -59,13 +66,16 @@ GLfloat aspectRatio;
 int timerDelay = 40; // 40 millisecond delay approximates 35 fps
 int frameCount = 0;
 
+int flag = 0;
+int currCam = 0;
+
 double currentTime;
 double lastTime;
 double timeInterval;
 
-//special camera modes
-int flag = 0;
-int currCam = 0; //arbritary value 
+
+//ship variables
+bool gravity = false;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -132,7 +142,6 @@ void display(void) {
 		frameCount = 0;
 		updateTitle();
 	}
-
 }
 
 void init(void) {
@@ -206,7 +215,7 @@ void update(int i) {
 	unumCam->update();
 	duoCam->update();
 
-	//camera updates
+		//camera updates
 	switch (flag) {
 		case 1:
 			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
@@ -217,28 +226,73 @@ void update(int i) {
 		default:
 			break;
 	}
+
+}
+
+void arrowInput(int key, int x, int y){
+	int mod = glutGetModifiers();
+
+
+	switch(key){
+		case GLUT_KEY_UP: //positive step on "at" vector
+			if (mod == GLUT_ACTIVE_SHIFT) 
+				warbird->movement(4);
+			else
+				warbird->movement(0);
+			break;
+		case GLUT_KEY_DOWN: //negative step on "at" vector
+			if (mod == GLUT_ACTIVE_SHIFT) 
+					warbird->movement(5);
+			else
+				warbird->movement(1);
+			break;
+		case GLUT_KEY_LEFT: //yaw +0.02 radians on "up" vector
+			if (mod == GLUT_ACTIVE_SHIFT) 
+				warbird->movement(6);
+			else
+				warbird->movement(2);
+			break;
+		case GLUT_KEY_RIGHT: //yaw -0.02 radians on "up" vector
+			if (mod == GLUT_ACTIVE_SHIFT) 
+				warbird->movement(7);
+			else
+				warbird->movement(3);
+			break;
+	}
 }
 
 void keyboard(unsigned char key, int x, int y) {
 
-	if(key == 'v' || key == 'V'){
-		currCam++;
-		if(currCam == 6){
-			currCam = 0;
-		}
+	switch(key){
+		case 'w': case 'W': // warp ship
 
-	}
-	else if(key == 'x' || key == 'X'){
-		if (currCam == 0) {
-			currCam = 5;
-		}
-		else {
+			break;
+		case 'f': case 'F': // fire missile
+
+			break;
+		case 'g': case 'G': // toggle gravity
+			gravity = !gravity;
+			break;
+		case 't': case 'T': // next TQ value
+
+			break;
+		case 's': case 'S': // next ship speed
+			warbird->changeStep();
+			break;
+		case 'v': case 'V': // next camera
+			currCam++;
+			if(currCam == 6)
+				currCam = 0;
+			break;
+		case 'x': case 'X':// prev camera
 			currCam--;
-		}
+			if(currCam == -1)
+				currCam = 5;
+			break;
+		case 033: case 'q': case 'Q':
+			exit(EXIT_SUCCESS);
 	}
-	else if(key == 033 || key == 'q' || key == 'Q'){
-		exit(EXIT_SUCCESS);
-	}
+
 
 	switch (currCam % 6) {
 		case 0:  // front view
@@ -262,8 +316,10 @@ void keyboard(unsigned char key, int x, int y) {
 			eye = glm::vec3(15000.0f, 250.0f, 250.0f);
 			at = glm::vec3(15000.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
-			strcpy(viewStr, " WarBird View,");
 			viewMatrix = glm::lookAt(eye, at, up);
+			// viewMatrix = warbirdCam->getCamMatrix(warbird->getModelMatrix());
+			// strcpy(viewStr, " WarBird View,");
+			
 			break;
 		case 3:  // missle view
 			flag = 0;
@@ -284,18 +340,33 @@ void keyboard(unsigned char key, int x, int y) {
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
 			break;	
 	}
+
 	updateTitle();
 }
 
 int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
+	// glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	// glutInitWindowSize(800, 600);
+	// // Uncomment the following line to force OpenGL & GLSL 3.3
+	// // glutInitContextVersion(3, 3);
+	// glutInitContextProfile(GLUT_CORE_PROFILE);
+	// glutCreateWindow("Starter source file for 465L");
+	// // initialize and verify glew
+	# ifdef __Mac__
+	// Can't change the version in the GLUT_3_2_CORE_PROFILE
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_3_2_CORE_PROFILE);
+# endif
+# ifndef __Mac__
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(800, 600);
-	// Uncomment the following line to force OpenGL & GLSL 3.3
-	// glutInitContextVersion(3, 3);
+# endif
+  glutInitWindowSize(800, 600);
+	// set OpenGL and GLSL versions to 3.3 for Comp 465/L, comment to see highest versions
+# ifndef __Mac__
+	glutInitContextVersion(3, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
-	glutCreateWindow("Starter source file for 465L");
-	// initialize and verify glew
+# endif
+  glutCreateWindow("lit solar system");
 	glewExperimental = GL_TRUE;  // needed my home system 
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
@@ -312,6 +383,7 @@ int main(int argc, char* argv[]) {
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(arrowInput);
 	glutTimerFunc(timerDelay, update, 1);  // keep the window up
 	glutIdleFunc(display);
 	glutMainLoop();
