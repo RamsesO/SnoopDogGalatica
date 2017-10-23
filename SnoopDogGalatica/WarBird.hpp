@@ -22,11 +22,9 @@ public:
     float rotateBy;
     float step;
 	int doRotateThruster; //0 is dont rotate. 1 is rotate left. 2 is rotate right
-	glm::vec3 direction;
     int key; // 1-8 designates the kind of movement
 
     WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians): Shape(id, numOfVert, fileName, size, translationMatrix, rotationAxis, radians) {
-    	this->direction = glm::vec3(0);
     	this->doRotateThruster = false;
         this->step = 10;
         this->rotateBy = 0;
@@ -90,6 +88,11 @@ public:
 	glm::mat4 getModelMatrix() {
         return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
     }
+
+    glm::mat4 getWarbirdMatrix() {
+        return (this->translationMatrix * this->rotationMatrix);
+    }
+
 
     void update() {
        // this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, this->rotationAxis);
