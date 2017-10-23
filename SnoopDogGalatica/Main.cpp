@@ -37,7 +37,7 @@ PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(
 PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.002f);
 
 //Warbird Camera
-WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(0,300,1000), glm::vec3(15000, 300, 0), 0.0f);
+WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(15000,0 + 300, 0 + 1000), glm::vec3(15000, 300, 0));
 
 //Title Information
 char baseStr[75] = "Snoop Dogg Galatica (keys: x, v)";
@@ -220,6 +220,8 @@ void update(int i) {
 		case 2:
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
 			break;
+		case 3:
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix(), warbird->getRotationMatrix());
 		default:
 			break;
 	}
@@ -232,28 +234,36 @@ void arrowInput(int key, int x, int y){
 
 	switch(key){
 		case GLUT_KEY_UP: //positive step on "at" vector
-			if (mod == GLUT_ACTIVE_SHIFT) 
+			if (mod == GLUT_ACTIVE_SHIFT) {
 				warbird->movement(4);
-			else
+			}
+			else{
 				warbird->movement(0);
+			}
 			break;
 		case GLUT_KEY_DOWN: //negative step on "at" vector
-			if (mod == GLUT_ACTIVE_SHIFT) 
+			if (mod == GLUT_ACTIVE_SHIFT) {
 					warbird->movement(5);
-			else
+				}
+			else{
 				warbird->movement(1);
+			}
 			break;
 		case GLUT_KEY_LEFT: //yaw +0.02 radians on "up" vector
-			if (mod == GLUT_ACTIVE_SHIFT) 
+			if (mod == GLUT_ACTIVE_SHIFT){ 
 				warbird->movement(6);
-			else
+			}
+			else{
 				warbird->movement(2);
+			}
 			break;
 		case GLUT_KEY_RIGHT: //yaw -0.02 radians on "up" vector
-			if (mod == GLUT_ACTIVE_SHIFT) 
+			if (mod == GLUT_ACTIVE_SHIFT){ 
 				warbird->movement(7);
-			else
+			}
+			else{
 				warbird->movement(3);
+			}
 			break;
 	}
 }
@@ -309,13 +319,13 @@ void keyboard(unsigned char key, int x, int y) {
 			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 2:  // warbird view
-			flag = 0;
-			eye = glm::vec3(15000.0f, 250.0f, 250.0f);
-			at = glm::vec3(15000.0f, 0.0f, 0.0f);
-			up = glm::vec3(0.0f, 1.0f, 0.0f);
-			viewMatrix = glm::lookAt(eye, at, up);
-			// viewMatrix = warbirdCam->getCamMatrix(warbird->getModelMatrix());
-			// strcpy(viewStr, " WarBird View,");
+			flag = 3;
+			// eye = glm::vec3(15000.0f, 250.0f, 250.0f);
+			// at = glm::vec3(15000.0f, 0.0f, 0.0f);
+			// up = glm::vec3(0.0f, 1.0f, 0.0f);
+			// viewMatrix = glm::lookAt(eye, at, up);
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix(), warbird->getRotationMatrix());
+			strcpy(viewStr, " WarBird View,");
 			
 			break;
 		case 3:  // missle view
