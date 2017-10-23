@@ -89,7 +89,7 @@ public:
         return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
     }
 
-    glm::mat4 getWarbirdOrientationMatrix() {
+    glm::mat4 getOrientationMatrix() {
         return (this->translationMatrix * this->rotationMatrix);
     }
 
