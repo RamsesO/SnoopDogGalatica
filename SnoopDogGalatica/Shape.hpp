@@ -68,4 +68,12 @@ public:
         return (translationMatrix * scaleMatrix);
     }
 
+    glm::mat4 getTranslationMatrix(){
+        return this->translationMatrix;
+    }
+
+    glm::mat4 getOrientationMatrix() {
+        return (this->translationMatrix * this->rotationMatrix);
+    }
+
 };

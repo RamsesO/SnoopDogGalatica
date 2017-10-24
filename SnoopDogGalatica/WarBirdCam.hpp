@@ -33,7 +33,6 @@ public:
 
 	glm::mat4 getCamMatrix(glm::mat4 warbirdOrientationMatrix) {
 		float * warbirdPos = (float*)glm::value_ptr(warbirdOrientationMatrix);
-
 		glm::mat4 cameraTranslationMatrix = glm::translate(glm::mat4(), glm::vec3(0,300,1000));
 		glm::mat4 cameraOrientationMatrix = warbirdOrientationMatrix * cameraTranslationMatrix ;
 

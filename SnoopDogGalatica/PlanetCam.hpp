@@ -48,6 +48,14 @@ public:
 		return viewMatrix;
 	}
 
+	glm::mat4 getOrientationMatrix(){
+		return this->translationMatrix * this->rotationMatrix;
+	}
+
+	glm::mat4 getRotationMatrix(){
+		return this->rotationMatrix;
+	}
+
 	void update() {
 		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
 	}
