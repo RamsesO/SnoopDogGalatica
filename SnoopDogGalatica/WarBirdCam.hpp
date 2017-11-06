@@ -32,14 +32,14 @@ public:
 	}
 
 	glm::mat4 getCamMatrix(glm::mat4 warbirdOrientationMatrix) {
-		float * warbirdPos = (float*)glm::value_ptr(warbirdOrientationMatrix);
-		glm::mat4 cameraTranslationMatrix = glm::translate(glm::mat4(), glm::vec3(0,300,1000));
-		glm::mat4 cameraOrientationMatrix = warbirdOrientationMatrix * cameraTranslationMatrix ;
 
-		this->eye = getPosition(cameraOrientationMatrix) ;
-		this->at = glm::vec3(warbirdPos[12], warbirdPos[13] + 300, warbirdPos[14]);
-		
-		this->up = getUp(cameraOrientationMatrix);
+		glm::mat4 camMatrix = warbirdOrientationMatrix * this->translationMatrix;
+		glm::mat4 atMatrix = warbirdOrientationMatrix * glm::translate(glm::mat4(), glm::vec3(0,300,0));
+
+
+		this->eye = getPosition(camMatrix);
+		this->at = getPosition(atMatrix);
+		this->up = getUp(camMatrix);
 
 		this->viewMatrix = glm::lookAt(this->eye, this->at, this->up);
 		return viewMatrix;

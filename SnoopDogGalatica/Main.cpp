@@ -40,7 +40,7 @@ PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(
 PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.002f);
 
 //Warbird Camera
-WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(15000,0 + 300, 0 + 1000));
+WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(0,0 + 300, 0 + 1000));
 
 //Warp Variables
 int warp = -1;
