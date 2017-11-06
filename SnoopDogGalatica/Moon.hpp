@@ -3,6 +3,8 @@
 
 	Lemuel Dizon
 	Ramses Ordonez
+	Kelly Kim
+
 	10/2/2017
 */
 

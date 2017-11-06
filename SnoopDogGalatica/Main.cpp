@@ -1,8 +1,10 @@
 /*
 	Snoop Dogg Galatica
 	The Dankest Solar System
+
 	Dizon, Lemuel
 	Ordonez, Ramses
+	Kim, Kelly
 */
 
 #define __Windows__
@@ -14,6 +16,7 @@
 # include "PlanetCam.hpp"
 # include "WarBird.hpp"
 # include "WarBirdCam.hpp"
+# include "MissileSite.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
 const int nModels = 7;

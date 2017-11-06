@@ -2,7 +2,9 @@
     Sun.hpp (non-orbiting planet)
 
     Lemuel Dizon
-    Ramses Ordonez
+	Ramses Ordonez
+	Kelly Kim
+
     10/2/2017
 */
 

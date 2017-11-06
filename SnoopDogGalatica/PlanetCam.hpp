@@ -1,11 +1,12 @@
 /*
-	Planet.hpp
+	PlanetCam.hpp
 
 	Lemuel Dizon
 	Ramses Ordonez
+	Kelly Kim
+
 	10/2/2017
 */
-
 
 # ifndef __INCLUDES465__
 # include "../includes465/include465.hpp"
