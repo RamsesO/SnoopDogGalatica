@@ -45,7 +45,7 @@ WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(0,0 + 300, 0 + 1000));
 //Warp Variables
 int warp = -1;
 glm::mat4 planetCamOM;
-glm::mat4 planetCamRM;
+glm::mat4 planetOM;
 
 //Title Information
 char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
@@ -284,13 +284,15 @@ void keyboard(unsigned char key, int x, int y) {
 
 			if(warp % 2 == 0){
 				planetCamOM = unumCam->getOrientationMatrix();
-				planetCamRM = unumCam->getRotationMatrix();
+				planetOM = unum->getPlanetMatrix();
+
 			}
 			else{
 				planetCamOM = duoCam->getOrientationMatrix();
-				planetCamRM = duoCam->getRotationMatrix();
+				planetOM = duo->getPlanetMatrix();
 			}
-			warbird->warpTo(planetCamOM, planetCamRM);
+			warbird->warpTo(planetCamOM, planetOM);
+
 			break;
 		case 'f': case 'F': // fire missile
 

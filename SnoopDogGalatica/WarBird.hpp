@@ -83,16 +83,24 @@ public:
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(0,0,1));
     }
 
-    void warpTo(glm::mat4 planetCamOM, glm::mat4 planetCamRM){
-        this->translationMatrix = planetCamOM;
-        this->rotationMatrix = planetCamRM;
+
+    void warpTo(glm::mat4 planetCamOM, glm::mat4 planetOM){
+        this->translationMatrix = glm::translate(glm::mat4(), getPosition(planetCamOM));
+        
+        glm::vec3 pos = getPosition(this->translationMatrix);
+        glm::vec3 at = getPosition(planetOM);
+
+        glm::mat4 tempRM = glm::inverse(glm::lookAt(getPosition(planetCamOM), at, glm::vec3(0,1,0)));
+        float * tempRMValues = (float*)glm::value_ptr(tempRM);
+        
+        this->rotationMatrix = glm::mat4(tempRMValues[0], tempRMValues[1],tempRMValues[2],0,tempRMValues[4],
+        tempRMValues[5],tempRMValues[6],0,tempRMValues[8],tempRMValues[9],tempRMValues[10],0,0,0,0,1);
+
     }
 
 	glm::mat4 getModelMatrix() {
         return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
     }
-
-
 
 
     void update() {
