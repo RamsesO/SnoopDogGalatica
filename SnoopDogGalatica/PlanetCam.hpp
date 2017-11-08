@@ -38,6 +38,7 @@ public:
 
 	glm::mat4 getCamMatrix(glm::mat4 planetMatrix) {
 		glm::mat4 eyeMatrix = this->rotationMatrix * this->translationMatrix;
+
 		float * eyePos = (float*)glm::value_ptr(eyeMatrix);
 		this->eye = glm::vec3(eyePos[12], 0.0f, eyePos[14]);
 
@@ -49,11 +50,7 @@ public:
 	}
 
 	glm::mat4 getOrientationMatrix(){
-		return this->translationMatrix * this->rotationMatrix;
-	}
-
-	glm::mat4 getRotationMatrix(){
-		return this->rotationMatrix;
+		return rotationMatrix * translationMatrix;
 	}
 
 	void update() {
