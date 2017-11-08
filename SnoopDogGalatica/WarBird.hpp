@@ -22,11 +22,16 @@ public:
     float rotateBy;
     float step;
     int key; // 1-8 designates the kind of movement
+    bool gravity = false;
+    float gravityConstant = 0;
+    glm::vec3 gravityVec;
 
     WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians): Shape(id, numOfVert, fileName, size, translationMatrix, rotationAxis, radians) {
         this->step = 10;
         this->rotateBy = 0;
         this->key = -1;
+        this->gravityVec = glm::vec3(0,0,0);
+
     }
 
     void changeStep(){
@@ -45,42 +50,83 @@ public:
         key = i;
     }
 
+    void toggleGravity(){
+        this->gravity = !this->gravity;
+        if(!gravity)
+            gravityVec = glm::vec3(0,0,0);
+    }
+
+    void setGravityConst(float constant){
+        this->gravityConstant = constant;
+    }
+
+    void setGravityDirection(){
+        float distanceBetween = distance(getPosition(this->translationMatrix), glm::vec3(0,0,0));
+
+        //used to temporarily change the direction the ship is facing in order to get the gravity vector values
+        glm::mat4 gravRM = glm::inverse(glm::lookAt(getPosition(this->translationMatrix), glm::vec3(0,0,0), glm::vec3(0,1,0)));
+        float * gravRMValues = (float*)glm::value_ptr(gravRM);
+
+        this->gravityVec = ((-this->gravityConstant)/(distanceBetween * distanceBetween)) * getOut(gravRM);
+
+        showVec3("GV", this->gravityVec);
+    }
+
 	void moveForward(){
-        this->translationMatrix =  glm::translate(this->translationMatrix, -step * getOut(this->rotationMatrix));
+        if(gravity){
+            this->translationMatrix =  glm::translate(this->translationMatrix, (-step * getOut(this->rotationMatrix)) + this->gravityVec);
+        }
+        else
+            this->translationMatrix =  glm::translate(this->translationMatrix, (-step * getOut(this->rotationMatrix)));
     }
 
     void moveBackward(){
-        this->translationMatrix =  glm::translate(this->translationMatrix, step * getOut(this->rotationMatrix)); 
+        if(gravity)
+            this->translationMatrix =  glm::translate(this->translationMatrix, (step * getOut(this->rotationMatrix)) + this->gravityVec); 
+        else
+            this->translationMatrix =  glm::translate(this->translationMatrix, (step * getOut(this->rotationMatrix)));
     }
 
     void yawLeft(){
         rotateBy = rotateRadians;
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(0,1,0));
+        if(gravity)
+            this->translationMatrix =  glm::translate(this->translationMatrix, this->gravityVec);
     }
 
     void yawRight(){
         rotateBy = -rotateRadians;
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(0,1,0));
+        if(gravity)
+            this->translationMatrix =  glm::translate(this->translationMatrix, this->gravityVec);
     }
 
     void pitchUp(){
         rotateBy = rotateRadians;
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(1,0,0));
+        if(gravity)
+            this->translationMatrix =  glm::translate(this->translationMatrix, this->gravityVec);
     }
 
     void pitchDown(){
         rotateBy = -rotateRadians;
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(1,0,0));
+        if(gravity)
+            this->translationMatrix =  glm::translate(this->translationMatrix, this->gravityVec);
     }
 
     void rollLeft(){
         rotateBy = rotateRadians;
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(0,0,1));
+        if(gravity)
+            this->translationMatrix =  glm::translate(this->translationMatrix, this->gravityVec);
     }
 
     void rollRight(){
         rotateBy = -rotateRadians;
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(0,0,1));
+        if(gravity)
+            this->translationMatrix =  glm::translate(this->translationMatrix, this->gravityVec);
     }
 
 
@@ -104,9 +150,8 @@ public:
 
 
     void update() {
-       // this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, this->rotationAxis);
-      //  rotateBy = 0;
-
+        if(gravity)
+            setGravityDirection();
         switch(key){
             case 0:
                 moveForward();
@@ -131,6 +176,9 @@ public:
             break;
             case 7:
                 rollRight();
+            break;
+            default:
+                this->translationMatrix = glm::translate(this->translationMatrix, gravityVec);
             break;
         }
 
