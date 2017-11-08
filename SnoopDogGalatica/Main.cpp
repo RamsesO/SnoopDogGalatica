@@ -48,8 +48,13 @@ glm::mat4 planetCamOM;
 glm::mat4 planetOM;
 
 //Title Information
+//i.e. Warbird 7 Unum 5 Secundus 0 U/S 25 F/S 321 View Duo
 char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
+char warbirdStr[15] = "Warbird 7 ";
+char unumStr[15] = "Unum 5 ";
+char secStr[15] = "Secundus 0 ";
 char viewStr[15] = " Front View,";
+char upsStr[15];
 char fpsStr[15];
 char titleStr[150];
 
@@ -84,8 +89,12 @@ bool gravity = false;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
-	strcat(titleStr, viewStr);
+	strcat(titleStr, warbirdStr);
+	strcat(titleStr, unumStr);
+	strcat(titleStr, secStr);
+	strcat(titleStr, upsStr);
 	strcat(titleStr, fpsStr);
+	strcat(titleStr, viewStr);
 	// printf("title string = %s \n", titleStr);
 	glutSetWindowTitle(titleStr);
 }
@@ -142,7 +151,9 @@ void display(void) {
 	currentTime = glutGet(GLUT_ELAPSED_TIME);  // get elapsed system time
 	timeInterval = currentTime - lastTime;
 	if (timeInterval >= 1000) {
-		sprintf(fpsStr, " FPS: %4d", (int)(frameCount / (timeInterval / 1000.0f)));
+		sprintf(fpsStr, " F/S: %4d", (int)(frameCount / (timeInterval / 1000.0f)));
+		sprintf(upsStr, " U/S: %4d", (int)((1000 / timerDelay)));
+
 		lastTime = currentTime;
 		frameCount = 0;
 		updateTitle();
