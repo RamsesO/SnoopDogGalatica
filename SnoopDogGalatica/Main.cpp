@@ -48,7 +48,7 @@ glm::mat4 planetCamOM;
 glm::mat4 planetOM;
 
 //gravity variables
-float gravityConstant = 90000000;
+float gravityConstant = 1000;
 
 //Title Information
 char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
@@ -217,7 +217,7 @@ void update(int i) {
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update();
+	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
 	missle->update();
 	unumCam->update();
 	duoCam->update();

@@ -60,14 +60,28 @@ public:
         this->gravityConstant = constant;
     }
 
-    void setGravityDirection(){
-        float distanceBetween = distance(getPosition(this->translationMatrix), glm::vec3(0,0,0));
+    void setGravityDirection(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize){
+        this->gravityVec = glm::vec3(0,0,0);
 
-        //used to temporarily change the direction the ship is facing in order to get the gravity vector values
-        glm::mat4 gravRM = glm::inverse(glm::lookAt(getPosition(this->translationMatrix), glm::vec3(0,0,0), glm::vec3(0,1,0)));
-        float * gravRMValues = (float*)glm::value_ptr(gravRM);
+        glm::vec3 shipPos = getPosition(this->translationMatrix);
 
-        this->gravityVec = ((-this->gravityConstant)/(distanceBetween * distanceBetween)) * getOut(gravRM);
+        //sun
+        float distanceBetween = distance(shipPos, getPosition(sunOM));
+        glm::mat4 gravRM = glm::inverse(glm::lookAt(getPosition(this->translationMatrix), getPosition(sunOM), glm::vec3(0,1,0)));
+        float gravityResult = (-this->gravityConstant * sunSize * this->size)/(distanceBetween * distanceBetween);
+        this->gravityVec += gravityResult * getOut(gravRM);
+
+        //unum
+        distanceBetween = distance(shipPos, getPosition(unumOM));
+        gravRM = glm::inverse(glm::lookAt(getPosition(this->translationMatrix), getPosition(unumOM), glm::vec3(0,1,0)));
+        gravityResult = (-this->gravityConstant * unumSize * this->size)/(distanceBetween * distanceBetween);
+        this->gravityVec += gravityResult * getOut(gravRM);
+
+        //duo
+        distanceBetween = distance(shipPos, getPosition(duoOM));
+        gravRM = glm::inverse(glm::lookAt(getPosition(this->translationMatrix), getPosition(duoOM), glm::vec3(0,1,0)));
+        gravityResult = (-this->gravityConstant * duoSize * this->size)/(distanceBetween * distanceBetween);
+        this->gravityVec += gravityResult * getOut(gravRM);
 
         showVec3("GV", this->gravityVec);
     }
@@ -149,9 +163,9 @@ public:
     }
 
 
-    void update() {
+    void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize) {
         if(gravity)
-            setGravityDirection();
+            setGravityDirection(sunOM, sunSize, unumOM, unumSize, duoOM, duoSize);
         switch(key){
             case 0:
                 moveForward();
