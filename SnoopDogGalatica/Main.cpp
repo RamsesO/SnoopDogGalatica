@@ -13,6 +13,7 @@
 # include "Moon.hpp"
 # include "PlanetCam.hpp"
 # include "WarBird.hpp"
+# include "Missile.hpp"
 # include "WarBirdCam.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
@@ -29,7 +30,11 @@ Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3
 	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
 	glm::vec3(0, 1, 0), 0.0f);
-Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
+Missile * missile0 = new Missile(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0), //confirm initial positioning
+	glm::vec3(0, 1, 0), 1.0f);
+Missile * missile1 = new Missile(7, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0),
+	glm::vec3(0, 1, 0), 1.0f);
+Missile * missile2 = new Missile(8, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
 //char * modelFiles[nModels] = { "assets/Ruber.tri", "assets/Unum.tri", "assets/Duo.tri",
 //	"assets/Primus.tri", "assets/Secundus.tri", "assets/WarBird.tri", "assets/Missle.tri"};
@@ -138,11 +143,23 @@ void display(void) {
 	glBindVertexArray(VAO[warbird->id]);
 	glDrawArrays(GL_TRIANGLES, 0, warbird->numOfVert);
 
-	modelMatrix = missle->getModelMatrix();
+	modelMatrix = missile0->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[missle->id]);
-	glDrawArrays(GL_TRIANGLES, 0, missle->numOfVert);
+	glBindVertexArray(VAO[missile0->id]);
+	glDrawArrays(GL_TRIANGLES, 0, missile0->numOfVert);
+
+	modelMatrix = missile1->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[missile1->id]);
+	glDrawArrays(GL_TRIANGLES, 0, missile1->numOfVert);
+
+	modelMatrix = missile2->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[missile2->id]);
+	glDrawArrays(GL_TRIANGLES, 0, missile2->numOfVert);
 
 	glutSwapBuffers();
 	frameCount++;
@@ -152,7 +169,7 @@ void display(void) {
 	timeInterval = currentTime - lastTime;
 	if (timeInterval >= 1000) {
 		sprintf(fpsStr, " F/S: %4d", (int)(frameCount / (timeInterval / 1000.0f)));
-		sprintf(upsStr, " U/S: %4d", (int)((1000 / timerDelay)));
+		sprintf(upsStr, " U/S: %4d", (int)((1000 / timeQuantum[timeQuantumIndex])));
 
 		lastTime = currentTime;
 		frameCount = 0;
@@ -191,9 +208,17 @@ void init(void) {
 		warbird->vPosition, warbird->vColor, warbird->vNormal, "vPosition", "vColor", "vNormal");
 	warbird->setScaleMatrix(modelSize);
 
-	modelSize = loadModelBuffer(missle->fileName, missle->numOfVert, VAO[missle->id], buffer[missle->id], shaderProgram,
-		missle->vPosition, missle->vColor, missle->vNormal, "vPosition", "vColor", "vNormal");
-	missle->setScaleMatrix(modelSize);
+	modelSize = loadModelBuffer(missile0->fileName, missile0->numOfVert, VAO[missile0->id], buffer[missile0->id], shaderProgram,
+		missile0->vPosition, missile0->vColor, missile0->vNormal, "vPosition", "vColor", "vNormal");
+	missile0->setScaleMatrix(modelSize);
+
+	modelSize = loadModelBuffer(missile1->fileName, missile1->numOfVert, VAO[missile1->id], buffer[missile1->id], shaderProgram,
+		missile1->vPosition, missile1->vColor, missile1->vNormal, "vPosition", "vColor", "vNormal");
+	missile0->setScaleMatrix(modelSize);	
+
+	modelSize = loadModelBuffer(missile2->fileName, missile2->numOfVert, VAO[missile2->id], buffer[missile2->id], shaderProgram,
+		missile2->vPosition, missile2->vColor, missile2->vNormal, "vPosition", "vColor", "vNormal");
+	missile0->setScaleMatrix(modelSize);
 
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
@@ -229,7 +254,9 @@ void update(int i) {
 	primus->update();
 	secundus->update();
 	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
-	missle->update();
+	missile0->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
+	missile1->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
+	missile2->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
 	unumCam->update();
 	duoCam->update();
 
@@ -307,8 +334,8 @@ void keyboard(unsigned char key, int x, int y) {
 			warbird->warpTo(planetCamOM, planetOM);
 
 			break;
-		case 'f': case 'F': // fire missile
-
+		case 'f': case 'F': // fire missile only if its not fired yet.
+			if(!missile0->isFired()) missile0->fire(warbird->getOrientationMatrix());
 			break;
 		case 'g': case 'G': // toggle gravity for ship
 			warbird->toggleGravity();
@@ -363,12 +390,12 @@ void keyboard(unsigned char key, int x, int y) {
 			strcpy(viewStr, " WarBird View,");
 			
 			break;
-		case 3:  // missle view
+		case 3:  // missile view
 			flag = 0;
 			eye = glm::vec3(14500.0f, 250.0f, 250.0f);
 			at = glm::vec3(14500.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
-			strcpy(viewStr, " Missle View,");
+			strcpy(viewStr, " missile View,");
 			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 4: // unum view
