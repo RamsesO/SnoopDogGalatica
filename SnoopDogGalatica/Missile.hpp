@@ -21,6 +21,7 @@ class Missile : public Shape {
     const private int UTL = 2000; //2000 updates to live
     const private int UTA = 200;  //200 updates to activate
     int ttl, activate;
+    bool fire;
 
 public:
     Missile (int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians) : 
@@ -40,6 +41,11 @@ public:
                 this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
                 ttl--;
             }
+        }
+        else //reset 
+        {
+            ttl = UTL;
+            activate = UTA;
         }
     }
 
