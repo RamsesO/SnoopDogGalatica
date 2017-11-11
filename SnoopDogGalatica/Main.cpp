@@ -47,6 +47,9 @@ int warp = -1;
 glm::mat4 planetCamOM;
 glm::mat4 planetOM;
 
+//gravity variables
+float gravityConstant = 1000;
+
 //Title Information
 //i.e. Warbird 7 Unum 5 Secundus 0 U/S 25 F/S 321 View Duo
 char baseStr[75] = "Snoop Dogg Galatica (keys: f, t, w, m): ";
@@ -73,7 +76,8 @@ glm::mat4 ModelViewProjectionMatrix; // set in display();
 GLfloat aspectRatio;
 
 //Time Keepers
-int timerDelay = 40; // 40 millisecond delay approximates 35 fps
+int timeQuantum[] = {5, 40, 100, 500};
+int timeQuantumIndex = 0;
 int frameCount = 0;
 
 int flag = 0;
@@ -82,10 +86,6 @@ int currCam = 0;
 double currentTime;
 double lastTime;
 double timeInterval;
-
-
-//ship variables
-bool gravity = false;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -206,6 +206,8 @@ void init(void) {
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
+
+	warbird->setGravityConst(gravityConstant);
 }
 
 // set viewport and projectionMatrix on window resize events
@@ -220,13 +222,13 @@ void reshape(int width, int height) {
 
 // Use with Idle and intervalTimer functions 
 void update(int i) {
-	glutTimerFunc(timerDelay, update, 1);
+	glutTimerFunc(timeQuantum[timeQuantumIndex], update, 1);
 	ruber->update();
 	unum->update();
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update();
+	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
 	missle->update();
 	unumCam->update();
 	duoCam->update();
@@ -308,11 +310,13 @@ void keyboard(unsigned char key, int x, int y) {
 		case 'f': case 'F': // fire missile
 
 			break;
-		case 'g': case 'G': // toggle gravity
-			gravity = !gravity;
+		case 'g': case 'G': // toggle gravity for ship
+			warbird->toggleGravity();
 			break;
 		case 't': case 'T': // next TQ value
-
+			timeQuantumIndex++;
+			if(timeQuantumIndex > 3)
+				timeQuantumIndex = 0;
 			break;
 		case 's': case 'S': // next ship speed
 			warbird->changeStep();
@@ -423,7 +427,7 @@ int main(int argc, char* argv[]) {
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(arrowInput);
-	glutTimerFunc(timerDelay, update, 1);  // keep the window up
+	glutTimerFunc(timeQuantum[timeQuantumIndex], update, 1);  // keep the window up
 	glutIdleFunc(display);
 	glutMainLoop();
 	printf("done\n");

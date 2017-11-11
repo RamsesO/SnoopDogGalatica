@@ -76,4 +76,8 @@ public:
         return (this->translationMatrix * this->rotationMatrix);
     }
 
+    float getSize(){
+        return this->size;
+    }
+
 };
