@@ -23,12 +23,13 @@ private:
 	const float UTL = 2000.0; //2000 updates to live
 	const float UTA = 200.0;  //200 updates to activate
 	float step;
-	float ttl, activate;
-	float target;
+	float rStep; //rotational step
+	float ttl, activate; 
+	int target;
 	bool fired;
 
 public:
-	bool isFired() {
+	bool reloading() {
 		return fired;
 	}
 	//missile's id should be used as following
