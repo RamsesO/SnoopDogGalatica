@@ -72,7 +72,7 @@ glm::mat4 ModelViewProjectionMatrix; // set in display();
 GLfloat aspectRatio;
 
 //Time Keepers
-int timeQuantum[] = {5, 40, 100, 500};
+int timeQuantum[] = { 5, 40, 100, 500 };
 int timeQuantumIndex = 0;
 int frameCount = 0;
 
@@ -234,30 +234,30 @@ void update(int i) {
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
+	warbird->update(ruber->getOrientationMatrix(), ruber->getSize() / 2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
 	missle->update();
 	unumCam->update();
 	duoCam->update();
 
 	//camera updates
 	switch (flag) {
-		case 1:
-			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
-			break;
-		case 2:
-			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
-			break;
-		case 3:
-			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
-		default:
-			break;
+	case 1:
+		viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
+		break;
+	case 2:
+		viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
+		break;
+	case 3:
+		viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
+		break;
+	default:
+		break;
 	}
 
 }
 
 void arrowInput(int key, int x, int y) {
 	int mod = glutGetModifiers();
-
 
 	switch (key) {
 	case GLUT_KEY_UP: //positive step on "at" vector
@@ -296,17 +296,14 @@ void arrowInput(int key, int x, int y) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
-
-	switch(key){
+	switch (key) {
 		case 'w': case 'W': // warp ship
 			warp++;
-
-			if(warp % 2 == 0){
+			if (warp % 2 == 0) {
 				planetCamOM = unumCam->getOrientationMatrix();
 				planetOM = unum->getPlanetMatrix();
-
 			}
-			else{
+			else {
 				planetCamOM = duoCam->getOrientationMatrix();
 				planetOM = duo->getPlanetMatrix();
 			}
@@ -321,7 +318,7 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 't': case 'T': // next TQ value
 			timeQuantumIndex++;
-			if(timeQuantumIndex > 3)
+			if (timeQuantumIndex > 3)
 				timeQuantumIndex = 0;
 			break;
 		case 's': case 'S': // next ship speed
@@ -329,18 +326,17 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 'v': case 'V': // next camera
 			currCam++;
-			if(currCam == 6)
+			if (currCam == 6)
 				currCam = 0;
 			break;
 		case 'x': case 'X':// prev camera
 			currCam--;
-			if(currCam == -1)
+			if (currCam == -1)
 				currCam = 5;
 			break;
 		case 033: case 'q': case 'Q':
 			exit(EXIT_SUCCESS);
 	}
-
 
 	switch (currCam % 6) {
 		case 0:  // front view
@@ -348,26 +344,21 @@ void keyboard(unsigned char key, int x, int y) {
 			eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
 			up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
-			strcpy(viewStr, " Front View,"); 
+			strcpy(viewStr, " Front View,");
 			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 1:  // top view
 			flag = 0;
-			eye = glm::vec3(0.0f, 20000.0f, 0.0f);   
-			at = glm::vec3(0.0f, 0.0f, 0.0f);   
-			up = glm::vec3(0.0f, 0.0f, -1.0f);   
-			strcpy(viewStr, " Top View,"); 
+			eye = glm::vec3(0.0f, 20000.0f, 0.0f);
+			at = glm::vec3(0.0f, 0.0f, 0.0f);
+			up = glm::vec3(0.0f, 0.0f, -1.0f);
+			strcpy(viewStr, " Top View,");
 			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 2:  // warbird view
 			flag = 3;
-			// eye = glm::vec3(15000.0f, 250.0f, 250.0f);
-			// at = glm::vec3(15000.0f, 0.0f, 0.0f);
-			// up = glm::vec3(0.0f, 1.0f, 0.0f);
-			// viewMatrix = glm::lookAt(eye, at, up);
-			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
 			strcpy(viewStr, " WarBird View,");
-			
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
 			break;
 		case 3:  // missle view
 			flag = 0;
@@ -379,14 +370,14 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 4: // unum view
 			flag = 1;
-			strcpy(viewStr, " Unum view,"); 
+			strcpy(viewStr, " Unum view,");
 			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
 			break;
 		case 5: // duo view 
 			flag = 2;
 			strcpy(viewStr, " Duo View,");
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
-			break;	
+			break;
 
 	}
 

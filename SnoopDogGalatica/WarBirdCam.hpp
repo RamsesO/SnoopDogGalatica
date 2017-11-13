@@ -33,10 +33,8 @@ public:
 	}
 
 	glm::mat4 getCamMatrix(glm::mat4 warbirdOrientationMatrix) {
-
 		glm::mat4 camMatrix = warbirdOrientationMatrix * this->translationMatrix;
 		glm::mat4 atMatrix = warbirdOrientationMatrix * glm::translate(glm::mat4(), glm::vec3(0,300,0));
-
 
 		this->eye = getPosition(camMatrix);
 		this->at = getPosition(atMatrix);
