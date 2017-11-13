@@ -56,14 +56,19 @@ glm::mat4 planetOM;
 float gravityConstant = 1000;
 
 //Title Information
-char baseStr[75] = "Snoop Dogg Galatica (keys: x, v)";
-char warbirdStr[15] = "Warbird 7 ";
-char unumStr[15] = "Unum 5 ";
-char secStr[15] = "Secundus 0 ";
-char viewStr[15] = " Front View,";
+char titleStr[300];
+char baseStr[75] = "Snoop Dogg Galatica:  ";
+char warbirdStr[15] = "Warbird";
+char wbMissileStr[15];
+char unumStr[15] = "UnumSite";
+char usMissileStr[15];
+char secStr[15] = "SecundusSite";
+char ssMissileStr[15];
 char upsStr[15];
 char fpsStr[15];
-char titleStr[150];
+char viewStr[15] = " Front View, ";
+char sTypeStr[15] = " Ace ";
+char speedStr[15] = "Speed";
 
 char * vertexShaderFile = "simpleVertex.glsl";
 char * fragmentShaderFile = "simpleFragment.glsl";
@@ -94,11 +99,16 @@ double timeInterval;
 void updateTitle() {
 	strcpy(titleStr, baseStr);
 	strcat(titleStr, warbirdStr);
+	strcat(titleStr, wbMissileStr);
 	strcat(titleStr, unumStr);
+	strcat(titleStr, usMissileStr);
 	strcat(titleStr, secStr);
+	strcat(titleStr, ssMissileStr);
 	strcat(titleStr, upsStr);
 	strcat(titleStr, fpsStr);
 	strcat(titleStr, viewStr);
+	strcat(titleStr, sTypeStr);
+	strcat(titleStr, speedStr);
 	// printf("title string = %s \n", titleStr);
 	glutSetWindowTitle(titleStr);
 }
@@ -179,8 +189,8 @@ void display(void) {
 	currentTime = glutGet(GLUT_ELAPSED_TIME);  // get elapsed system time
 	timeInterval = currentTime - lastTime;
 	if (timeInterval >= 1000) {
-		sprintf(fpsStr, " F/S: %4d", (int)(frameCount / (timeInterval / 1000.0f)));
-		sprintf(upsStr, " U/S: %4d", (int)((1000 / timeQuantum[timeQuantumIndex])));
+		sprintf(fpsStr, " F/S: %4d, ", (int)(frameCount / (timeInterval / 1000.0f)));
+		sprintf(upsStr, " U/S: %4d, ", (int)((1000 / timeQuantum[timeQuantumIndex])));
 
 		lastTime = currentTime;
 		frameCount = 0;
@@ -283,19 +293,37 @@ void update(int i) {
 
 	//camera updates
 	switch (flag) {
-	case 1:
-		viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
-		break;
-	case 2:
-		viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
-		break;
-	case 3:
-		viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
-		break;
-	default:
-		break;
+		case 1:
+			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
+			break;
+		case 2:
+			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
+			break;
+		case 3:
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
+			break;
+		default:
+			break;
 	}
 
+	//Update Title
+	sprintf(wbMissileStr, " %2d, ", warbird->getMissileCount());
+	sprintf(usMissileStr, " %2d, ", unumSite->getMissileCount());
+	sprintf(ssMissileStr, " %2d, ", secundusSite->getMissileCount());
+	switch (timeQuantumIndex) {
+		case 0:
+			strcpy(sTypeStr, " Ace ");
+			break;
+		case 1:
+			strcpy(sTypeStr, " Pilot ");
+			break;
+		case 2:
+			strcpy(sTypeStr, " Trainee ");
+			break;
+		case 3:
+			strcpy(sTypeStr, " Debug ");
+			break;
+	}
 }
 
 void arrowInput(int key, int x, int y) {
@@ -432,7 +460,7 @@ int main(int argc, char* argv[]) {
 		glutInitContextVersion(3, 3);
 		glutInitContextProfile(GLUT_CORE_PROFILE);
 	# endif
-	glutCreateWindow("lit solar system");
+	glutCreateWindow("The Dankest Universe");
 	glewExperimental = GL_TRUE;  // needed my home system 
 	GLenum err = glewInit();
 	if (GLEW_OK != err)

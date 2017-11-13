@@ -35,6 +35,10 @@ public:
 		this->isEnemy = isEnemy;
 	}
 
+	int getMissileCount() {
+		return missile;
+	}
+
 	void fire(bool reloading) {
 		if (this->missile > 0) {
 			if (reloading == false) {
