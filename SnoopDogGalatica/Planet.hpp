@@ -24,6 +24,7 @@ public:
 	glm::mat4 orbitalMatrix;
 
 	glm::mat4 axialTilt;
+	float tiltAngle;
 
 	Planet(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians, 
 		glm::vec3 orbitalAxis, float orbitalRadians, glm::vec3 tiltAxis, float tiltAngle) 
@@ -31,6 +32,7 @@ public:
 		this->orbitalAxis = orbitalAxis;
 		this->orbitalRadians = orbitalRadians;
 
+		this->tiltAngle = tiltAngle;
 		this->axialTilt = glm::rotate(glm::mat4(), tiltAngle, tiltAxis);
 	}
 	

@@ -50,6 +50,17 @@ public:
         radians = glm::radians(1.0f);
     }
 
+	Shape(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix) {
+		this->id = id;
+		this->numOfVert = numOfVert;
+		this->fileName = fileName;
+		this->size = size;
+
+		this->translationMatrix = glm::translate(glm::mat4(), translationMatrix);
+		rotationAxis = glm::vec3(0, 1, 0);
+		radians = glm::radians(1.0f);
+	}
+
     Shape(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians) {
         this->id = id;
         this->numOfVert = numOfVert;
