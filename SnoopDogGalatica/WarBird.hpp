@@ -1,5 +1,5 @@
 /*
-	Warbird.hpp
+	WarBird.hpp
 
 	Lemuel Dizon
 	Ramses Ordonez

@@ -15,6 +15,7 @@
 # include "Moon.hpp"
 # include "PlanetCam.hpp"
 # include "WarBird.hpp"
+# include "Missile.hpp"
 # include "WarBirdCam.hpp"
 # include "MissileSite.hpp"
 
@@ -29,11 +30,15 @@ Planet * duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000
 Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(2000, 0, 0),
 	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, -1, 0), 0.025f, glm::vec3(0, 0, 1), -0.4f);
 Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
-	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.012f, glm::vec3(0, 0, 1), 0.5f);
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0));
 MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f);
 MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f);
-Sun * missle = new Sun(8, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
+	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.012f, glm::vec3(0, 0, 1), 0.5f);
+Missile * missile0 = new Missile(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0), //confirm initial positioning
+	glm::vec3(0, 1, 0), 1.0f);
+Missile * missile1 = new Missile(7, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0),
+	glm::vec3(0, 1, 0), 1.0f);
+Missile * missile2 = new Missile(8, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
 
 //Planetary Cameras
@@ -53,7 +58,11 @@ float gravityConstant = 1000;
 
 //Title Information
 char baseStr[75] = "Snoop Dogg Galatica (keys: x, v)";
+char warbirdStr[15] = "Warbird 7 ";
+char unumStr[15] = "Unum 5 ";
+char secStr[15] = "Secundus 0 ";
 char viewStr[15] = " Front View,";
+char upsStr[15];
 char fpsStr[15];
 char titleStr[150];
 
@@ -85,8 +94,12 @@ double timeInterval;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
-	strcat(titleStr, viewStr);
+	strcat(titleStr, warbirdStr);
+	strcat(titleStr, unumStr);
+	strcat(titleStr, secStr);
+	strcat(titleStr, upsStr);
 	strcat(titleStr, fpsStr);
+	strcat(titleStr, viewStr);
 	// printf("title string = %s \n", titleStr);
 	glutSetWindowTitle(titleStr);
 }
@@ -149,7 +162,9 @@ void display(void) {
 	currentTime = glutGet(GLUT_ELAPSED_TIME);  // get elapsed system time
 	timeInterval = currentTime - lastTime;
 	if (timeInterval >= 1000) {
-		sprintf(fpsStr, " FPS: %4d", (int)(frameCount / (timeInterval / 1000.0f)));
+		sprintf(fpsStr, " F/S: %4d", (int)(frameCount / (timeInterval / 1000.0f)));
+		sprintf(upsStr, " U/S: %4d", (int)((1000 / timeQuantum[timeQuantumIndex])));
+
 		lastTime = currentTime;
 		frameCount = 0;
 		updateTitle();
@@ -197,9 +212,17 @@ void init(void) {
 	secundusSite->setScaleMatrix(modelSize);
 	secundusSite->setSitePosition(secundus->getModelMatrix(duo->getPlanetMatrix()), secundus->tiltAngle);
 
-	modelSize = loadModelBuffer(missle->fileName, missle->numOfVert, VAO[missle->id], buffer[missle->id], shaderProgram,
-		missle->vPosition, missle->vColor, missle->vNormal, "vPosition", "vColor", "vNormal");
-	missle->setScaleMatrix(modelSize);
+	modelSize = loadModelBuffer(missile0->fileName, missile0->numOfVert, VAO[missile0->id], buffer[missile0->id], shaderProgram,
+		missile0->vPosition, missile0->vColor, missile0->vNormal, "vPosition", "vColor", "vNormal");
+	missile0->setScaleMatrix(modelSize);
+
+	modelSize = loadModelBuffer(missile1->fileName, missile1->numOfVert, VAO[missile1->id], buffer[missile1->id], shaderProgram,
+		missile1->vPosition, missile1->vColor, missile1->vNormal, "vPosition", "vColor", "vNormal");
+	missile0->setScaleMatrix(modelSize);	
+
+	modelSize = loadModelBuffer(missile2->fileName, missile2->numOfVert, VAO[missile2->id], buffer[missile2->id], shaderProgram,
+		missile2->vPosition, missile2->vColor, missile2->vNormal, "vPosition", "vColor", "vNormal");
+	missile0->setScaleMatrix(modelSize);
 
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
@@ -234,8 +257,10 @@ void update(int i) {
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update(ruber->getOrientationMatrix(), ruber->getSize() / 2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
-	missle->update();
+	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
+	missile0->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
+	missile1->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
+	missile2->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
 	unumCam->update();
 	duoCam->update();
 
@@ -310,8 +335,8 @@ void keyboard(unsigned char key, int x, int y) {
 			warbird->warpTo(planetCamOM, planetOM);
 
 			break;
-		case 'f': case 'F': // fire missile
-
+		case 'f': case 'F': // fire missile only if its not fired yet.
+			if(!missile0->isFired()) missile0->fire(warbird->getOrientationMatrix());
 			break;
 		case 'g': case 'G': // toggle gravity for ship
 			warbird->toggleGravity();
@@ -360,12 +385,12 @@ void keyboard(unsigned char key, int x, int y) {
 			strcpy(viewStr, " WarBird View,");
 			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
 			break;
-		case 3:  // missle view
+		case 3:  // missile view
 			flag = 0;
 			eye = glm::vec3(14500.0f, 250.0f, 250.0f);
 			at = glm::vec3(14500.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 1.0f, 0.0f);
-			strcpy(viewStr, " Missle View,");
+			strcpy(viewStr, " missile View,");
 			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 4: // unum view
