@@ -21,22 +21,46 @@ private:
 	int missile;
 	int health;
 	bool isEnemy;
-	bool isDead;
 
+public:
 	Entity(int missile, int health) {
 		this->missile = missile;
 		this->health = health;
 		this->isEnemy = false;
-		this->isDead = false;
 	}
 
 	Entity(int missile, int health, bool isEnemy) {
 		this->missile = missile;
 		this->health = health;
 		this->isEnemy = isEnemy;
-		this->isDead = false;
 	}
 
+	void fire(bool reloading) {
+		if (this->missile > 0) {
+			if (reloading == false) {
+				this->missile--;
+				//fire the missile
+			}
+			else {
+				printf("Still Reloading, Please Wait");
+			}
+		}
+		else {
+			printf("Out of Ammo!\n");
+		}
+	}
 
+	void hit() {
+		if (this->health > 0) {
+			this->health--;
+		}
+		else {
+			printf("Already Dead");
+		}
+	}
+
+	bool isDead() {
+		return (this->health <= 0);
+	}
 
 };
