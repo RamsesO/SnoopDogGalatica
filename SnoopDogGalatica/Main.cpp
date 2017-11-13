@@ -19,7 +19,7 @@
 # include "MissileSite.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
-const int nModels = 7;
+const int nModels = 9;
 Sun * ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0),
 	glm::vec3(0, 1, 0), 1.0f);
 Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0),
@@ -32,7 +32,11 @@ Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3
 	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.025f, glm::vec3(0, 0, 1), -0.5f);
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0),
 	glm::vec3(0, 1, 0), 0.0f);
-Sun * missle = new Sun(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
+MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, glm::vec3(-125, 250, 0),
+	glm::vec3(0, 1, 0), 0.0f);
+MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, glm::vec3(0, 75, 0),
+	glm::vec3(0, 1, 0), 0.0f);
+Sun * missle = new Sun(8, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(14500, 0, 0),
 	glm::vec3(0, 1, 0), 1.0f);
 
 //Planetary Cameras
@@ -124,11 +128,17 @@ void display(void) {
 	glBindVertexArray(VAO[warbird->id]);
 	glDrawArrays(GL_TRIANGLES, 0, warbird->numOfVert);
 
-	modelMatrix = missle->getModelMatrix();
+	modelMatrix = unumSite->getModelMatrix(unum->getHubMatrix());
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[missle->id]);
-	glDrawArrays(GL_TRIANGLES, 0, missle->numOfVert);
+	glBindVertexArray(VAO[unumSite->id]);
+	glDrawArrays(GL_TRIANGLES, 0, unumSite->numOfVert);
+
+	modelMatrix = secundusSite->getModelMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[secundus->id]);
+	glDrawArrays(GL_TRIANGLES, 0, secundus->numOfVert);
 
 	glutSwapBuffers();
 	frameCount++;
@@ -174,6 +184,14 @@ void init(void) {
 	modelSize = loadModelBuffer(warbird->fileName, warbird->numOfVert, VAO[warbird->id], buffer[warbird->id], shaderProgram,
 		warbird->vPosition, warbird->vColor, warbird->vNormal, "vPosition", "vColor", "vNormal");
 	warbird->setScaleMatrix(modelSize);
+
+	modelSize = loadModelBuffer(unumSite->fileName, unumSite->numOfVert, VAO[unumSite->id], buffer[unumSite->id], shaderProgram,
+		unumSite->vPosition, unumSite->vColor, unumSite->vNormal, "vPosition", "vColor", "vNormal");
+	unumSite->setScaleMatrix(modelSize);
+
+	modelSize = loadModelBuffer(secundusSite->fileName, secundusSite->numOfVert, VAO[secundusSite->id], buffer[secundusSite->id], shaderProgram,
+		secundusSite->vPosition, secundusSite->vColor, secundusSite->vNormal, "vPosition", "vColor", "vNormal");
+	secundusSite->setScaleMatrix(modelSize);
 
 	modelSize = loadModelBuffer(missle->fileName, missle->numOfVert, VAO[missle->id], buffer[missle->id], shaderProgram,
 		missle->vPosition, missle->vColor, missle->vNormal, "vPosition", "vColor", "vNormal");

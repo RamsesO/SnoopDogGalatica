@@ -30,7 +30,7 @@ public:
 	}
 
 	glm::mat4 getModelMatrix(glm::mat4 hubMatrix) {
-		return (hubMatrix * this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
+		return (this->translationMatrix * hubMatrix * this->scaleMatrix);
 	}
 
 };

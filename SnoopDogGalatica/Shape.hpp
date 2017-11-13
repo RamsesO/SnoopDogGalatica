@@ -1,9 +1,11 @@
 /*
-    Shape.hpp
+	Shape.hpp
 
-    Lemuel Dizon
-    Ramses Ordonez
-    10/2/2017
+	Lemuel Dizon
+	Ramses Ordonez
+	Kelly Kim
+
+	10/2/2017
 */
 
 # ifndef __INCLUDES465__

@@ -43,6 +43,10 @@ public:
 		return (this->orbitalMatrix * this->translationMatrix * glm::inverse(this->orbitalMatrix));
 	}
 
+	glm::mat4 getHubMatrix() {
+		return (this->orbitalMatrix * this->translationMatrix * glm::inverse(this->orbitalMatrix) * this->axialTilt * this->rotationMatrix);
+	}
+
 	void update() {
 		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
 		this->orbitalMatrix = glm::rotate(this->orbitalMatrix, this->orbitalRadians, this->orbitalAxis);

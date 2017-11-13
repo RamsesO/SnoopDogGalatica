@@ -26,4 +26,9 @@ public:
 			this->axialTilt * this->rotationMatrix * this->scaleMatrix);
 	}
 
+	glm::mat4 getHubMatrix(glm::mat4 planetMatrix) {
+		return (planetMatrix * this->orbitalMatrix * this->translationMatrix * glm::inverse(this->orbitalMatrix) *
+			this->axialTilt * this->rotationMatrix);
+	}
+
 };
