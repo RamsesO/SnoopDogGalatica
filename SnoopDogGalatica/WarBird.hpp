@@ -16,7 +16,7 @@
 
 # define __WarBird__
 
-class WarBird : public Shape, public Entity {
+class WarBird : public Shape, public Entity, public Gravity {
 
 public:
 
@@ -24,16 +24,12 @@ public:
 	float rotateBy;
 	float step;
 	int key; // 1-8 designates the kind of movement
-	bool gravity = false;
-	float gravityConstant = 0;
-	glm::vec3 gravityVec;
 
 	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, int missile, int health) :
-		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health) {
+		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health), Gravity() {
 		this->step = 10;
 		this->rotateBy = 0;
 		this->key = -1;
-		this->gravityVec = glm::vec3(0, 0, 0);
 	}
 
 	void changeStep() {
@@ -52,40 +48,9 @@ public:
 		key = i;
 	}
 
-	void toggleGravity() {
-		this->gravity = !this->gravity;
-		if (!gravity)
-			gravityVec = glm::vec3(0, 0, 0);
-	}
-
-	void setGravityConst(float constant) {
-		this->gravityConstant = constant;
-	}
-
 	void setGravityDirection(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize) {
-		this->gravityVec = glm::vec3(0, 0, 0);
-
 		glm::vec3 shipPos = getPosition(this->translationMatrix);
-
-		//sun
-		float distanceBetween = distance(shipPos, getPosition(sunOM));
-		glm::mat4 gravRM = glm::inverse(glm::lookAt(getPosition(this->translationMatrix), getPosition(sunOM), glm::vec3(0, 1, 0)));
-		float gravityResult = (-this->gravityConstant * sunSize * this->size) / (distanceBetween * distanceBetween);
-		this->gravityVec += gravityResult * getOut(gravRM);
-
-		//unum
-		distanceBetween = distance(shipPos, getPosition(unumOM));
-		gravRM = glm::inverse(glm::lookAt(getPosition(this->translationMatrix), getPosition(unumOM), glm::vec3(0, 1, 0)));
-		gravityResult = (-this->gravityConstant * unumSize * this->size) / (distanceBetween * distanceBetween);
-		this->gravityVec += gravityResult * getOut(gravRM);
-
-		//duo
-		distanceBetween = distance(shipPos, getPosition(duoOM));
-		gravRM = glm::inverse(glm::lookAt(getPosition(this->translationMatrix), getPosition(duoOM), glm::vec3(0, 1, 0)));
-		gravityResult = (-this->gravityConstant * duoSize * this->size) / (distanceBetween * distanceBetween);
-		this->gravityVec += gravityResult * getOut(gravRM);
-
-		showVec3("GV", this->gravityVec);
+		setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize);
 	}
 
 	void moveForward() {

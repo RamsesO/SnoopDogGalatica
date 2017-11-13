@@ -11,6 +11,7 @@
 # include "../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Entity.hpp"
+# include "Gravity.hpp"
 # include "Sun.hpp"
 # include "Planet.hpp"
 # include "Moon.hpp"
