@@ -16,7 +16,7 @@
 
 # define __WarBird__
 
-class WarBird : public Shape {
+class WarBird : public Shape, public Entity {
 
 public:
 
@@ -28,8 +28,8 @@ public:
 	float gravityConstant = 0;
 	glm::vec3 gravityVec;
 
-	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix) :
-		Shape(id, numOfVert, fileName, size, translationMatrix) {
+	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, int missile, int health) :
+		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health) {
 		this->step = 10;
 		this->rotateBy = 0;
 		this->key = -1;
