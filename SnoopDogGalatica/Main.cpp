@@ -10,6 +10,7 @@
 # define __Windows__
 # include "../includes465/include465.hpp"
 # include "Shape.hpp"
+# include "Entity.hpp"
 # include "Sun.hpp"
 # include "Planet.hpp"
 # include "Moon.hpp"
@@ -32,8 +33,8 @@ Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(200
 Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
 	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.012f, glm::vec3(0, 0, 1), 0.5f);
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0));
-MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f);
-MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f);
+MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
+MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
 Missile * wbMissile = new Missile(8, 918 * 3, "assets/Missle.tri", 25.0f);
 Missile * usMissile = new Missile(9, 918 * 3, "assets/Missle.tri", 25.0f);
 Missile * ssMissile = new Missile(10, 918 * 3, "assets/Missle.tri", 25.0f);

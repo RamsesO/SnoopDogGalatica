@@ -15,18 +15,13 @@
 
 # define __MissileSite__
 
-class MissileSite : public Shape {
+class MissileSite : public Shape, public Entity {
 
-private:
-	int missiles;
-	int health;
 
 public:
 
-	MissileSite(int id, int numOfVert, char * fileName, float size) :
-		Shape(id, numOfVert, fileName, size) {
-		this->missiles = 5;
-		this->health = 1;
+	MissileSite(int id, int numOfVert, char * fileName, float size, int missile, int health, bool isEnemy) :
+		Shape(id, numOfVert, fileName, size), Entity(missile, health, isEnemy) {
 	}
 
 	void setSitePosition(glm::mat4 hubMatrix, float tiltAngle) {
@@ -40,10 +35,6 @@ public:
 		printf("Angle: %f, vDist: %f, xDist: %f, yDist: %f\n", angle, vDist, xDist, yDist);
 
 		this->translationMatrix = glm::translate(glm::mat4(), glm::vec3(xDist, yDist, 0));
-	}
-
-	int getMissleCount() {
-		return this->missiles;
 	}
 
 	glm::mat4 getModelMatrix(glm::mat4 hubMatrix) {
