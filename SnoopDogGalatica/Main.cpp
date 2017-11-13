@@ -7,7 +7,7 @@
 	Kim, Kelly
 */
 
-# define __Windows__
+# define __MAC__
 # include "../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Entity.hpp"
