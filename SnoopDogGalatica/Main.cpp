@@ -7,8 +7,8 @@
 	Kim, Kelly
 */
 
-# define __MAC__
-# include "../includes465/include465.hpp"
+# define __Mac__
+# include "../../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Entity.hpp"
 # include "Gravity.hpp"
