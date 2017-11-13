@@ -366,19 +366,17 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 'v': case 'V': // next camera
 			currCam++;
-			if (currCam == 6)
-				currCam = 0;
 			break;
 		case 'x': case 'X':// prev camera
 			currCam--;
 			if (currCam == -1)
-				currCam = 5;
+				currCam = 4;
 			break;
 		case 033: case 'q': case 'Q':
 			exit(EXIT_SUCCESS);
 	}
 
-	switch (currCam % 6) {
+	switch (currCam % 5) {
 		case 0:  // front view
 			flag = 0;
 			eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
@@ -395,30 +393,23 @@ void keyboard(unsigned char key, int x, int y) {
 			strcpy(viewStr, " Top View,");
 			viewMatrix = glm::lookAt(eye, at, up);
 			break;
-		case 2:  // warbird view
-			flag = 3;
-			strcpy(viewStr, " WarBird View,");
-			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
-			break;
-		case 3:  // missile view
-			flag = 0;
-			eye = glm::vec3(14500.0f, 250.0f, 250.0f);
-			at = glm::vec3(14500.0f, 0.0f, 0.0f);
-			up = glm::vec3(0.0f, 1.0f, 0.0f);
-			strcpy(viewStr, " missile View,");
-			viewMatrix = glm::lookAt(eye, at, up);
-			break;
-		case 4: // unum view
+		case 2: // unum view
 			flag = 1;
 			strcpy(viewStr, " Unum view,");
 			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
 			break;
-		case 5: // duo view 
+		case 3: // duo view 
 			flag = 2;
 			strcpy(viewStr, " Duo View,");
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
 			break;
-
+		case 4:  // warbird view
+			flag = 3;
+			strcpy(viewStr, " WarBird View,");
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
+			break;
+		default:
+			break;
 	}
 
 	updateTitle();
