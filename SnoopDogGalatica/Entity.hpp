@@ -1,11 +1,11 @@
 /*
-MissileSite.hpp
+	Entity.hpp
 
-Lemuel Dizon
-Ramses Ordonez
-Kelly Kim
+	Lemuel Dizon
+	Ramses Ordonez
+	Kelly Kim
 
-10/2/2017
+	10/2/2017
 */
 
 # ifndef __INCLUDES465__
