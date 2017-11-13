@@ -43,6 +43,14 @@ PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0
 //Warbird Camera
 WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(0, 300, 1000));
 
+//Warp Variables
+int warp = -1;
+glm::mat4 planetCamOM;
+glm::mat4 planetOM;
+
+//gravity variables
+float gravityConstant = 1000;
+
 //Title Information
 char baseStr[75] = "Snoop Dogg Galatica (keys: x, v)";
 char viewStr[15] = " Front View,";
@@ -64,7 +72,8 @@ glm::mat4 ModelViewProjectionMatrix; // set in display();
 GLfloat aspectRatio;
 
 //Time Keepers
-int timerDelay = 40; // 40 millisecond delay approximates 35 fps
+int timeQuantum[] = {5, 40, 100, 500};
+int timeQuantumIndex = 0;
 int frameCount = 0;
 
 int flag = 0;
@@ -73,10 +82,6 @@ int currCam = 0;
 double currentTime;
 double lastTime;
 double timeInterval;
-
-
-//ship variables
-bool gravity = false;
 
 void updateTitle() {
 	strcpy(titleStr, baseStr);
@@ -207,6 +212,8 @@ void init(void) {
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
+
+	warbird->setGravityConst(gravityConstant);
 }
 
 // set viewport and projectionMatrix on window resize events
@@ -221,29 +228,29 @@ void reshape(int width, int height) {
 
 // Use with Idle and intervalTimer functions 
 void update(int i) {
-	glutTimerFunc(timerDelay, update, 1);
+	glutTimerFunc(timeQuantum[timeQuantumIndex], update, 1);
 	ruber->update();
 	unum->update();
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update();
+	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
 	missle->update();
 	unumCam->update();
 	duoCam->update();
 
 	//camera updates
 	switch (flag) {
-	case 1:
-		viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
-		break;
-	case 2:
-		viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
-		break;
-	case 3:
-		viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix());
-	default:
-		break;
+		case 1:
+			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
+			break;
+		case 2:
+			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
+			break;
+		case 3:
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
+		default:
+			break;
 	}
 
 }
@@ -290,77 +297,97 @@ void arrowInput(int key, int x, int y) {
 
 void keyboard(unsigned char key, int x, int y) {
 
-	switch (key) {
-	case 'w': case 'W': // warp ship
+	switch(key){
+		case 'w': case 'W': // warp ship
+			warp++;
 
-		break;
-	case 'f': case 'F': // fire missile
+			if(warp % 2 == 0){
+				planetCamOM = unumCam->getOrientationMatrix();
+				planetOM = unum->getPlanetMatrix();
 
-		break;
-	case 'g': case 'G': // toggle gravity
-		gravity = !gravity;
-		break;
-	case 't': case 'T': // next TQ value
+			}
+			else{
+				planetCamOM = duoCam->getOrientationMatrix();
+				planetOM = duo->getPlanetMatrix();
+			}
+			warbird->warpTo(planetCamOM, planetOM);
 
-		break;
-	case 's': case 'S': // next ship speed
-		warbird->changeStep();
-		break;
-	case 'v': case 'V': // next camera
-		currCam++;
-		if (currCam == 6)
-			currCam = 0;
-		break;
-	case 'x': case 'X':// prev camera
-		currCam--;
-		if (currCam == -1)
-			currCam = 5;
-		break;
-	case 033: case 'q': case 'Q':
-		exit(EXIT_SUCCESS);
+			break;
+		case 'f': case 'F': // fire missile
+
+			break;
+		case 'g': case 'G': // toggle gravity for ship
+			warbird->toggleGravity();
+			break;
+		case 't': case 'T': // next TQ value
+			timeQuantumIndex++;
+			if(timeQuantumIndex > 3)
+				timeQuantumIndex = 0;
+			break;
+		case 's': case 'S': // next ship speed
+			warbird->changeStep();
+			break;
+		case 'v': case 'V': // next camera
+			currCam++;
+			if(currCam == 6)
+				currCam = 0;
+			break;
+		case 'x': case 'X':// prev camera
+			currCam--;
+			if(currCam == -1)
+				currCam = 5;
+			break;
+		case 033: case 'q': case 'Q':
+			exit(EXIT_SUCCESS);
 	}
 
 
 	switch (currCam % 6) {
-	case 0:  // front view
-		flag = 0;
-		eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
-		at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
-		up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
-		strcpy(viewStr, " Front View,");
-		viewMatrix = glm::lookAt(eye, at, up);
-		break;
-	case 1:  // top view
-		flag = 0;
-		eye = glm::vec3(0.0f, 20000.0f, 0.0f);
-		at = glm::vec3(0.0f, 0.0f, 0.0f);
-		up = glm::vec3(0.0f, 0.0f, -1.0f);
-		strcpy(viewStr, " Top View,");
-		viewMatrix = glm::lookAt(eye, at, up);
-		break;
-	case 2:  // warbird view
-		flag = 3;
-		viewMatrix = warbirdCam->getCamMatrix(warbird->getWarbirdMatrix());
-		strcpy(viewStr, " WarBird View,");
-		break;
-	case 3:  // missle view
-		flag = 0;
-		eye = glm::vec3(14500.0f, 250.0f, 250.0f);
-		at = glm::vec3(14500.0f, 0.0f, 0.0f);
-		up = glm::vec3(0.0f, 1.0f, 0.0f);
-		strcpy(viewStr, " Missle View,");
-		viewMatrix = glm::lookAt(eye, at, up);
-		break;
-	case 4: // unum view
-		flag = 1;
-		strcpy(viewStr, " Unum view,");
-		viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
-		break;
-	case 5: // duo view 
-		flag = 2;
-		strcpy(viewStr, " Duo View,");
-		viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
-		break;
+		case 0:  // front view
+			flag = 0;
+			eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
+			at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
+			up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
+			strcpy(viewStr, " Front View,"); 
+			viewMatrix = glm::lookAt(eye, at, up);
+			break;
+		case 1:  // top view
+			flag = 0;
+			eye = glm::vec3(0.0f, 20000.0f, 0.0f);   
+			at = glm::vec3(0.0f, 0.0f, 0.0f);   
+			up = glm::vec3(0.0f, 0.0f, -1.0f);   
+			strcpy(viewStr, " Top View,"); 
+			viewMatrix = glm::lookAt(eye, at, up);
+			break;
+		case 2:  // warbird view
+			flag = 3;
+			// eye = glm::vec3(15000.0f, 250.0f, 250.0f);
+			// at = glm::vec3(15000.0f, 0.0f, 0.0f);
+			// up = glm::vec3(0.0f, 1.0f, 0.0f);
+			// viewMatrix = glm::lookAt(eye, at, up);
+			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
+			strcpy(viewStr, " WarBird View,");
+			
+			break;
+		case 3:  // missle view
+			flag = 0;
+			eye = glm::vec3(14500.0f, 250.0f, 250.0f);
+			at = glm::vec3(14500.0f, 0.0f, 0.0f);
+			up = glm::vec3(0.0f, 1.0f, 0.0f);
+			strcpy(viewStr, " Missle View,");
+			viewMatrix = glm::lookAt(eye, at, up);
+			break;
+		case 4: // unum view
+			flag = 1;
+			strcpy(viewStr, " Unum view,"); 
+			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
+			break;
+		case 5: // duo view 
+			flag = 2;
+			strcpy(viewStr, " Duo View,");
+			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
+			break;	
+
 	}
 
 	updateTitle();
@@ -399,7 +426,7 @@ int main(int argc, char* argv[]) {
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(arrowInput);
-	glutTimerFunc(timerDelay, update, 1);  // keep the window up
+	glutTimerFunc(timeQuantum[timeQuantumIndex], update, 1);  // keep the window up
 	glutIdleFunc(display);
 	glutMainLoop();
 	printf("done\n");
