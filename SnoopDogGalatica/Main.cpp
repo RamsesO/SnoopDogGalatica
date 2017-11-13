@@ -7,7 +7,7 @@
 	Kim, Kelly
 */
 
-#define __Windows__
+# define __Windows__
 # include "../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Sun.hpp"
@@ -20,7 +20,7 @@
 # include "MissileSite.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
-const int nModels = 9;
+const int nModels = 11;
 Sun * ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0),
 	glm::vec3(0, 1, 0), 1.0f);
 Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0),
@@ -30,16 +30,13 @@ Planet * duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000
 Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(2000, 0, 0),
 	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, -1, 0), 0.025f, glm::vec3(0, 0, 1), -0.4f);
 Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
+	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.012f, glm::vec3(0, 0, 1), 0.5f);
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0));
 MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f);
 MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f);
-	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.012f, glm::vec3(0, 0, 1), 0.5f);
-Missile * missile0 = new Missile(6, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0), //confirm initial positioning
-	glm::vec3(0, 1, 0), 1.0f);
-Missile * missile1 = new Missile(7, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0),
-	glm::vec3(0, 1, 0), 1.0f);
-Missile * missile2 = new Missile(8, 918 * 3, "assets/Missle.tri", 25.0f, glm::vec3(0, 0, 0),
-	glm::vec3(0, 1, 0), 1.0f);
+Missile * wbMissile = new Missile(8, 918 * 3, "assets/Missle.tri", 25.0f);
+Missile * usMissile = new Missile(9, 918 * 3, "assets/Missle.tri", 25.0f);
+Missile * ssMissile = new Missile(10, 918 * 3, "assets/Missle.tri", 25.0f);
 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
@@ -155,6 +152,24 @@ void display(void) {
 	glBindVertexArray(VAO[secundusSite->id]);
 	glDrawArrays(GL_TRIANGLES, 0, secundusSite->numOfVert);
 
+	modelMatrix = wbMissile->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[wbMissile->id]);
+	glDrawArrays(GL_TRIANGLES, 0, wbMissile->numOfVert);
+
+	modelMatrix = usMissile->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[usMissile->id]);
+	glDrawArrays(GL_TRIANGLES, 0, usMissile->numOfVert);
+
+	modelMatrix = ssMissile->getModelMatrix();
+	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glBindVertexArray(VAO[ssMissile->id]);
+	glDrawArrays(GL_TRIANGLES, 0, ssMissile->numOfVert);
+
 	glutSwapBuffers();
 	frameCount++;
 
@@ -212,17 +227,17 @@ void init(void) {
 	secundusSite->setScaleMatrix(modelSize);
 	secundusSite->setSitePosition(secundus->getModelMatrix(duo->getPlanetMatrix()), secundus->tiltAngle);
 
-	modelSize = loadModelBuffer(missile0->fileName, missile0->numOfVert, VAO[missile0->id], buffer[missile0->id], shaderProgram,
-		missile0->vPosition, missile0->vColor, missile0->vNormal, "vPosition", "vColor", "vNormal");
-	missile0->setScaleMatrix(modelSize);
+	modelSize = loadModelBuffer(wbMissile->fileName, wbMissile->numOfVert, VAO[wbMissile->id], buffer[wbMissile->id], shaderProgram,
+		wbMissile->vPosition, wbMissile->vColor, wbMissile->vNormal, "vPosition", "vColor", "vNormal");
+	wbMissile->setScaleMatrix(modelSize);
 
-	modelSize = loadModelBuffer(missile1->fileName, missile1->numOfVert, VAO[missile1->id], buffer[missile1->id], shaderProgram,
-		missile1->vPosition, missile1->vColor, missile1->vNormal, "vPosition", "vColor", "vNormal");
-	missile0->setScaleMatrix(modelSize);	
+	modelSize = loadModelBuffer(usMissile->fileName, usMissile->numOfVert, VAO[usMissile->id], buffer[usMissile->id], shaderProgram,
+		usMissile->vPosition, usMissile->vColor, usMissile->vNormal, "vPosition", "vColor", "vNormal");
+	usMissile->setScaleMatrix(modelSize);	
 
-	modelSize = loadModelBuffer(missile2->fileName, missile2->numOfVert, VAO[missile2->id], buffer[missile2->id], shaderProgram,
-		missile2->vPosition, missile2->vColor, missile2->vNormal, "vPosition", "vColor", "vNormal");
-	missile0->setScaleMatrix(modelSize);
+	modelSize = loadModelBuffer(ssMissile->fileName, ssMissile->numOfVert, VAO[ssMissile->id], buffer[ssMissile->id], shaderProgram,
+		ssMissile->vPosition, ssMissile->vColor, ssMissile->vNormal, "vPosition", "vColor", "vNormal");
+	ssMissile->setScaleMatrix(modelSize);
 
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
@@ -258,9 +273,9 @@ void update(int i) {
 	primus->update();
 	secundus->update();
 	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getOrientationMatrix(), unum->getSize(), duo->getOrientationMatrix(), duo->getSize());
-	missile0->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
-	missile1->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
-	missile2->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
+	wbMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
+	usMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
+	ssMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
 	unumCam->update();
 	duoCam->update();
 
@@ -336,7 +351,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 			break;
 		case 'f': case 'F': // fire missile only if its not fired yet.
-			if(!missile0->isFired()) missile0->fire(warbird->getOrientationMatrix());
+			if(!wbMissile->isFired()) wbMissile->fire(warbird->getOrientationMatrix());
 			break;
 		case 'g': case 'G': // toggle gravity for ship
 			warbird->toggleGravity();
