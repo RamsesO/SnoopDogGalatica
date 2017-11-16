@@ -141,18 +141,11 @@ public:
 		if (gravity)
 			setGravityDirection(sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 		
-		if(destruction(getPosition(this->translationMatrix), this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize)){
-			printf("boom \n");
-			printf("boom \n");
-			printf("boom \n");
-			printf("boom \n");
-			printf("boom \n");
-			printf("boom \n");
-			printf(" %d \n", hitCount++);
-
+		if(planetCollision(getPosition(this->translationMatrix), this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize)){
+			
 			//ship has been hit by a planet
 			//send to middle of the sun and leave camera where it is
-			this->translationMatrix = glm::mat4(0);
+			sendToCenter();
 			this->destroyed = true;
 
 		}
