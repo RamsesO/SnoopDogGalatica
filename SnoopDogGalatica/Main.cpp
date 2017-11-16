@@ -7,9 +7,10 @@
 	Kim, Kelly
 */
 
-# define __Mac__
-# include "../../includes465/include465.hpp"
+# define __Windows__
+# include "../includes465/include465.hpp"
 # include "Shape.hpp"
+# include "Collision.hpp"
 # include "Entity.hpp"
 # include "Gravity.hpp"
 # include "Sun.hpp"
@@ -382,7 +383,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 			break;
 		case 'f': case 'F': // fire missile only if its not fired yet.
-			if(!wbMissile->isFired()) wbMissile->fire(warbird->getOrientationMatrix());
+			//if(!wbMissile->isFired()) wbMissile->fire(warbird->getOrientationMatrix());
 			break;
 		case 'g': case 'G': // toggle gravity for ship
 			warbird->toggleGravity();

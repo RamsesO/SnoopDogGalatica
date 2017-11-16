@@ -15,24 +15,27 @@
 
 # define __Entity__
 
-class Entity {
+class Entity : public Collision {
 
 private:
 	int missile;
 	int health;
 	bool isEnemy;
+	bool isDead;
 
 public:
 	Entity(int missile, int health) {
 		this->missile = missile;
 		this->health = health;
 		this->isEnemy = false;
+		this->isDead = false;
 	}
 
 	Entity(int missile, int health, bool isEnemy) {
 		this->missile = missile;
 		this->health = health;
 		this->isEnemy = isEnemy;
+		this->isDead = false;
 	}
 
 	int getMissileCount() {
@@ -54,17 +57,36 @@ public:
 		}
 	}
 
-	void hit() {
-		if (this->health > 0) {
+	void onMissileHit() {
+		if (this->isDead == false) {
 			this->health--;
+			if (this->health == 0) {
+				this->isDead == true;
+			}
 		}
 		else {
 			printf("Already Dead");
 		}
 	}
 
-	bool isDead() {
-		return (this->health <= 0);
+	bool onPlanetHit() {
+		if (isInPContact()) {
+			if (this->isDead == false) {
+				this->health = 0;
+				this->isDead = true;
+				return true;
+			}
+			else {
+				printf("Already Dead");
+				return false;
+			}
+		}
+		return false;
 	}
+
+	bool isItDead() {
+		return this->isDead;
+	}
+
 
 };

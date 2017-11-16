@@ -10,7 +10,7 @@
 
 
 # ifndef __INCLUDES465__
-# include "../../includes465/include465.hpp"
+# include "../includes465/include465.hpp"
 # define __INCLUDES465__
 # endif
 
@@ -24,8 +24,7 @@ public:
 	float rotateBy;
 	float step;
 	int key; // 1-8 designates the kind of movement
-	int hitCount = 0;
-	bool destroyed = false;
+
 
 	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, int missile, int health) :
 		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health), Gravity() {
@@ -48,12 +47,6 @@ public:
 
 	void movement(int i) {
 		key = i;
-	}
-
-	void setGravityDirection(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, 
-		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
-		glm::vec3 shipPos = getPosition(this->translationMatrix);
-		setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize,primusOM, primusSize, secundusOM, secundusSize);
 	}
 
 	void moveForward() {
@@ -133,29 +126,20 @@ public:
 	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
 		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
 
-		if(this->destroyed){
+		if(isItDead()){
 			printf("ship is dead \n");
 			return;
 		}
 
-		if (gravity)
-			setGravityDirection(sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
-		
-		if(destruction(getPosition(this->translationMatrix), this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize)){
-			printf("boom \n");
-			printf("boom \n");
-			printf("boom \n");
-			printf("boom \n");
-			printf("boom \n");
-			printf("boom \n");
-			printf(" %d \n", hitCount++);
-
-			//ship has been hit by a planet
-			//send to middle of the sun and leave camera where it is
-			this->translationMatrix = glm::mat4(0);
-			this->destroyed = true;
-
+		glm::vec3 shipPos = getPosition(this->translationMatrix);
+		if (gravity) {
+			setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 		}
+		
+		planetCollision(shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		bool justDied = onPlanetHit();
+		if (justDied) sendToCenter();
+
 		switch (key) {
 			case 0:
 				moveForward();

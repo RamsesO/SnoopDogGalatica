@@ -9,7 +9,7 @@
 */
 
 # ifndef __INCLUDES465__
-# include "../../includes465/include465.hpp"
+# include "../includes465/include465.hpp"
 # define __INCLUDES465__
 # endif
 
@@ -20,9 +20,8 @@ class Sun : public Shape {
 public:
 
     Sun(): Shape(){}
-    Sun(int id, int numOfVert, char * fileName, float size): Shape(id, numOfVert, fileName, size){}
+    Sun(int id, int numOfVert, char * fileName, float size): Shape(id, numOfVert, fileName, size) {}
     Sun(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, glm::vec3 rotationAxis, float radians): Shape(id, numOfVert, fileName, size, translationMatrix, rotationAxis, radians) {}
-
 
     glm::mat4 getModelMatrix() {
         return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
