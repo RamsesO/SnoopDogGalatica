@@ -136,14 +136,10 @@ public:
 			setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 		}
 		
-		if(planetCollision(getPosition(this->translationMatrix), this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize)){
-			
-			//ship has been hit by a planet
-			//send to middle of the sun and leave camera where it is
-			sendToCenter();
-			this->destroyed = true;
+		planetCollision(shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		bool justDied = onPlanetHit();
+		if (justDied) sendToCenter();
 
-		}
 		switch (key) {
 			case 0:
 				moveForward();
