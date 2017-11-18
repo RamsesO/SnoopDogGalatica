@@ -22,6 +22,7 @@ private:
 	//
 	const float UTL = 2000.0; //2000 updates to live
 	const float UTA = 200.0;  //200 updates to activate
+	const int detectionRange = 3000; 
 	float step;
 	int ttl, activate;
 	int target;
@@ -71,7 +72,8 @@ public:
 						fired = false;
 					}
 					else{
-						rotateTowards(ship, unumOM, duoOM);
+						if(target != -1)
+							rotateTowards(ship, unumOM, duoOM);
 						translateForward();
 						ttl--;
 					}
@@ -91,19 +93,21 @@ public:
 
 	float identify(glm::mat4 unum, glm::mat4 duo) {
 		//here calculate distance
-
 		glm::vec3 missilePos = getPosition(getOrientationMatrix());
 		float distanceBetweenUnum = distance(missilePos, getPosition(unum));
 		float distanceBetweenDuo = distance(missilePos, getPosition(duo));
-
-		if(distanceBetweenUnum > distanceBetweenDuo){
-			printf("chose duo\n");
-			return 2;
+		if(distanceBetweenUnum <= detectionRange || distanceBetweenDuo <= detectionRange){
+			if(distanceBetweenUnum > distanceBetweenDuo){
+				printf("chose duo\n");
+				return 2;
+			}
+			else{
+				printf("chose unum\n");
+				return 1;
+			}
 		}
-		else{
-			printf("chose unum\n");
-			return 1;
-		}
+		else//all out of detection range
+			return -1;
 	}
 
 	void translateForward(){
