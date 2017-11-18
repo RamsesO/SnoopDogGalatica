@@ -25,6 +25,7 @@ public:
 	float step;
 	int key; // 1-8 designates the kind of movement
 
+
 	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, int missile, int health) :
 		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health), Gravity() {
 		this->step = 10;
@@ -46,11 +47,6 @@ public:
 
 	void movement(int i) {
 		key = i;
-	}
-
-	void setGravityDirection(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize) {
-		glm::vec3 shipPos = getPosition(this->translationMatrix);
-		setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize);
 	}
 
 	void moveForward() {
@@ -127,9 +123,22 @@ public:
 		return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
 	}
 
-	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize) {
-		if (gravity)
-			setGravityDirection(sunOM, sunSize, unumOM, unumSize, duoOM, duoSize);
+	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
+		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
+
+		if(isItDead()){
+			printf("ship is dead \n");
+			return;
+		}
+
+		glm::vec3 shipPos = getPosition(this->translationMatrix);
+		if (gravity) {
+			setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		}
+		
+		planetCollision(shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		bool justDied = onPlanetHit();
+		if (justDied) sendToCenter();
 
 		switch (key) {
 			case 0:

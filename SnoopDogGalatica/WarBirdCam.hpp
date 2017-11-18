@@ -25,6 +25,7 @@ private:
 
 	glm::mat4 translationMatrix;
 	glm::mat4 rotationMatrix;
+	bool shipDestroyed = false;
 
 public:
 
@@ -33,6 +34,12 @@ public:
 	}
 
 	glm::mat4 getCamMatrix(glm::mat4 warbirdOrientationMatrix) {
+
+		if(this->shipDestroyed || getPosition(warbirdOrientationMatrix) == glm::vec3(0,0,0)){
+			this->shipDestroyed = true;
+			return viewMatrix;
+		}
+		
 		glm::mat4 camMatrix = warbirdOrientationMatrix * this->translationMatrix;
 		glm::mat4 atMatrix = warbirdOrientationMatrix * glm::translate(glm::mat4(), glm::vec3(0,300,0));
 

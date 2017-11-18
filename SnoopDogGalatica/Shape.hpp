@@ -77,6 +77,10 @@ public:
         this->scaleMatrix = glm::scale(glm::mat4(), glm::vec3(size * 1.0f / modelSize));
     }
 
+	void sendToCenter() {
+		this->translationMatrix = glm::mat4(0);
+	}
+
     glm::mat4 getModelMatrix() {
         return (translationMatrix * scaleMatrix);
     }

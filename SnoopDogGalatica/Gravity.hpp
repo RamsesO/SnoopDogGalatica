@@ -44,7 +44,8 @@ public:
 		}
 	}
 
-	void setGravDirection(glm::vec3 objPos, float objSize, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize) {
+	void setGravDirection(glm::vec3 objPos, float objSize, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
+		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
 		resetGravity();
 
 		//sun
@@ -63,6 +64,18 @@ public:
 		distanceBetween = distance(objPos, getPosition(duoOM));
 		gravRM = glm::inverse(glm::lookAt(objPos, getPosition(duoOM), glm::vec3(0, 1, 0)));
 		gravityResult = (-this->gravityConstant * duoSize * objSize) / (distanceBetween * distanceBetween);
+		this->gravityVec += gravityResult * getOut(gravRM);
+
+		//primus
+		distanceBetween = distance(objPos, getPosition(primusOM));
+		gravRM = glm::inverse(glm::lookAt(objPos, getPosition(primusOM), glm::vec3(0, 1, 0)));
+		gravityResult = (-this->gravityConstant * primusSize * objSize) / (distanceBetween * distanceBetween);
+		this->gravityVec += gravityResult * getOut(gravRM);
+
+		//secundus
+		distanceBetween = distance(objPos, getPosition(secundusOM));
+		gravRM = glm::inverse(glm::lookAt(objPos, getPosition(secundusOM), glm::vec3(0, 1, 0)));
+		gravityResult = (-this->gravityConstant * secundusSize * objSize) / (distanceBetween * distanceBetween);
 		this->gravityVec += gravityResult * getOut(gravRM);
 
 		showVec3("GV", this->gravityVec);

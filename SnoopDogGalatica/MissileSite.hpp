@@ -17,7 +17,6 @@
 
 class MissileSite : public Shape, public Entity {
 
-
 public:
 
 	MissileSite(int id, int numOfVert, char * fileName, float size, int missile, int health, bool isEnemy) :
