@@ -28,6 +28,7 @@ private:
 	float ttl, activate; 
 	int target;
 	bool fired;
+	int hostId;
 
 public:
 	bool reloading() {
@@ -37,19 +38,21 @@ public:
 	//6 for from ship
 	//7 for from unum missilesite
 	//8 for from duo missilesite
-	Missile(int id, int numOfVert, char * fileName, float size) :
+	Missile(int id, int hostId, int numOfVert, char * fileName, float size) :
 		Shape(id, numOfVert, fileName, size) {
+		hostId = hostId;
 		ttl = UTL;
 		activate = UTA;
 		fired = false;
-		step = 10;
-		if (id == 7 || id == 8)
-			target = 6;
+		step = 50;
+		if (fromMissileSites())
+			target = 0;
 	}
 //calculate distance 
 //float distanceBetween = distance(objPos, getPosition(sunOM));
 	void update(glm::mat4 ship, glm::mat4 unum, glm::mat4 duo) {
 		if (fired) { //if not fired, no action needed
+
 			if (ttl > 0) { //translate all the time if there are time to live remaining
 				moveForward();
 				if (activate > 0) { //Tracking not yet activated
@@ -61,10 +64,12 @@ public:
 					this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
 					ttl--;
 				}
+				
 			}
-			else //reset counters and position
+			else //if it's reached its max distance, then reset counters and position
 			{
-				this->translationMatrix = glm::translate(this->translationMatrix, glm::vec3(0));
+				printf("destroyed\n");
+				sendToCenter();
 				ttl = UTL;
 				activate = UTA;
 				fired = false;
@@ -78,6 +83,37 @@ public:
 		//return 8 for otherwise
 
 		target = 0;
+	}
+
+	void translateForward(){
+		this->translationMatrix = glm::translate(this->translationMatrix, -step * getOut(this->rotationMatrix));
+
+	}
+	void rotateTowards(glm::mat4 shipOM, glm::mat4 unumOM, glm::mat4 duoOM){
+		glm::vec3 targetPos; //this will be your at
+		glm::vec3 missilePos = getPosition(getOrientationMatrix());
+
+		if(target == 0){
+			targetPos = getPosition(shipOM);
+		}
+		else if(target == 1){
+			targetPos = getPosition(unumOM);
+		}
+		else{
+			targetPos = getPosition(duoOM);
+		}
+
+		//now calculate the rotation matrix
+
+
+		//our up vector here might need to be changed
+		glm::mat4 tempRM = glm::inverse(glm::lookAt(missilePos, targetPos, glm::vec3(0, 1, 0)));
+		float * tempRMValues = (float*)glm::value_ptr(tempRM);
+
+		this->rotationMatrix = glm::mat4(tempRMValues[0], tempRMValues[1], tempRMValues[2], 0, tempRMValues[4],
+			tempRMValues[5], tempRMValues[6], 0, tempRMValues[8], tempRMValues[9], tempRMValues[10], 0, 0, 0, 0, 1);
+
+
 	}
 
 	//instead of locate we could use "rotate toward identified target" instead.
@@ -130,10 +166,31 @@ public:
 	}
 	//at the point of fire, change RM to match the ship's rotation matrix
 	//or match it to the angle of missilesite to warbird
-	void fire(glm::mat4 OM) {
-		if (id == 6)
-			this->rotationMatrix = OM;
+	void fire(glm::mat4 objOM) {
+		printf("enter fire function\n");
+		if (fromWarbird()){
+			printf("enter ship fire \n");
+			spawn(objOM);
+		}
 		fired = true;
+	}
+
+	void spawn(glm::mat4 objOM){
+		this->translationMatrix = glm::translate(glm::mat4(), getPosition(objOM));
+
+		float * tempRMValues = (float*)glm::value_ptr(objOM);
+
+		this->rotationMatrix = glm::mat4(tempRMValues[0], tempRMValues[1], tempRMValues[2], 0, tempRMValues[4],
+			tempRMValues[5], tempRMValues[6], 0, tempRMValues[8], tempRMValues[9], tempRMValues[10], 0, 0, 0, 0, 1);
+
+	}
+
+	bool fromWarbird(){
+		return hostId == 0;
+	}
+
+	bool fromMissileSites(){
+		return hostId != 0;
 	}
 
 	glm::mat4 getModelMatrix() {

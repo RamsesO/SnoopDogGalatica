@@ -93,6 +93,9 @@ public:
         return (this->translationMatrix * this->rotationMatrix);
     }
 
+    void sendToCenter(){
+        this->translationMatrix = glm::mat4(0);
+    }
     float getSize(){
         return this->size;
     }
