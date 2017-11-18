@@ -9,23 +9,21 @@
 
 
 # ifndef __INCLUDES465__
-# include "../includes465/include465.hpp"
+# include "../../includes465/include465.hpp"
 # define __INCLUDES465__
 # endif
 
 # define __Missile__
 
-class Missile : public Shape, public Gravity {
+class Missile : public Shape, public Entity{
 
 private:
 	//update by target location and current position
 	//
 	const float UTL = 2000.0; //2000 updates to live
 	const float UTA = 200.0;  //200 updates to activate
-	const float rotateRadians = 0.05f;
 	float step;
-	float rotateBy; //rotational step
-	float ttl, activate; 
+	int ttl, activate;
 	int target;
 	bool fired;
 	int hostId;
@@ -39,7 +37,8 @@ public:
 	//7 for from unum missilesite
 	//8 for from duo missilesite
 	Missile(int id, int hostId, int numOfVert, char * fileName, float size) :
-		Shape(id, numOfVert, fileName, size) {
+		Shape(id, numOfVert, fileName, size), 
+		Entity(0, 1){ //dummy values to use entity's relation to collision
 		hostId = hostId;
 		ttl = UTL;
 		activate = UTA;
@@ -48,21 +47,34 @@ public:
 		if (fromMissileSites())
 			target = 0;
 	}
-//calculate distance 
-//float distanceBetween = distance(objPos, getPosition(sunOM));
-	void update(glm::mat4 ship, glm::mat4 unum, glm::mat4 duo) {
+	//keep ship, 
+	void update(glm::mat4 ship, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
+		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
 		if (fired) { //if not fired, no action needed
 
 			if (ttl > 0) { //translate all the time if there are time to live remaining
-				moveForward();
-				if (activate > 0) { //Tracking not yet activated
+				if (activate > 0) {
+					translateForward();
 					activate--;//since not activated no rotation 
-					if (activate == 0 && id == 6)//identify target
-						identify(ship, unum, duo);
+					if (activate == 0 && fromWarbird())//identify target
+						target = identify(unumOM, duoOM);
 				}
-				else { //Tracking activated
-					this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
-					ttl--;
+				else { //activated
+					glm::vec3 misPos = getPosition(this->translationMatrix);
+					planetCollision(misPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+					bool justDied = onPlanetHit();
+					if (justDied) {
+						printf("destroyed\n");
+						sendToCenter();
+						ttl = UTL;
+						activate = UTA;
+						fired = false;
+					}
+					else{
+						rotateTowards(ship, unumOM, duoOM);
+						translateForward();
+						ttl--;
+					}
 				}
 				
 			}
@@ -77,12 +89,21 @@ public:
 		}
 	}
 
-	void identify(glm::mat4 ship, glm::mat4 unum, glm::mat4 duo) {
+	float identify(glm::mat4 unum, glm::mat4 duo) {
 		//here calculate distance
-		//return 7 for unum < duo
-		//return 8 for otherwise
 
-		target = 0;
+		glm::vec3 missilePos = getPosition(getOrientationMatrix());
+		float distanceBetweenUnum = distance(missilePos, getPosition(unum));
+		float distanceBetweenDuo = distance(missilePos, getPosition(duo));
+
+		if(distanceBetweenUnum > distanceBetweenDuo){
+			printf("chose duo\n");
+			return 2;
+		}
+		else{
+			printf("chose unum\n");
+			return 1;
+		}
 	}
 
 	void translateForward(){
@@ -116,54 +137,6 @@ public:
 
 	}
 
-	//instead of locate we could use "rotate toward identified target" instead.
-	void locate(glm::mat4 ship, glm::mat4 unum, glm::mat4 duo) {//locate should receive all positions 
-		//find nearest target 
-		if (id == 6) { //from ship
-			//retrieve distance from ship vs unum and vs duo 
-			//find shortest distance 
-			//select target
-		}
-		else {//from missile site so target the ship
-
-
-		}
-	}
-	void moveForward() {
-		if (gravity) {
-			this->translationMatrix = glm::translate(this->translationMatrix, (-step * getOut(this->rotationMatrix)) + this->gravityVec);
-		}
-		else
-			this->translationMatrix = glm::translate(this->translationMatrix, (-step * getOut(this->rotationMatrix)));
-	}
-
-	void yawLeft() {
-		rotateBy = rotateRadians;
-		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(0, 1, 0));
-		if (gravity)
-			this->translationMatrix = glm::translate(this->translationMatrix, this->gravityVec);
-	}
-
-	void yawRight() {
-		rotateBy = -rotateRadians;
-		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(0, 1, 0));
-		if (gravity)
-			this->translationMatrix = glm::translate(this->translationMatrix, this->gravityVec);
-	}
-
-	void pitchUp() {
-		rotateBy = rotateRadians;
-		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(1, 0, 0));
-		if (gravity)
-			this->translationMatrix = glm::translate(this->translationMatrix, this->gravityVec);
-	}
-
-	void pitchDown() {
-		rotateBy = -rotateRadians;
-		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->rotateBy, glm::vec3(1, 0, 0));
-		if (gravity)
-			this->translationMatrix = glm::translate(this->translationMatrix, this->gravityVec);
-	}
 	//at the point of fire, change RM to match the ship's rotation matrix
 	//or match it to the angle of missilesite to warbird
 	void fire(glm::mat4 objOM) {
@@ -196,6 +169,5 @@ public:
 	glm::mat4 getModelMatrix() {
 		return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
 	}
-
 
 };
