@@ -7,7 +7,7 @@
 	Kim, Kelly
 */
 
-# define __Windows__
+# define __Mac__
 # include "../includes465/include465.hpp"
 # include "Shape.hpp"
 # include "Entity.hpp"
@@ -381,7 +381,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 			break;
 		case 'f': case 'F': // fire missile only if its not fired yet.
-			if(!wbMissile->isFired()) wbMissile->fire(warbird->getOrientationMatrix());
+			if(!wbMissile->reloading()) wbMissile->fire(warbird->getOrientationMatrix());
 			break;
 		case 'g': case 'G': // toggle gravity for ship
 			warbird->toggleGravity();
@@ -445,7 +445,7 @@ void keyboard(unsigned char key, int x, int y) {
 	updateTitle();
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) { 
 	glutInit(&argc, argv);
 	# ifdef __Mac__
 		// Can't change the version in the GLUT_3_2_CORE_PROFILE
