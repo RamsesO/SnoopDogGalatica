@@ -54,7 +54,7 @@ glm::mat4 planetCamOM;
 glm::mat4 planetOM;
 
 //gravity variables
-float gravityConstant = 1000;
+float gravityConstant = 1000; 
 
 //Title Information
 char titleStr[300];
@@ -383,7 +383,10 @@ void keyboard(unsigned char key, int x, int y) {
 
 			break;
 		case 'f': case 'F': // fire missile only if its not fired yet.
-			if(!wbMissile->reloading()) wbMissile->fire(warbird->getOrientationMatrix());
+			if(!wbMissile->reloading()){
+				wbMissile->fire(warbird->getOrientationMatrix());
+				warbird->fire(false); // sending false since it is tested above
+			}
 			break;
 		case 'g': case 'G': // toggle gravity for ship
 			warbird->toggleGravity();
