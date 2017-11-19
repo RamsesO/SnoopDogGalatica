@@ -35,7 +35,7 @@ public:
 	//missile's id should be used as following
 	//6 for from ship
 	//7 for from unum missilesite
-	//8 for from duo missilesite
+	//8 for from secundus missilesite
 	Missile(int id, int hostId, int numOfVert, char * fileName, float size) :
 		Shape(id, numOfVert, fileName, size) {
 		hostId = hostId;
@@ -47,7 +47,7 @@ public:
 			target = 0;
 	}
 
-	void update(glm::mat4 ship, glm::mat4 unum, glm::mat4 duo) {
+	void update(glm::mat4 ship, glm::mat4 unum, glm::mat4 secundus) {
 		if (fired) { //if not fired, no action needed
 
 			if (ttl > 0) { //translate all the time if there are time to live remaining
@@ -55,10 +55,10 @@ public:
 					translateForward();
 					activate--;//since not activated no rotation 
 					if (activate == 0 && fromWarbird())//identify target
-						target = identify(unum, duo);
+						target = identify(unum, secundus);
 				}
 				else { //activated
-					rotateTowards(ship, unum, duo);
+					rotateTowards(ship, unum, secundus);
 					translateForward();
 					ttl--;
 				}
@@ -75,15 +75,15 @@ public:
 		}
 	}
 
-	float identify(glm::mat4 unum, glm::mat4 duo) {
+	float identify(glm::mat4 unum, glm::mat4 secundus) {
 		//here calculate distance
 
 		glm::vec3 missilePos = getPosition(getOrientationMatrix());
 		float distanceBetweenUnum = distance(missilePos, getPosition(unum));
-		float distanceBetweenDuo = distance(missilePos, getPosition(duo));
+		float distanceBetweenSecundus = distance(missilePos, getPosition(secundus));
 
-		if(distanceBetweenUnum > distanceBetweenDuo){
-			printf("chose duo\n");
+		if(distanceBetweenUnum > distanceBetweenSecundus){
+			printf("chose secundus\n");
 			return 2;
 		}
 		else{
@@ -96,7 +96,7 @@ public:
 		this->translationMatrix = glm::translate(this->translationMatrix, -step * getOut(this->rotationMatrix));
 
 	}
-	void rotateTowards(glm::mat4 shipOM, glm::mat4 unumOM, glm::mat4 duoOM){
+	void rotateTowards(glm::mat4 shipOM, glm::mat4 unumOM, glm::mat4 secundusOM){
 		glm::vec3 targetPos; //this will be your at
 		glm::vec3 missilePos = getPosition(getOrientationMatrix());
 
@@ -107,7 +107,7 @@ public:
 			targetPos = getPosition(unumOM);
 		}
 		else{
-			targetPos = getPosition(duoOM);
+			targetPos = getPosition(secundusOM);
 		}
 
 		//now calculate the rotation matrix
