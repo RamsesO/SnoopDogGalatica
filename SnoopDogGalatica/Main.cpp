@@ -38,8 +38,8 @@ WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::
 MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
 MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
 Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f * 20);
-Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 25.0f);
-Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 25.0f);
+Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 25.0f * 20);
+Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 25.0f * 20);
 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
@@ -286,16 +286,32 @@ void update(int i) {
 	primus->update();
 	secundus->update();
 	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
+		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize(), false);
+	wbMissile->update(warbird->getOrientationMatrix(), warbird->getSize(), ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
 		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
-	wbMissile->update(warbird->getOrientationMatrix(), ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
+	int hit = usMissile->update(warbird->getOrientationMatrix(), warbird->getSize(), ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
 		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
-	usMissile->update(warbird->getOrientationMatrix(), ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
+	if(hit == 1){
+		printf("unum site fire!!!\n");
+		unumSite->fire(false);
+	}
+	if (hit == 2){
+		warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
+			primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize(), true);
+	}
+	hit = ssMissile->update(warbird->getOrientationMatrix(), warbird->getSize(),ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
 		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
-	ssMissile->update(warbird->getOrientationMatrix(), ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
-		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
-	unumCam->update();
+	if(hit == 1){
+		printf("sec site fire!!!\n");
+		secundusSite->fire(false);
+	}
+	if (hit == 2){
+		warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
+			primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize(), true);
+	}
+	unumCam->update(); 
 	duoCam->update();
-
+   
 	//camera updates
 	switch (flag) {
 		case 1:
@@ -310,6 +326,8 @@ void update(int i) {
 		default:
 			break;
 	}
+
+
 
 	//Update Title
 	sprintf(wbMissileStr, " %2d, ", warbird->getMissileCount());
@@ -451,8 +469,8 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 
 	updateTitle();
-}
-
+} 
+ 
 int main(int argc, char* argv[]) { 
 	glutInit(&argc, argv);
 	# ifdef __Mac__

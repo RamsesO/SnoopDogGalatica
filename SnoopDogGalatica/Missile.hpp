@@ -34,13 +34,13 @@ public:
 		return fired;
 	}
 	//missile's id should be used as following
-	//6 for from ship
-	//7 for from unum missilesite
-	//8 for from duo missilesite
+	//8 for from ship
+	//9 for from unum missilesite
+	//10 for from duo missilesite
 	Missile(int id, int hostId, int numOfVert, char * fileName, float size) :
 		Shape(id, numOfVert, fileName, size), 
 		Entity(0, 1){ //dummy values to use entity's relation to collision
-		hostId = hostId;
+		this->hostId = hostId;
 		ttl = UTL;
 		activate = UTA;
 		fired = false;
@@ -48,24 +48,43 @@ public:
 		if (fromMissileSites())
 			target = 0;
 	}
-	//keep ship, 
-	void update(glm::mat4 ship, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
-		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
-		if (fired) { //if not fired, no action needed
 
+	int update(glm::mat4 ship, float shipSize, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
+		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
+		int result = 0;
+		if (fired) { //if not fired, no action needed
 			if (ttl > 0) { //translate all the time if there are time to live remaining
 				if (activate > 0) {
 					translateForward();
 					activate--;//since not activated no rotation 
 					if (activate == 0 && fromWarbird())//identify target
 						target = identify(unumOM, duoOM);
+					else if(activate == 0 && fromMissileSites())
+						target = 0;
 				}
 				else { //activated
 					glm::vec3 misPos = getPosition(this->translationMatrix);
-					planetCollision(misPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+					planetCollision(id, misPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+					shipCollision(id, misPos, this->size, ship, shipSize);
 					bool justDied = onPlanetHit();
-					if (justDied) {
-						printf("destroyed\n");
+					bool hit;
+					if(fromWarbird())
+						hit = onMissileHit();
+					else{
+						hit = onShipHit();
+						result = 2;
+					}
+					if(hit){
+						printf("target destroyed\n");
+						resetCollisions();
+						sendToCenter();
+						ttl = UTL;
+						activate = UTA;
+						fired = false;
+					}
+					else if (justDied) {
+						printf("destroyed by planet\n");
+						resetCollisions();
 						sendToCenter();
 						ttl = UTL;
 						activate = UTA;
@@ -82,14 +101,36 @@ public:
 			}
 			else //if it's reached its max distance, then reset counters and position
 			{
-				printf("destroyed\n");
+				printf("exploded on its own. \n");
 				sendToCenter();
 				ttl = UTL;
 				activate = UTA;
 				fired = false;
 			}
+		}else{
+			if(fromMissileSites()){ //detect 
+				if(hostId == 1){
+					if (detect(ship, unumOM)){
+						printf("unum detected the ship\n");
+						fire(unumOM);
+						return 1;
+					}
+				}else{
+					if (detect(ship, duoOM)){
+						printf("secundus detected the ship\n");
+						fire(secundusOM);
+						return 1;
+					}
+				}
+			}
 		}
+		return result;
 	}
+
+	 bool detect(glm::mat4 shipOM, glm::mat4 myOM){
+	 	float distanceBetween = distance(getPosition(shipOM), getPosition(myOM));
+	 	return (distanceBetween <= 3000);
+	 }
 
 	float identify(glm::mat4 unum, glm::mat4 duo) {
 		//here calculate distance
@@ -128,9 +169,6 @@ public:
 			targetPos = getPosition(duoOM);
 		}
 
-		//now calculate the rotation matrix
-
-
 		//our up vector here might need to be changed
 		glm::mat4 tempRM = glm::inverse(glm::lookAt(missilePos, targetPos, glm::vec3(0, 1, 0)));
 		float * tempRMValues = (float*)glm::value_ptr(tempRM);
@@ -148,7 +186,11 @@ public:
 		if (fromWarbird()){
 			printf("enter ship fire \n");
 			spawn(objOM);
+		}else{
+			printf("missile site fire!!!\n");
+			spawn(objOM);
 		}
+
 		fired = true;
 	}
 
@@ -167,7 +209,7 @@ public:
 	}
 
 	bool fromMissileSites(){
-		return hostId != 0;
+		return (hostId == 1 || hostId == 2);
 	}
 
 	glm::mat4 getModelMatrix() {

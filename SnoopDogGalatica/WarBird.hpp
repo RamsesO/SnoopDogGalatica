@@ -124,7 +124,7 @@ public:
 	}
 
 	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
-		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
+		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize, bool death) {
 
 		if(isItDead()){
 			printf("ship is dead \n");
@@ -136,9 +136,10 @@ public:
 			setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 		}
 		
-		planetCollision(shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		planetCollision(id, shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		
 		bool justDied = onPlanetHit();
-		if (justDied) sendToCenter();
+		if (justDied || death) sendToCenter();
 
 		switch (key) {
 			case 0:
