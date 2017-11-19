@@ -54,8 +54,13 @@ public:
 				if (activate > 0) {
 					translateForward();
 					activate--;//since not activated no rotation 
-					if (activate == 0 && fromWarbird())//identify target
-						target = identify(unum, secundus);
+					if (activate == 0) {//identify target
+						if(fromWarbird())
+							target = identify(unum, secundus);
+						else if(fromMissileSites()){
+							target = 0;
+						}
+					}
 				}
 				else { //activated
 					rotateTowards(ship, unum, secundus);
