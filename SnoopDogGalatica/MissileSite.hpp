@@ -41,4 +41,8 @@ public:
 		return (this->translationMatrix * hubMatrix * this->scaleMatrix);
 	}
 
+	glm::mat4 getSiteMatrix(glm::mat4 hubMatrix){
+		return (this->translationMatrix * hubMatrix);
+	}
+
 };

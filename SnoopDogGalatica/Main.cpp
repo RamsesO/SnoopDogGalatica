@@ -286,12 +286,12 @@ void update(int i) {
 	secundus->update();
 	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
 		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
-	wbMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), secundus->getHubMatrix(duo->getPlanetMatrix()));
+	wbMissile->update(warbird->getOrientationMatrix(), unumSite->getSiteMatrix(unum->getHubMatrix()), secundusSite->getSiteMatrix(secundus->getHubMatrix(duo->getPlanetMatrix())));
 	usMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
 	ssMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
 	unumCam->update();
 	duoCam->update();
-
+	
 	//camera updates
 	switch (flag) {
 		case 1:
