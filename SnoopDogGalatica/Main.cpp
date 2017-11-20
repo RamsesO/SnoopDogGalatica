@@ -289,6 +289,8 @@ void update(int i) {
 		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize(), false);
 	wbMissile->update(warbird->getOrientationMatrix(), warbird->getSize(), ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
 		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
+	
+
 	int hit = usMissile->update(warbird->getOrientationMatrix(), warbird->getSize(), ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
 		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
 	if(hit == 1){
@@ -299,6 +301,8 @@ void update(int i) {
 		warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
 			primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize(), true);
 	}
+
+	
 	hit = ssMissile->update(warbird->getOrientationMatrix(), warbird->getSize(),ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
 		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
 	if(hit == 1){

@@ -66,14 +66,19 @@ public:
 					glm::vec3 misPos = getPosition(this->translationMatrix);
 					planetCollision(id, misPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 					shipCollision(id, misPos, this->size, ship, shipSize);
-					bool justDied = onPlanetHit();
 					bool hit;
-					if(fromWarbird())
+					bool deathByPlanet = onPlanetHit(); //missile collided with a planet
+
+					if(fromWarbird()){
+						//warbird missile has hit a missile site
 						hit = onMissileHit();
+					}
 					else{
+						//missile site has hit the ship
 						hit = onShipHit();
 						result = 2;
 					}
+
 					if(hit){
 						printf("target destroyed\n");
 						resetCollisions();
@@ -82,8 +87,8 @@ public:
 						activate = UTA;
 						fired = false;
 					}
-					else if (justDied) {
-						printf("destroyed by planet\n");
+					else if (deathByPlanet) {
+						printf("missile destroyed by planet\n");
 						resetCollisions();
 						sendToCenter();
 						ttl = UTL;
@@ -127,10 +132,11 @@ public:
 		return result;
 	}
 
-	 bool detect(glm::mat4 shipOM, glm::mat4 myOM){
-	 	float distanceBetween = distance(getPosition(shipOM), getPosition(myOM));
-	 	return (distanceBetween <= 3000);
-	 }
+	//checking if the missile site should start shooting missiles by set distance
+	bool detect(glm::mat4 shipOM, glm::mat4 myOM){
+		float distanceBetween = distance(getPosition(shipOM), getPosition(myOM));
+		return (distanceBetween <= 3000);
+	}
 
 	float identify(glm::mat4 unum, glm::mat4 duo) {
 		//here calculate distance
