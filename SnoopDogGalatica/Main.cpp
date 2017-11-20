@@ -152,51 +152,22 @@ void init(void) {
 	glGenVertexArrays(nModels, VAO);
 	glGenBuffers(nModels, buffer);
 
-	float modelSize = loadModelBuffer(ruber->fileName, ruber->numOfVert, VAO[ruber->id], buffer[ruber->id], shaderProgram,
-		ruber->vPosition, ruber->vColor, ruber->vNormal, "vPosition", "vColor", "vNormal");
-	ruber->setScaleMatrix(modelSize);
+	float modelSize = 0.0;
 
-	modelSize = loadModelBuffer(unum->fileName, unum->numOfVert, VAO[unum->id], buffer[unum->id], shaderProgram,
-		unum->vPosition, unum->vColor, unum->vNormal, "vPosition", "vColor", "vNormal");
-	unum->setScaleMatrix(modelSize);
+	ruber->initializeShape(VAO, buffer, shaderProgram);
+	unum->initializeShape(VAO, buffer, shaderProgram);
+	duo->initializeShape(VAO, buffer, shaderProgram);
+	primus->initializeShape(VAO, buffer, shaderProgram);
+	secundus->initializeShape(VAO, buffer, shaderProgram);
+	warbird->initializeShape(VAO, buffer, shaderProgram);
+	unumSite->initializeShape(VAO, buffer, shaderProgram);
+	secundusSite->initializeShape(VAO, buffer, shaderProgram);
+	wbMissile->initializeShape(VAO, buffer, shaderProgram);
+	usMissile->initializeShape(VAO, buffer, shaderProgram);
+	ssMissile->initializeShape(VAO, buffer, shaderProgram);
 
-	modelSize = loadModelBuffer(duo->fileName, duo->numOfVert, VAO[duo->id], buffer[duo->id], shaderProgram,
-		duo->vPosition, duo->vColor, duo->vNormal, "vPosition", "vColor", "vNormal");
-	duo->setScaleMatrix(modelSize);
-
-	modelSize = loadModelBuffer(primus->fileName, primus->numOfVert, VAO[primus->id], buffer[primus->id], shaderProgram,
-		primus->vPosition, primus->vColor, primus->vNormal, "vPosition", "vColor", "vNormal");
-	primus->setScaleMatrix(modelSize);
-
-	modelSize = loadModelBuffer(secundus->fileName, secundus->numOfVert, VAO[secundus->id], buffer[secundus->id], shaderProgram,
-		secundus->vPosition, secundus->vColor, secundus->vNormal, "vPosition", "vColor", "vNormal");
-	secundus->setScaleMatrix(modelSize);
-
-	modelSize = loadModelBuffer(warbird->fileName, warbird->numOfVert, VAO[warbird->id], buffer[warbird->id], shaderProgram,
-		warbird->vPosition, warbird->vColor, warbird->vNormal, "vPosition", "vColor", "vNormal");
-	warbird->setScaleMatrix(modelSize);
-
-	modelSize = loadModelBuffer(unumSite->fileName, unumSite->numOfVert, VAO[unumSite->id], buffer[unumSite->id], shaderProgram,
-		unumSite->vPosition, unumSite->vColor, unumSite->vNormal, "vPosition", "vColor", "vNormal");
-	unumSite->setScaleMatrix(modelSize);
 	unumSite->setSitePosition(unum->getModelMatrix(), unum->tiltAngle);
-
-	modelSize = loadModelBuffer(secundusSite->fileName, secundusSite->numOfVert, VAO[secundusSite->id], buffer[secundusSite->id], shaderProgram,
-		secundusSite->vPosition, secundusSite->vColor, secundusSite->vNormal, "vPosition", "vColor", "vNormal");
-	secundusSite->setScaleMatrix(modelSize);
 	secundusSite->setSitePosition(secundus->getModelMatrix(duo->getPlanetMatrix()), secundus->tiltAngle);
-
-	modelSize = loadModelBuffer(wbMissile->fileName, wbMissile->numOfVert, VAO[wbMissile->id], buffer[wbMissile->id], shaderProgram,
-		wbMissile->vPosition, wbMissile->vColor, wbMissile->vNormal, "vPosition", "vColor", "vNormal");
-	wbMissile->setScaleMatrix(modelSize);
-
-	modelSize = loadModelBuffer(usMissile->fileName, usMissile->numOfVert, VAO[usMissile->id], buffer[usMissile->id], shaderProgram,
-		usMissile->vPosition, usMissile->vColor, usMissile->vNormal, "vPosition", "vColor", "vNormal");
-	usMissile->setScaleMatrix(modelSize);	
-
-	modelSize = loadModelBuffer(ssMissile->fileName, ssMissile->numOfVert, VAO[ssMissile->id], buffer[ssMissile->id], shaderProgram,
-		ssMissile->vPosition, ssMissile->vColor, ssMissile->vNormal, "vPosition", "vColor", "vNormal");
-	ssMissile->setScaleMatrix(modelSize);
 
 	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 

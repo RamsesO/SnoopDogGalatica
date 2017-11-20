@@ -72,6 +72,12 @@ public:
         this->radians = glm::radians(radians);
     }
 
+	void initializeShape(GLuint(&VAO)[11], GLuint(&buffer)[11], GLuint &shaderProgram) {
+		float modelSize = loadModelBuffer(this->fileName, this->numOfVert, VAO[this->id], buffer[this->id], shaderProgram,
+			this->vPosition, this->vColor, this->vNormal, "vPosition", "vColor", "vNormal");
+		this->setScaleMatrix(modelSize);
+	}
+
 	void displayShape(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, glm::mat4 modelMatrix, GLuint &MVP, GLuint (&VAO)[11]) {
 		glm::mat4 ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
 		glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
