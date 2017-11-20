@@ -123,7 +123,8 @@ public:
 	}
 
 	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM, float primusSize,
-		glm::mat4 secundusOM, float secundusSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize) {
+		glm::mat4 secundusOM, float secundusSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
+		glm::mat4 wbMissileOM, glm::mat4 usMissileOM, glm::mat4 ssMissileOM, float missileSize) {
 		if (isItDead() == false) {
 			glm::vec3 shipPos = getPosition(this->translationMatrix);
 			if (gravity) {
@@ -132,7 +133,8 @@ public:
 
 			planetCollision(shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 			siteCollision(shipPos, this->size, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
-			bool justDied = (onPlanetHit() || onSiteHit());
+			missileCollision(shipPos, this->size, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
+			bool justDied = (onPlanetHit() || onSiteHit() || onMissileHit());
 			if (justDied) {
 				sendToCenter();
 				printf("Ship has Died.\n");

@@ -61,6 +61,7 @@ public:
 
 	bool onMissileHit() {
 		if (this->isDead == false) {
+			printf("Hit by missile.");
 			this->health--;
 			if (this->health == 0) {
 				this->isDead == true;
