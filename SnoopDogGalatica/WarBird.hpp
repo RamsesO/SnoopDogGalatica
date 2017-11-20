@@ -125,21 +125,21 @@ public:
 
 	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM, float primusSize,
 		glm::mat4 secundusOM, float secundusSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize) {
+		if (isItDead() == false) {
+			glm::vec3 shipPos = getPosition(this->translationMatrix);
+			if (gravity) {
+				setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+			}
 
-		glm::vec3 shipPos = getPosition(this->translationMatrix);
-		if (gravity) {
-			setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
-		}
-		
-		planetCollision(shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
-		siteCollision(shipPos, this->size, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
-		bool justDied = (onPlanetHit() || onSiteHit());
-		if (justDied) {
-			sendToCenter();
-			printf("Ship has Died.");
-		}
+			planetCollision(shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+			siteCollision(shipPos, this->size, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
+			bool justDied = (onPlanetHit() || onSiteHit());
+			if (justDied) {
+				sendToCenter();
+				printf("Ship has Died.\n");
+			}
 
-		switch (key) {
+			switch (key) {
 			case 0:
 				moveForward();
 				break;
@@ -167,8 +167,9 @@ public:
 			default:
 				this->translationMatrix = glm::translate(this->translationMatrix, gravityVec);
 				break;
+			}
+			key = -1;
 		}
-		key = -1;
 	}
 
 };

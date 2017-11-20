@@ -197,8 +197,8 @@ void reshape(int width, int height) {
 // Use with Idle and intervalTimer functions 
 void update(int i) {
 	glm::mat4 ruberOM = ruber->getOrientationMatrix();
-	glm::mat4 unumOM = unum->getPlanetMatrix();
-	glm::mat4 duoOM = duo->getPlanetMatrix();
+	glm::mat4 unumOM = unum->getHubMatrix();
+	glm::mat4 duoOM = duo->getHubMatrix();
 	glm::mat4 primusOM = primus->getHubMatrix(duo->getPlanetMatrix());
 	glm::mat4 secundusOM = secundus->getHubMatrix(duo->getPlanetMatrix());
 	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unum->getHubMatrix());
@@ -222,6 +222,8 @@ void update(int i) {
 	secundus->update();
 	warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, 
 		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
+	unumSite->update(unumOM, warbirdOM, warbirdSize);
+	secundusSite->update(secundusOM, warbirdOM, warbirdSize);
 	wbMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
 	usMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
 	ssMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());

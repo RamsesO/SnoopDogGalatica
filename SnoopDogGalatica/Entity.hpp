@@ -94,6 +94,13 @@ public:
 		return false;
 	}
 
+	bool onWarbirdHit() {
+		if (isInWContact()) {
+			return oneHitKO();
+		}
+		return false;
+	}
+
 	bool isItDead() {
 		return this->isDead;
 	}

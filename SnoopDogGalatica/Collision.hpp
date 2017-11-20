@@ -20,12 +20,14 @@ class Collision {
 private:
 	bool pContact;
 	bool sContact;
+	bool wContact;
 	bool mContact;
 
 public:
 	Collision() {
 		this->pContact = false;
 		this->sContact = false;
+		this->wContact = false;
 		this->mContact = false;
 	}
 
@@ -37,6 +39,10 @@ public:
 		return this->sContact;
 	}
 
+	bool isInWContact() {
+		return this->wContact;
+	}
+
 	bool isInMContact() {
 		return this->mContact;
 	}
@@ -44,6 +50,7 @@ public:
 	void resetCollisions() {
 		this->pContact = false;
 		this->sContact = false;
+		this->wContact = false;
 		this->mContact = false;
 	}
 
@@ -87,6 +94,15 @@ public:
 		}
 		else {
 			this->sContact = false;
+		}
+	}
+
+	void warbirdCollision(glm::vec3 objPos, float objSize, glm::mat4 warbirdOM, float warbirdSize) {
+		if (colliding(objPos, objSize, warbirdOM, warbirdSize) == true) {
+			this->wContact = true;
+		}
+		else {
+			this->wContact = false;
 		}
 	}
 
