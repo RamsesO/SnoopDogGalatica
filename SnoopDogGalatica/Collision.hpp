@@ -58,7 +58,6 @@ public:
 
 	void planetCollision(glm::vec3 objPos, float objSize, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
 		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
-
 		if (colliding(objPos, objSize, sunOM, sunSize) == true) {
 			this->pContact = true;
 		}
@@ -77,7 +76,18 @@ public:
 		else {
 			this->pContact = false;
 		}
+	}
 
+	void siteCollision(glm::vec3 objPos, float objSize, glm::mat4 usOM, float usSize, glm::mat4 ssOM, float ssSize) {
+		if (colliding(objPos, objSize, usOM, usSize) == true) {
+			this->sContact = true;
+		}
+		else if (colliding(objPos, objSize, ssOM, ssSize) == true) {
+			this->sContact = true;
+		}
+		else {
+			this->sContact = false;
+		}
 	}
 
 };

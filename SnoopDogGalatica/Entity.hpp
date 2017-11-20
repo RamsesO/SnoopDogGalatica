@@ -69,16 +69,27 @@ public:
 		}
 	}
 
+	bool oneHitKO() {
+		if (this->isDead == false) {
+			this->health = 0;
+			this->isDead = true;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	bool onPlanetHit() {
 		if (isInPContact()) {
-			if (this->isDead == false) {
-				this->health = 0;
-				this->isDead = true;
-				return true;
-			}
-			else {
-				return false;
-			}
+			return oneHitKO();
+		}
+		return false;
+	}
+
+	bool onSiteHit() {
+		if (isInSContact()) {
+			return oneHitKO();
 		}
 		return false;
 	}
