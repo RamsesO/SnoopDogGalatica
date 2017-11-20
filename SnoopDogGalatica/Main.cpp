@@ -279,14 +279,6 @@ void reshape(int width, int height) {
 
 // Use with Idle and intervalTimer functions 
 void update(int i) {
-	glm::mat4 ruberOM = ruber->getOrientationMatrix();
-	glm::mat4 unumOM = unum->getPlanetMatrix();
-	glm::mat4 duoOM = duo->getPlanetMatrix();
-	glm::mat4 primusOM = primus->getHubMatrix(duo->getPlanetMatrix());
-	glm::mat4 secundusOM = secundus->getHubMatrix(duo->getPlanetMatrix());
-	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unum->getHubMatrix());
-	glm::mat4 secundusSiteOM = secundusSite->getSiteMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
-	glm::mat4 warbirdOM = warbird->getOrientationMatrix();
 
 	float ruberSize = ruber->getSize()/2;
 	float unumSize = unum->getSize();
@@ -305,6 +297,16 @@ void update(int i) {
 	primus->update();
 	secundus->update();
 	warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+
+	glm::mat4 ruberOM = ruber->getOrientationMatrix();
+	glm::mat4 unumOM = unum->getPlanetMatrix();
+	glm::mat4 duoOM = duo->getPlanetMatrix();
+	glm::mat4 primusOM = primus->getHubMatrix(duo->getPlanetMatrix());
+	glm::mat4 secundusOM = secundus->getHubMatrix(duo->getPlanetMatrix());
+	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unum->getHubMatrix());
+	glm::mat4 secundusSiteOM = secundusSite->getSiteMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
+	glm::mat4 warbirdOM = warbird->getOrientationMatrix();
+	
 	wbMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
 		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 	usMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
