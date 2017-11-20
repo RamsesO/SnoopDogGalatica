@@ -44,39 +44,22 @@ public:
 		}
 	}
 
+	glm::vec3 calculateGrav(glm::vec3 objPos, float objSize, glm::mat4 targetOM, float targetSize) {
+		float distanceBetween = distance(objPos, getPosition(targetOM));
+		glm::mat4 gravRM = glm::inverse(glm::lookAt(objPos, getPosition(targetOM), glm::vec3(0, 1, 0)));
+		float gravityResult = (-this->gravityConstant * targetSize * objSize) / (distanceBetween * distanceBetween);
+		return (gravityResult * getOut(gravRM));
+	}
+
 	void setGravDirection(glm::vec3 objPos, float objSize, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
 		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
 		resetGravity();
 
-		//sun
-		float distanceBetween = distance(objPos, getPosition(sunOM));
-		glm::mat4 gravRM = glm::inverse(glm::lookAt(objPos, getPosition(sunOM), glm::vec3(0, 1, 0)));
-		float gravityResult = (-this->gravityConstant * sunSize * objSize) / (distanceBetween * distanceBetween);
-		this->gravityVec += gravityResult * getOut(gravRM);
-
-		//unum
-		distanceBetween = distance(objPos, getPosition(unumOM));
-		gravRM = glm::inverse(glm::lookAt(objPos, getPosition(unumOM), glm::vec3(0, 1, 0)));
-		gravityResult = (-this->gravityConstant * unumSize * objSize) / (distanceBetween * distanceBetween);
-		this->gravityVec += gravityResult * getOut(gravRM);
-
-		//duo
-		distanceBetween = distance(objPos, getPosition(duoOM));
-		gravRM = glm::inverse(glm::lookAt(objPos, getPosition(duoOM), glm::vec3(0, 1, 0)));
-		gravityResult = (-this->gravityConstant * duoSize * objSize) / (distanceBetween * distanceBetween);
-		this->gravityVec += gravityResult * getOut(gravRM);
-
-		//primus
-		distanceBetween = distance(objPos, getPosition(primusOM));
-		gravRM = glm::inverse(glm::lookAt(objPos, getPosition(primusOM), glm::vec3(0, 1, 0)));
-		gravityResult = (-this->gravityConstant * primusSize * objSize) / (distanceBetween * distanceBetween);
-		this->gravityVec += gravityResult * getOut(gravRM);
-
-		//secundus
-		distanceBetween = distance(objPos, getPosition(secundusOM));
-		gravRM = glm::inverse(glm::lookAt(objPos, getPosition(secundusOM), glm::vec3(0, 1, 0)));
-		gravityResult = (-this->gravityConstant * secundusSize * objSize) / (distanceBetween * distanceBetween);
-		this->gravityVec += gravityResult * getOut(gravRM);
+		this->gravityVec += calculateGrav(objPos, objSize, sunOM, sunSize);
+		this->gravityVec += calculateGrav(objPos, objSize, unumOM, unumSize);
+		this->gravityVec += calculateGrav(objPos, objSize, duoOM, duoSize);
+		this->gravityVec += calculateGrav(objPos, objSize, primusOM, primusSize);
+		this->gravityVec += calculateGrav(objPos, objSize, secundusOM, secundusSize);
 
 		showVec3("GV", this->gravityVec);
 	}
