@@ -20,11 +20,12 @@ private:
 	bool sContact;
 	bool mContact;
 	bool wContact;
-	int planetCollisionConstant = 0;
-	int siteCollisionConstant = 30;
+	int planetCollisionConstant = -30;
+	int siteCollisionConstant = 10;
 	int warbirdCollisionConstant = 0;
 	int missileCollisionConstant = 40;
-
+	int singleMissileCollisionConstant = 50;
+	
 public:
 	Collision() {
 		this->pContact = false;
@@ -106,6 +107,7 @@ public:
 	int missileSiteCollision(glm::vec3 objPos, float objSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize){
 		//unumSite
 		float distanceBetween = distance(objPos, getPosition(unumSiteOM));
+
 		if (distanceBetween < (unumSiteSize + objSize + siteCollisionConstant)) {
 			this->sContact = true;
 			return 0;
@@ -140,6 +142,16 @@ public:
 		return;
 
 	}
+
+	void singleMissileCollision(glm::vec3 objPos, float objSize, glm::mat4 missileOM, float missileSize){
+		float distanceBetween = distance(objPos, getPosition(missileOM));
+		if (distanceBetween < (missileSize + objSize + singleMissileCollisionConstant)) {
+			this->mContact = true;
+			return;
+		}
+		this->mContact = false;
+	}
+
 	//did obj hit the warbird?
 	void warbirdCollision(glm::vec3 objPos, float objSize, glm::mat4 warbirdOM, float warbirdSize){
 		float distanceBetween = distance(objPos, getPosition(warbirdOM));

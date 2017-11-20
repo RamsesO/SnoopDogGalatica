@@ -66,7 +66,6 @@ public:
 			else {
 				printf("Already Dead");
 			}
-			printf("%d \n", health);
 		}
 	}
 

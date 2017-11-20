@@ -45,4 +45,16 @@ public:
 		return (this->translationMatrix * hubMatrix);
 	}
 
+	void destructionCheck(glm::mat4 missileOM, float missileSize, glm::mat4 hubMatrix){
+		singleMissileCollision(getPosition(getSiteMatrix(hubMatrix)), this->size, missileOM, missileSize);
+		onMissileHit();
+		if(isItDead()){
+			sendToCenter();
+		}
+	}
+
+	void update(glm::mat4 missileOM, float missileSize, glm::mat4 hubMatrix){
+		destructionCheck(missileOM, missileSize, hubMatrix);
+	}
+
 };

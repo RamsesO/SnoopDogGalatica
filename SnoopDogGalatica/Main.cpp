@@ -37,7 +37,7 @@ Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0), 7, 1);
 MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
 MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
-Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f* 10);
+Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f* 3);
 Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 25.0f * 10);
 Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 25.0f * 10);
 
@@ -288,6 +288,7 @@ void update(int i) {
 	float unumSiteSize = unumSite->getSize();
 	float secundusSiteSize = secundusSite->getSize();
 	float warbirdSize = warbird->getSize();
+	float wbMissileSize = wbMissile->getSize();
 	float usMissileSize = usMissile->getSize();
 	float ssMissileSize = ssMissile->getSize();
 
@@ -309,15 +310,24 @@ void update(int i) {
 	glm::mat4 warbirdOM = warbird->getOrientationMatrix();
 	glm::mat4 usMissileOM = usMissile->getOrientationMatrix();
 	glm::mat4 ssMissileOM = ssMissile->getOrientationMatrix();
+	glm::mat4 wbMissileOM = wbMissile->getOrientationMatrix();
+	bool shipIsDead = warbird->isItDead();
+	bool unumSiteIsDead = unumSite->isItDead();
+	bool secundusSiteIsDead = secundusSite->isItDead();
 
 
 	warbird->update(usMissileOM, usMissileSize, ssMissileOM, ssMissileSize, ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 	wbMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
-		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, shipIsDead, unumSiteIsDead, secundusSiteIsDead);
 	usMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
-		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, shipIsDead, unumSiteIsDead, secundusSiteIsDead);
 	ssMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
-		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, shipIsDead, unumSiteIsDead, secundusSiteIsDead);
+	
+
+	unumSite->update(wbMissileOM, wbMissileSize, unumOM);
+	secundusSite->update(wbMissileOM, wbMissileSize, secundusOM);
+
 	unumCam->update();
 	duoCam->update();
 	

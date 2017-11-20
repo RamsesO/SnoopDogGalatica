@@ -127,7 +127,7 @@ public:
 		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
 
 		if(isItDead()){
-			printf("ship is dead \n");
+			//printf("ship is dead \n");
 			return;
 		}
 

@@ -63,7 +63,7 @@ public:
 
 	void update(glm::mat4 shipOM, float shipSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
 		glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM, 
-		float primusSize, glm::mat4 secundusOM, float secundusSize) {
+		float primusSize, glm::mat4 secundusOM, float secundusSize, bool shipIsDead, bool unumSiteIsDead, bool secundusSiteIsDead) {
 
 		bool diedViaPlanet = false;
 		bool diedViaSite = false;
@@ -73,7 +73,7 @@ public:
 		if (fired) { //if not fired, no action needed
 
 			if (ttl > 0) { //translate all the time if there are time to live remaining
-				if(UTL - ttl > 5)
+				if(UTL - ttl > 0)
 					exitedPlanet = true;
 
 				if (activate > 0) {
@@ -81,15 +81,19 @@ public:
 					activate--;//since not activated no rotation 
 					if (activate == 0) {//identify target
 						if(fromWarbird())
-							target = identify(unumOM, secundusOM);
+							target = identify(unumSiteOM, secundusSiteOM, unumSiteIsDead, secundusSiteIsDead);
 						else if(fromMissileSites()){
 							target = 0;
 						}
 					}
 				}
 				else { //activated
-					if(target != -1)
-						rotateTowards(shipOM, unumOM, secundusOM);
+					if(target != -1){
+						if(fromMissileSites() && !shipIsDead)
+							rotateTowards(shipOM, unumSiteOM, secundusSiteOM);
+						else if(fromWarbird())
+							rotateTowards(shipOM, unumSiteOM, secundusSiteOM);	
+					}
 					translateForward();
 					ttl--;
 				}
@@ -121,16 +125,16 @@ public:
 					diedViaShip = isInWContact();
 				}
 
-				if(diedViaPlanet){
-					printf("missile from %s died via planet hit\n", hostName);
+				if(diedViaSite){
+					printf("missile from %s died via site destruction\n", hostName);
 					resetMissile();
 				}
 				else if(diedViaShip){
 					printf("missile from %s died via hitting warbird\n", hostName);
 					resetMissile();
 				}
-				else if(diedViaSite){
-					printf("missile from %s died via site destruction\n", hostName);
+				else if(diedViaPlanet){
+					printf("missile from %s died via planet hit\n", hostName);
 					resetMissile();
 				}
 
@@ -169,8 +173,12 @@ public:
 		exitedPlanet = false;
 	}
 
-	int identify(glm::mat4 unum, glm::mat4 secundus) {
+	int identify(glm::mat4 unum, glm::mat4 secundus, bool unumSiteIsDead, bool secundusSiteIsDead) {
 		//here calculate distance
+
+		//no sites alive. no targets available
+		if(unumSiteIsDead && secundusSiteIsDead)
+			return -1;
 
 		glm::vec3 missilePos = getPosition(getOrientationMatrix());
 		float distanceBetweenUnum = distance(missilePos, getPosition(unum));
@@ -180,22 +188,28 @@ public:
 
 		//needs to be in detection range to be able to choose
 		if(distanceBetweenUnum <= detectionRange && distanceBetweenSecundus <= detectionRange){
-			if(distanceBetweenUnum > distanceBetweenSecundus){
+			if((distanceBetweenUnum > distanceBetweenSecundus) && !secundusSiteIsDead ){
 				printf("chose secundus\n");
-				return 2;
+				return 1;
 			}
 			else{
+				if(!unumSiteIsDead){
+					printf("chose unum\n");
+					return 1;
+				}
+			}
+		}
+		else if(distanceBetweenUnum <= detectionRange){
+			if(!unumSiteIsDead){
 				printf("chose unum\n");
 				return 1;
 			}
 		}
-		else if(distanceBetweenUnum <= detectionRange){
-			printf("chose unum\n");
-			return 1;
-		}
 		else if(distanceBetweenSecundus <= detectionRange){
-			printf("chose secundus\n");
-			return 2;
+			if(!secundusSiteIsDead){
+				printf("chose secundus\n");
+				return 2;
+			}
 		}
 		else
 			return -1;
@@ -252,7 +266,6 @@ public:
 	//at the point of fire, change RM to match the ship's rotation matrix
 	//or match it to the angle of missilesite to warbird
 	void fire(glm::mat4 objOM) {
-		printf("enter fire function\n");
 		if (fromWarbird()){
 			printf("firing missile from %s \n", hostName);
 			spawn(objOM);
