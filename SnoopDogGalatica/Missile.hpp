@@ -46,7 +46,15 @@ public:
 			target = 6;
 	}
 
-	void update(glm::mat4 ship, glm::mat4 unum, glm::mat4 duo) {
+	void update(glm::mat4 shipOM, float shipSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
+		glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM, 
+		float primusSize, glm::mat4 secundusOM, float secundusSize) {
+
+		bool diedViaPlanet = false;
+		bool diedViaSite = false;
+		bool diedViaShip = false;
+		int hit = -1;
+
 		if (fired) { //if not fired, no action needed
 			if (ttl > 0) { //translate all the time if there are time to live remaining
 				this->translationMatrix = glm::translate(this->translationMatrix, -step * getOut(this->rotationMatrix));
@@ -59,14 +67,55 @@ public:
 					this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
 					ttl--;
 				}
+
+				glm::vec3 missilePos = getPosition(getOrientationMatrix());
+				float missileSize = getSize();
+
+				//general missiles
+				//should check if you hit the target/obstacles whether or not smart aspect is activated
+				//int to check the initial spawning of missiles (which are being spawned inside the planet)
+				planetCollision(missilePos, missileSize, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+				if(fromUnumSite() && !exitedPlanet)
+					diedViaPlanet = false;
+				else if(fromSecundusSite() && !exitedPlanet)
+					diedViaPlanet = false;
+				else
+					diedViaPlanet = isInPContact();
+
+				//specifically for WARBIRD MISSILE hitting missile sites
+				//returns -1 if no, 0 if unumsite, 1 if secundussite
+				if(fromWarbird()){
+					int hit = missileSiteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
+					diedViaSite = isInSContact();
+				}
+
+				//specifically for MISSILE SITES hitting the ship
+				if(fromMissileSites()){
+					warbirdCollision(missilePos, missileSize, shipOM, shipSize);
+					diedViaShip = isInWContact();
+				}
+
+				if(diedViaPlanet){
+					printf("missile from %s died via planet hit\n", hostName);
+					resetMissile();
+				}
+				else if(diedViaShip){
+					printf("missile from %s died via hitting warbird\n", hostName);
+					resetMissile();
+				}
+				else if(diedViaSite){
+					printf("missile from %s died via site destruction\n", hostName);
+					resetMissile();
+				}
+
 			}
 			else //reset counters and position
 			{
-				this->translationMatrix = glm::translate(this->translationMatrix, glm::vec3(0));
-				ttl = UTL;
-				activate = UTA;
-				fired = false;
+				printf("missile from %s died via distance\n", hostName);
+				resetMissile();
+				
 			}
+			
 		}
 	}
 
