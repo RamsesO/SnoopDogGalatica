@@ -23,6 +23,7 @@ private:
 	const float UTL = 2000.0; //2000 updates to live
 	const float UTA = 200.0;  //200 updates to activate
 	float step;
+	float rStep; 
 	int ttl, activate;
 	int target;
 	bool fired;

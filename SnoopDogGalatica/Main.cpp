@@ -10,6 +10,7 @@
 # define __Mac__
 # include "../../includes465/include465.hpp"
 # include "Shape.hpp"
+# include "Collision.hpp"
 # include "Entity.hpp"
 # include "Gravity.hpp"
 # include "Sun.hpp"
@@ -329,7 +330,7 @@ void update(int i) {
 
 void arrowInput(int key, int x, int y) {
 
-	if(warbird->isDestroyed())
+	if(warbird->isItDead())
 		return;
 
 	int mod = glutGetModifiers();
@@ -373,7 +374,7 @@ void arrowInput(int key, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 		case 'w': case 'W': // warp ship
-			if(warbird->isDestroyed())
+			if(warbird->isItDead())
 				return;
 			warp++;
 			if (warp % 2 == 0) {
@@ -388,7 +389,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 			break;
 		case 'f': case 'F': // fire missile only if its not fired yet.
-			if(warbird->isDestroyed())
+			if(warbird->isItDead())
 				return;
 			if(!wbMissile->isFired()) 
 				wbMissile->fire(warbird->getOrientationMatrix());
@@ -402,7 +403,7 @@ void keyboard(unsigned char key, int x, int y) {
 				timeQuantumIndex = 0;
 			break;
 		case 's': case 'S': // next ship speed
-			if(warbird->isDestroyed())
+			if(warbird->isItDead())
 				return;
 			warbird->changeStep();
 			break;
