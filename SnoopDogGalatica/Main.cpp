@@ -204,6 +204,9 @@ void update(int i) {
 	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unumOM);
 	glm::mat4 secundusSiteOM = secundusSite->getSiteMatrix(secundusOM);
 	glm::mat4 warbirdOM = warbird->getOrientationMatrix();
+	glm::mat4 wbMissileOM = wbMissile->getOrientationMatrix();
+	glm::mat4 usMissileOM = usMissile->getOrientationMatrix();
+	glm::mat4 ssMissileOM = ssMissile->getOrientationMatrix();
 
 	float ruberSize = ruber->getSize() / 2;
 	float unumSize = unum->getSize();
@@ -213,6 +216,7 @@ void update(int i) {
 	float unumSiteSize = unumSite->getSize();
 	float secundusSiteSize = secundusSite->getSize();
 	float warbirdSize = warbird->getSize();
+	float missileSize = wbMissile->getSize();
 
 	glutTimerFunc(timeQuantum[timeQuantumIndex], update, 1);
 	ruber->update();
