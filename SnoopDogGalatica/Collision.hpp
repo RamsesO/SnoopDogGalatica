@@ -47,48 +47,37 @@ public:
 		this->mContact = false;
 	}
 
+	bool colliding(glm::vec3 objPos, float objSize, glm::mat4 targetOM, float targetSize) {
+		float distanceBetween = distance(objPos, getPosition(targetOM));
+		if (distanceBetween < (targetSize + objSize + 50)) {
+			return true;
+		}
+		//printf("distance between sun and obj: %f . sun + obj distance: %f \n", distanceBetween, (sunSize + objSize + 50));
+		return false;
+	}
+
 	void planetCollision(glm::vec3 objPos, float objSize, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
 		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
 
-		//sun
-		float distanceBetween = distance(objPos, getPosition(sunOM));
-		if (distanceBetween < (sunSize + objSize + 50)) {
+		if (colliding(objPos, objSize, sunOM, sunSize) == true) {
 			this->pContact = true;
-			return;
 		}
-		//printf("distance between sun and obj: %f . sun + obj distance: %f \n", distanceBetween, (sunSize + objSize + 50));
+		else if (colliding(objPos, objSize, unumOM, unumSize) == true) {
+			this->pContact = true;
+		}
+		else if (colliding(objPos, objSize, duoOM, duoSize) == true) {
+			this->pContact = true;
+		}
+		else if (colliding(objPos, objSize, primusOM, primusSize) == true) {
+			this->pContact = true;
+		}
+		else if (colliding(objPos, objSize, secundusOM, secundusSize) == true) {
+			this->pContact = true;
+		}
+		else {
+			this->pContact = false;
+		}
 
-		//unum
-		distanceBetween = distance(objPos, getPosition(unumOM));
-		if (distanceBetween < (unumSize + objSize + 50)) {
-			this->pContact = true;
-			return;
-		}
-		//printf("distance between unum and obj: %f . unum + obj distance: %f \n", distanceBetween, (unumSize + objSize + 50));
-
-		//duo
-		distanceBetween = distance(objPos, getPosition(duoOM));
-		if (distanceBetween < (duoSize + objSize + 50)) {
-			this->pContact = true;
-			return;
-		}
-		//printf("distance between duo and obj: %f . duo + obj distance: %f \n", distanceBetween, (duoSize + objSize + 50));
-
-		//primus
-		distanceBetween = distance(objPos, getPosition(primusOM));
-		if (distanceBetween < (primusSize + objSize + 50)) {
-			this->pContact = true;
-			return;
-		}
-		//printf("distance between primus and obj: %f . primus + obj distance: %f \n", distanceBetween, (primusSize + objSize + 50));
-
-		//secundus
-		distanceBetween = distance(objPos, getPosition(secundusOM));
-		if (distanceBetween < (secundusSize + objSize + 50)) {
-			this->pContact = true;
-			return;
-		}
-		//printf("distance between secundus and obj: %f . secundus + obj distance: %f \n", distanceBetween, (secundusSize + objSize + 50));
 	}
 
 };
