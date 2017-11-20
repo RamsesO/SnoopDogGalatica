@@ -22,12 +22,14 @@ private:
 	//
 	const float UTL = 2000.0; //2000 updates to live
 	const float UTA = 200.0;  //200 updates to activate
+	const int detectionRange = 3000;
 	float step;
 	float rStep; 
 	int ttl, activate;
 	int target;
-	bool fired;
 	int hostId;
+	bool fired;
+	bool exitedPlanet; //for the initial spawn for missile sites
 	char * hostName;
 
 public:
@@ -37,14 +39,16 @@ public:
 	//8 for from secundus missilesite
 	Missile(int id, int hostId, int numOfVert, char * fileName, float size) :
 		Shape(id, numOfVert, fileName, size){
-		hostId = hostId;
+		this->hostId = hostId;
 		ttl = UTL;
 		activate = UTA;
 		fired = false;
+		exitedPlanet = false;
 		step = 50;
 
-		if (fromMissileSites())
-			target = 0;
+		if (fromMissileSites()){
+			this->target = 0;
+		}
 
 		if(hostId == 1){
 			hostName = "Unum Site";
@@ -61,15 +65,18 @@ public:
 		glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM, 
 		float primusSize, glm::mat4 secundusOM, float secundusSize) {
 
-		bool missileDestroyed = false;
 		bool diedViaPlanet = false;
 		bool diedViaSite = false;
 		bool diedViaDistance = false;
+		bool diedViaShip = false;
 		int hit = -1;
 
 		if (fired) { //if not fired, no action needed
 
 			if (ttl > 0) { //translate all the time if there are time to live remaining
+				if(UTL - ttl > 10)
+					exitedPlanet = true;
+
 				if (activate > 0) {
 					translateForward();
 					activate--;//since not activated no rotation 
@@ -90,13 +97,29 @@ public:
 				glm::vec3 missilePos = getPosition(getOrientationMatrix());
 				float missileSize = getSize();
 
+				//general missiles
 				//should check if you hit the target/obstacles whether or not smart aspect is activated
+				//int to check the initial spawning of missiles (which are being spawned inside the planet)
 				planetCollision(missilePos, missileSize, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
-				diedViaPlanet = isInPContact();
+				if(fromUnumSite() && !exitedPlanet)
+					diedViaPlanet = false;
+				else if(fromSecundusSite() && !exitedPlanet)
+					diedViaPlanet = false;
+				else
+					diedViaPlanet = isInPContact();
 
+				//specifically for WARBIRD MISSILE hitting missile sites
 				//returns -1 if no, 0 if unumsite, 1 if secundussite
-				int hit = missileSiteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
-				diedViaSite = isInSContact();
+				if(fromWarbird()){
+					int hit = missileSiteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
+					diedViaSite = isInSContact();
+				}
+
+				//specifically for MISSILE SITES hitting the ship
+				if(fromMissileSites()){
+					warbirdCollision(missilePos, missileSize, shipOM, shipSize);
+					diedViaShip = isInWContact();
+				}
 
 			}
 			else //if it's reached its max distance, then reset counters and position
@@ -117,7 +140,27 @@ public:
 				printf("missile from %s died via distance\n", hostName);
 				resetMissile();
 			}
+			else if(diedViaShip){
+				printf("missile from %s died via hitting warbird\n", hostName);
+				resetMissile();
+			}
 		}
+		else{ //hasnt been fired yet. must check if the ship is detection 
+			if(fromMissileSites()){
+				detectShip(shipOM, unumSiteOM, secundusSiteOM);
+			}
+		}
+	}
+
+	void detectShip(glm::mat4 warbirdOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM){
+		float distanceBetween = distance(getPosition(warbirdOM), getPosition(unumSiteOM));
+		if((distanceBetween <= detectionRange) && fromUnumSite())
+			fire(unumSiteOM);
+
+		distanceBetween = distance(getPosition(warbirdOM), getPosition(secundusSiteOM));
+		if((distanceBetween <= detectionRange) && fromSecundusSite())
+			fire(secundusSiteOM);		
+
 	}
 
 	void resetMissile(){
@@ -125,23 +168,28 @@ public:
 		ttl = UTL;
 		activate = UTA;
 		fired = false;
+		exitedPlanet = false;
 	}
 
-	float identify(glm::mat4 unum, glm::mat4 secundus) {
+	int identify(glm::mat4 unum, glm::mat4 secundus) {
 		//here calculate distance
 
 		glm::vec3 missilePos = getPosition(getOrientationMatrix());
 		float distanceBetweenUnum = distance(missilePos, getPosition(unum));
 		float distanceBetweenSecundus = distance(missilePos, getPosition(secundus));
 
-		if(distanceBetweenUnum > distanceBetweenSecundus){
-			printf("chose secundus\n");
-			return 2;
+		//needs to be in detection range to be able to choose
+		if(distanceBetweenUnum <= detectionRange || distanceBetweenSecundus <= detectionRange){
+			if(distanceBetweenUnum > distanceBetweenSecundus){
+				printf("chose secundus\n");
+				return 2;
+			}
+			else{
+				printf("chose unum\n");
+				return 1;
+			}
 		}
-		else{
-			printf("chose unum\n");
-			return 1;
-		}
+		return -1;
 	}
 	bool isFired() {
 		return fired;
@@ -197,7 +245,11 @@ public:
 	void fire(glm::mat4 objOM) {
 		printf("enter fire function\n");
 		if (fromWarbird()){
-			printf("enter ship fire \n");
+			printf("firing missile from %s \n", hostName);
+			spawn(objOM);
+		}
+		else{
+			printf("firing missile from %s \n", hostName);
 			spawn(objOM);
 		}
 		fired = true;
@@ -218,7 +270,15 @@ public:
 	}
 
 	bool fromMissileSites(){
-		return hostId != 0;
+		return (hostId ==  1 || hostId == 2);
+	}
+
+	bool fromUnumSite(){
+		return hostId == 1;
+	}
+
+	bool fromSecundusSite(){
+		return hostId == 2;
 	}
 
 	glm::mat4 getModelMatrix() {

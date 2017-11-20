@@ -19,14 +19,18 @@ private:
 	bool pContact;
 	bool sContact;
 	bool mContact;
+	bool wContact;
 	int planetCollisionConstant = 0;
-	int siteCollisinoConstant = 30;
+	int siteCollisionConstant = 30;
+	int warbirdCollisionConstant = 0;
+	int missileCollisionConstant = 0;
 
 public:
 	Collision() {
 		this->pContact = false;
 		this->sContact = false;
 		this->mContact = false;
+		this->wContact = false;
 	}
 
 	bool isInPContact() {
@@ -41,10 +45,15 @@ public:
 		return this->mContact;
 	}
 
+	bool isInWContact(){
+		return this->wContact;
+	}
+
 	void resetCollisions() {
 		this->pContact = false;
 		this->sContact = false;
 		this->mContact = false;
+		this->wContact = false;
 	}
 
 	void planetCollision(glm::vec3 objPos, float objSize, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
@@ -97,20 +106,50 @@ public:
 	int missileSiteCollision(glm::vec3 objPos, float objSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize){
 		//unumSite
 		float distanceBetween = distance(objPos, getPosition(unumSiteOM));
-		if (distanceBetween < (unumSiteSize + objSize + 50)) {
+		if (distanceBetween < (unumSiteSize + objSize + siteCollisionConstant)) {
 			this->sContact = true;
 			return 0;
 		}
 
 		//secundusSite
 		distanceBetween = distance(objPos, getPosition(secundusSiteOM));
-		if (distanceBetween < (secundusSiteSize + objSize + 50)) {
+		if (distanceBetween < (secundusSiteSize + objSize + siteCollisionConstant)) {
 			this->sContact = true;
 			return 1;
 		}
 
 		this->sContact = false;
 		return -1;
+	}
+
+	void missileCollision(glm::vec3 objPos, float objSize, glm::mat4 unumMissileOM, float unumMissileSize, 
+		glm::mat4 secundusMissileOM, float secundusMissileSize){
+		float distanceBetween = distance(objPos, getPosition(unumMissileOM));
+		if (distanceBetween < (unumMissileSize + objSize + missileCollisionConstant)) {
+			this->mContact = true;
+			return;
+		}
+
+		distanceBetween = distance(objPos, getPosition(secundusMissileOM));
+		if (distanceBetween < (secundusMissileSize + objSize + missileCollisionConstant)) {
+			this->mContact = true;
+			return;
+		}
+
+		this->mContact = false;
+		return;
+
+	}
+	//did obj hit the warbird?
+	void warbirdCollision(glm::vec3 objPos, float objSize, glm::mat4 warbirdOM, float warbirdSize){
+		float distanceBetween = distance(objPos, getPosition(warbirdOM));
+		if (distanceBetween < (warbirdSize + objSize + warbirdCollisionConstant)) {
+			this->wContact = true;
+			return;
+		}
+		
+		this->wContact = false;
+		return;
 	}
 
 };

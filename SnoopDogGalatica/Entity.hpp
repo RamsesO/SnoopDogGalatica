@@ -56,14 +56,16 @@ public:
 	}
 
 	void onMissileHit() {
-		if (this->isDead == false) {
-			this->health--;
-			if (this->health == 0) {
-				this->isDead == true;
+		if(isInMContact()){
+			if (this->isDead == false) {
+				this->health--;
+				if (this->health == 0) {
+					this->isDead == true;
+				}
 			}
-		}
-		else {
-			printf("Already Dead");
+			else {
+				printf("Already Dead");
+			}
 		}
 	}
 
