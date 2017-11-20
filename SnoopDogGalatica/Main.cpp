@@ -328,6 +328,10 @@ void update(int i) {
 }
 
 void arrowInput(int key, int x, int y) {
+
+	if(warbird->isDestroyed())
+		return;
+
 	int mod = glutGetModifiers();
 
 	switch (key) {
@@ -369,6 +373,8 @@ void arrowInput(int key, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 		case 'w': case 'W': // warp ship
+			if(warbird->isDestroyed())
+				return;
 			warp++;
 			if (warp % 2 == 0) {
 				planetCamOM = unumCam->getOrientationMatrix();
@@ -382,6 +388,8 @@ void keyboard(unsigned char key, int x, int y) {
 
 			break;
 		case 'f': case 'F': // fire missile only if its not fired yet.
+			if(warbird->isDestroyed())
+				return;
 			if(!wbMissile->isFired()) 
 				wbMissile->fire(warbird->getOrientationMatrix());
 			break;
@@ -394,6 +402,8 @@ void keyboard(unsigned char key, int x, int y) {
 				timeQuantumIndex = 0;
 			break;
 		case 's': case 'S': // next ship speed
+			if(warbird->isDestroyed())
+				return;
 			warbird->changeStep();
 			break;
 		case 'v': case 'V': // next camera

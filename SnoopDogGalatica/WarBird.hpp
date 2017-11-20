@@ -130,10 +130,14 @@ public:
 		return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
 	}
 
+	bool isDestroyed(){
+		return this->destroyed;
+	}
+
 	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
 		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
 
-		if(this->destroyed){
+		if(isDestroyed()){
 			printf("ship is dead \n");
 			return;
 		}
