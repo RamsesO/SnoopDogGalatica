@@ -79,8 +79,8 @@ public:
 	}
 
 	void launch(glm::mat4 objOM) {
-		printf("enter fire function\n");
-		printf("firing missile from %s \n", hostName);
+		printf("Launching missile... \n");
+		printf("Launching missile from %s.\n", hostName);
 		spawn(objOM);
 		launched = true;
 	}
@@ -106,16 +106,16 @@ public:
 		}
 	}
 
-	int identifyTarget(glm::mat4 unum, glm::mat4 secundus) {
+	int identifyTarget(glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
 		//here calculate distance
 
 		glm::vec3 missilePos = getPosition(getOrientationMatrix());
-		float distanceBetweenUnum = distance(missilePos, getPosition(unum));
-		float distanceBetweenSecundus = distance(missilePos, getPosition(secundus));
+		float disBetweenUSOM = distance(missilePos, getPosition(unumSiteOM));
+		float disBetweenSSOM = distance(missilePos, getPosition(secundusSiteOM));
 
 		//needs to be in detection range to be able to choose
-		if (distanceBetweenUnum <= detectionRange || distanceBetweenSecundus <= detectionRange) {
-			if (distanceBetweenUnum > distanceBetweenSecundus) {
+		if (disBetweenUSOM <= detectionRange || disBetweenSSOM <= detectionRange) {
+			if (disBetweenUSOM > disBetweenSSOM) {
 				printf("Chose secundus.\n");
 				return 2;
 			}
@@ -131,7 +131,7 @@ public:
 		this->translationMatrix = glm::translate(this->translationMatrix, -step * getOut(this->rotationMatrix));
 	}
 
-	void rotateTowards(glm::mat4 shipOM, glm::mat4 unumOM, glm::mat4 secundusOM) {
+	void rotateTowards(glm::mat4 shipOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
 		glm::vec3 targetPos; //this will be your at
 		glm::vec3 missilePos = getPosition(getOrientationMatrix());
 
@@ -139,10 +139,10 @@ public:
 			targetPos = getPosition(shipOM);
 		}
 		else if (target == 1) {
-			targetPos = getPosition(unumOM);
+			targetPos = getPosition(unumSiteOM);
 		}
 		else {
-			targetPos = getPosition(secundusOM);
+			targetPos = getPosition(secundusSiteOM);
 		}
 
 		//our up vector here might need to be changed
@@ -160,9 +160,9 @@ public:
 		launched = false;
 	}
 
-	void update(glm::mat4 shipOM, float shipSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
-		glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM,
-		float primusSize, glm::mat4 secundusOM, float secundusSize) {
+	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM,
+		float primusSize, glm::mat4 secundusOM, float secundusSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, 
+		float secundusSiteSize, glm::mat4 shipOM, float shipSize) {
 
 		bool diedViaPlanet = false;
 		bool diedViaSite = false;
@@ -176,7 +176,7 @@ public:
 					activate--;//since not activated no rotation 
 					if (activate == 0) {//identify target
 						if (fromWarbird()) {
-							target = identifyTarget(unumOM, secundusOM);
+							target = identifyTarget(unumSiteOM, secundusSiteOM);
 						}
 						else if (fromMissileSites()) {
 							target = 0;
@@ -184,7 +184,7 @@ public:
 					}
 				}
 				else { //activated
-					rotateTowards(shipOM, unumOM, secundusOM);
+					rotateTowards(shipOM, unumSiteOM, secundusSiteOM);
 					ttl--;
 				}
 
