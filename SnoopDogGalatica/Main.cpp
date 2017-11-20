@@ -225,9 +225,9 @@ void update(int i) {
 	primus->update();
 	secundus->update();
 	warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, 
-		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
-	unumSite->update(unumOM, warbirdOM, warbirdSize);
-	secundusSite->update(secundusOM, warbirdOM, warbirdSize);
+		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
+	unumSite->update(unumOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
+	secundusSite->update(secundusOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
 	unumCam->update();
 	duoCam->update();
 
