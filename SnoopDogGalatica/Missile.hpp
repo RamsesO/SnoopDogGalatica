@@ -73,7 +73,7 @@ public:
 		if (fired) { //if not fired, no action needed
 
 			if (ttl > 0) { //translate all the time if there are time to live remaining
-				if(UTL - ttl > 10)
+				if(UTL - ttl > 5)
 					exitedPlanet = true;
 
 				if (activate > 0) {
@@ -88,7 +88,8 @@ public:
 					}
 				}
 				else { //activated
-					rotateTowards(shipOM, unumOM, secundusOM);
+					if(target != -1)
+						rotateTowards(shipOM, unumOM, secundusOM);
 					translateForward();
 					ttl--;
 				}
@@ -175,8 +176,10 @@ public:
 		float distanceBetweenUnum = distance(missilePos, getPosition(unum));
 		float distanceBetweenSecundus = distance(missilePos, getPosition(secundus));
 
+		printf("%f \t %f \n", distanceBetweenUnum, distanceBetweenSecundus);
+
 		//needs to be in detection range to be able to choose
-		if(distanceBetweenUnum <= detectionRange || distanceBetweenSecundus <= detectionRange){
+		if(distanceBetweenUnum <= detectionRange && distanceBetweenSecundus <= detectionRange){
 			if(distanceBetweenUnum > distanceBetweenSecundus){
 				printf("chose secundus\n");
 				return 2;
@@ -186,7 +189,16 @@ public:
 				return 1;
 			}
 		}
-		return -1;
+		else if(distanceBetweenUnum <= detectionRange){
+			printf("chose unum\n");
+			return 1;
+		}
+		else if(distanceBetweenSecundus <= detectionRange){
+			printf("chose secundus\n");
+			return 2;
+		}
+		else
+			return -1;
 	}
 	bool isFired() {
 		return fired;
@@ -206,7 +218,7 @@ public:
 		else if(target == 1){
 			targetPos = getPosition(unumOM);
 		}
-		else{
+		else if(target == 2){
 			targetPos = getPosition(secundusOM);
 		}
 
