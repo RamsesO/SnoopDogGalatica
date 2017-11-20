@@ -192,27 +192,28 @@ public:
 				printf("chose secundus\n");
 				return 1;
 			}
-			else{
-				if(!unumSiteIsDead){
-					printf("chose unum\n");
-					return 1;
-				}
+			
+			if((distanceBetweenUnum < distanceBetweenSecundus) && !unumSiteIsDead){
+				printf("chose unum\n");
+				return 1;
 			}
 		}
-		else if(distanceBetweenUnum <= detectionRange){
+		
+		if(distanceBetweenUnum <= detectionRange){
 			if(!unumSiteIsDead){
 				printf("chose unum\n");
 				return 1;
 			}
 		}
-		else if(distanceBetweenSecundus <= detectionRange){
+		
+		if(distanceBetweenSecundus <= detectionRange){
 			if(!secundusSiteIsDead){
 				printf("chose secundus\n");
 				return 2;
 			}
 		}
-		else
-			return -1;
+		
+		return -1;
 	}
 	bool isFired() {
 		return fired;
