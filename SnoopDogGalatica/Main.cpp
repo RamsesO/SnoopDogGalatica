@@ -61,9 +61,9 @@ char titleStr[300];
 char baseStr[75] = "Snoop Dogg Galatica:  ";
 char warbirdStr[15] = "Warbird";
 char wbMissileStr[15];
-char unumStr[15] = "UnumSite";
+char unumStr[15] = "Unum Site";
 char usMissileStr[15];
-char secStr[15] = "SecundusSite";
+char secStr[15] = "Secundus Site";
 char ssMissileStr[15];
 char upsStr[15];
 char fpsStr[15];
@@ -117,71 +117,17 @@ void updateTitle() {
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	modelMatrix = ruber->getModelMatrix();
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[ruber->id]);
-	glDrawArrays(GL_TRIANGLES, 0, ruber->numOfVert);
-
-	modelMatrix = unum->getModelMatrix();
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[unum->id]);
-	glDrawArrays(GL_TRIANGLES, 0, unum->numOfVert);
-
-	modelMatrix = duo->getModelMatrix();
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[duo->id]);
-	glDrawArrays(GL_TRIANGLES, 0, duo->numOfVert);
-
-	modelMatrix = primus->getModelMatrix(duo->getPlanetMatrix());
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[primus->id]);
-	glDrawArrays(GL_TRIANGLES, 0, primus->numOfVert);
-
-	modelMatrix = secundus->getModelMatrix(duo->getPlanetMatrix());
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[secundus->id]);
-	glDrawArrays(GL_TRIANGLES, 0, secundus->numOfVert);
-
-	modelMatrix = warbird->getModelMatrix();
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[warbird->id]);
-	glDrawArrays(GL_TRIANGLES, 0, warbird->numOfVert);
-
-	modelMatrix = unumSite->getModelMatrix(unum->getHubMatrix());
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[unumSite->id]);
-	glDrawArrays(GL_TRIANGLES, 0, unumSite->numOfVert);
-
-	modelMatrix = secundusSite->getModelMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[secundusSite->id]);
-	glDrawArrays(GL_TRIANGLES, 0, secundusSite->numOfVert);
-
-	modelMatrix = wbMissile->getModelMatrix();
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[wbMissile->id]);
-	glDrawArrays(GL_TRIANGLES, 0, wbMissile->numOfVert);
-
-	modelMatrix = usMissile->getModelMatrix();
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[usMissile->id]);
-	glDrawArrays(GL_TRIANGLES, 0, usMissile->numOfVert);
-
-	modelMatrix = ssMissile->getModelMatrix();
-	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
-	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
-	glBindVertexArray(VAO[ssMissile->id]);
-	glDrawArrays(GL_TRIANGLES, 0, ssMissile->numOfVert);
+	ruber->displayShape(projectionMatrix, viewMatrix, ruber->getModelMatrix(), MVP, VAO);
+	unum->displayShape(projectionMatrix, viewMatrix, unum->getModelMatrix(), MVP, VAO);
+	duo->displayShape(projectionMatrix, viewMatrix, duo->getModelMatrix(), MVP, VAO);
+	primus->displayShape(projectionMatrix, viewMatrix, primus->getModelMatrix(duo->getPlanetMatrix()), MVP, VAO);
+	secundus->displayShape(projectionMatrix, viewMatrix, secundus->getModelMatrix(duo->getPlanetMatrix()), MVP, VAO);
+	warbird->displayShape(projectionMatrix, viewMatrix, warbird->getModelMatrix(), MVP, VAO);
+	unumSite->displayShape(projectionMatrix, viewMatrix, unumSite->getModelMatrix(unum->getHubMatrix()), MVP, VAO);
+	secundusSite->displayShape(projectionMatrix, viewMatrix, secundusSite->getModelMatrix(secundus->getHubMatrix(duo->getPlanetMatrix())), MVP, VAO);
+	wbMissile->displayShape(projectionMatrix, viewMatrix, wbMissile->getModelMatrix(), MVP, VAO);
+	usMissile->displayShape(projectionMatrix, viewMatrix, usMissile->getModelMatrix(), MVP, VAO);
+	ssMissile->displayShape(projectionMatrix, viewMatrix, ssMissile->getModelMatrix(), MVP, VAO);
 
 	glutSwapBuffers();
 	frameCount++;

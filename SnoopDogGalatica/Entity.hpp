@@ -77,7 +77,6 @@ public:
 				return true;
 			}
 			else {
-				printf("Already Dead");
 				return false;
 			}
 		}

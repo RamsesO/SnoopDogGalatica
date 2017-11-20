@@ -72,6 +72,13 @@ public:
         this->radians = glm::radians(radians);
     }
 
+	void displayShape(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, glm::mat4 modelMatrix, GLuint &MVP, GLuint (&VAO)[11]) {
+		glm::mat4 ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+		glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+		glBindVertexArray(VAO[this->id]);
+		glDrawArrays(GL_TRIANGLES, 0, this->numOfVert);
+	}
+
     void setScaleMatrix(float modelSize) {
 		this->modelSize = modelSize;
         this->scaleMatrix = glm::scale(glm::mat4(), glm::vec3(size * 1.0f / modelSize));
