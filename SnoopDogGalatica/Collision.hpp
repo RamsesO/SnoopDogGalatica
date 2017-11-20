@@ -106,4 +106,19 @@ public:
 		}
 	}
 
+	void missileCollision(glm::vec3 objPos, float objSize, glm::mat4 wbmOM, float wbmSize, glm::mat4 usmOM, float usmSize, glm::mat4 ssmOM, float ssmSize) {
+		if (colliding(objPos, objSize, wbmOM, wbmSize) == true) {
+			this->mContact = true;
+		}
+		else if (colliding(objPos, objSize, usmOM, usmSize) == true) {
+			this->mContact = true;
+		}
+		else if (colliding(objPos, objSize, ssmOM, ssmSize) == true) {
+			this->mContact = true;
+		}
+		else {
+			this->mContact = false;
+		}
+	}
+
 };

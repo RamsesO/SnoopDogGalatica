@@ -63,7 +63,6 @@ public:
 			if (this->health == 0) {
 				this->isDead == true;
 			}
-			printf("%d \n", health);
 		}
 		else {
 			printf("Already Dead");

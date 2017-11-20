@@ -37,9 +37,9 @@ Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0), 7, 1);
 MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
 MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
-Missile * wbMissile = new Missile(8, 918 * 3, "assets/Missle.tri", 25.0f);
-Missile * usMissile = new Missile(9, 918 * 3, "assets/Missle.tri", 25.0f);
-Missile * ssMissile = new Missile(10, 918 * 3, "assets/Missle.tri", 25.0f);
+Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f);
+Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 25.0f);
+Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 25.0f);
 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
@@ -201,8 +201,8 @@ void update(int i) {
 	glm::mat4 duoOM = duo->getHubMatrix();
 	glm::mat4 primusOM = primus->getHubMatrix(duo->getPlanetMatrix());
 	glm::mat4 secundusOM = secundus->getHubMatrix(duo->getPlanetMatrix());
-	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unum->getHubMatrix());
-	glm::mat4 secundusSiteOM = secundusSite->getSiteMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
+	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unumOM);
+	glm::mat4 secundusSiteOM = secundusSite->getSiteMatrix(secundusOM);
 	glm::mat4 warbirdOM = warbird->getOrientationMatrix();
 
 	float ruberSize = ruber->getSize() / 2;
@@ -224,9 +224,6 @@ void update(int i) {
 		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
 	unumSite->update(unumOM, warbirdOM, warbirdSize);
 	secundusSite->update(secundusOM, warbirdOM, warbirdSize);
-	wbMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
-	usMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
-	ssMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
 	unumCam->update();
 	duoCam->update();
 
@@ -307,20 +304,23 @@ void arrowInput(int key, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 		case 'w': case 'W': // warp ship
-			warp++;
-			if (warp % 2 == 0) {
-				planetCamOM = unumCam->getOrientationMatrix();
-				planetOM = unum->getPlanetMatrix();
+			if (warbird->isItDead() == false) {
+				warp++;
+				if (warp % 2 == 0) {
+					planetCamOM = unumCam->getOrientationMatrix();
+					planetOM = unum->getPlanetMatrix();
+				}
+				else {
+					planetCamOM = duoCam->getOrientationMatrix();
+					planetOM = duo->getPlanetMatrix();
+				}
+				warbird->warpTo(planetCamOM, planetOM);
 			}
-			else {
-				planetCamOM = duoCam->getOrientationMatrix();
-				planetOM = duo->getPlanetMatrix();
-			}
-			warbird->warpTo(planetCamOM, planetOM);
-
 			break;
 		case 'f': case 'F': 
+			if (warbird->isItDead() == false) {
 
+			}
 			break;
 		case 'g': case 'G': // toggle gravity for ship
 			warbird->toggleGravity();
