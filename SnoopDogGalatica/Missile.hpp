@@ -67,7 +67,6 @@ public:
 
 		bool diedViaPlanet = false;
 		bool diedViaSite = false;
-		bool diedViaDistance = false;
 		bool diedViaShip = false;
 		int hit = -1;
 
@@ -121,29 +120,27 @@ public:
 					diedViaShip = isInWContact();
 				}
 
+				if(diedViaPlanet){
+					printf("missile from %s died via planet hit\n", hostName);
+					resetMissile();
+				}
+				else if(diedViaShip){
+					printf("missile from %s died via hitting warbird\n", hostName);
+					resetMissile();
+				}
+				else if(diedViaSite){
+					printf("missile from %s died via site destruction\n", hostName);
+					resetMissile();
+				}
+
 			}
 			else //if it's reached its max distance, then reset counters and position
 			{
-				diedViaDistance = true;
-				
-			}
-
-			if(diedViaPlanet){
-				printf("missile from %s died via planet hit\n", hostName);
-				resetMissile();
-			}
-			else if(diedViaSite){
-				printf("missile from %s died via site destruction\n", hostName);
-				resetMissile();
-			}
-			else if(diedViaDistance){
 				printf("missile from %s died via distance\n", hostName);
 				resetMissile();
+				
 			}
-			else if(diedViaShip){
-				printf("missile from %s died via hitting warbird\n", hostName);
-				resetMissile();
-			}
+			
 		}
 		else{ //hasnt been fired yet. must check if the ship is detection 
 			if(fromMissileSites()){

@@ -23,7 +23,7 @@ private:
 	int planetCollisionConstant = 0;
 	int siteCollisionConstant = 30;
 	int warbirdCollisionConstant = 0;
-	int missileCollisionConstant = 0;
+	int missileCollisionConstant = 30;
 
 public:
 	Collision() {
@@ -125,6 +125,7 @@ public:
 	void missileCollision(glm::vec3 objPos, float objSize, glm::mat4 unumMissileOM, float unumMissileSize, 
 		glm::mat4 secundusMissileOM, float secundusMissileSize){
 		float distanceBetween = distance(objPos, getPosition(unumMissileOM));
+		printf("%f \n", distanceBetween);
 		if (distanceBetween < (unumMissileSize + objSize + missileCollisionConstant)) {
 			this->mContact = true;
 			return;
