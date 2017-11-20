@@ -7,7 +7,7 @@
 */
 
 # ifndef __INCLUDES465__
-# include "../includes465/include465.hpp"
+# include "../../includes465/include465.hpp"
 # define __INCLUDES465__
 # endif
 
@@ -19,6 +19,8 @@ private:
 	bool pContact;
 	bool sContact;
 	bool mContact;
+	int planetCollisionConstant = 0;
+	int siteCollisinoConstant = 30;
 
 public:
 	Collision() {
@@ -50,7 +52,7 @@ public:
 
 		//sun
 		float distanceBetween = distance(objPos, getPosition(sunOM));
-		if (distanceBetween < (sunSize + objSize + 50)) {
+		if (distanceBetween < (sunSize + objSize + planetCollisionConstant)) {
 			this->pContact = true;
 			return;
 		}
@@ -58,7 +60,7 @@ public:
 
 		//unum
 		distanceBetween = distance(objPos, getPosition(unumOM));
-		if (distanceBetween < (unumSize + objSize + 50)) {
+		if (distanceBetween < (unumSize + objSize + planetCollisionConstant)) {
 			this->pContact = true;
 			return;
 		}
@@ -66,7 +68,7 @@ public:
 
 		//duo
 		distanceBetween = distance(objPos, getPosition(duoOM));
-		if (distanceBetween < (duoSize + objSize + 50)) {
+		if (distanceBetween < (duoSize + objSize + planetCollisionConstant)) {
 			this->pContact = true;
 			return;
 		}
@@ -74,7 +76,7 @@ public:
 
 		//primus
 		distanceBetween = distance(objPos, getPosition(primusOM));
-		if (distanceBetween < (primusSize + objSize + 50)) {
+		if (distanceBetween < (primusSize + objSize + planetCollisionConstant)) {
 			this->pContact = true;
 			return;
 		}
@@ -82,14 +84,17 @@ public:
 
 		//secundus
 		distanceBetween = distance(objPos, getPosition(secundusOM));
-		if (distanceBetween < (secundusSize + objSize + 50)) {
+		if (distanceBetween < (secundusSize + objSize + planetCollisionConstant)) {
 			this->pContact = true;
 			return;
 		}
 		//printf("distance between secundus and obj: %f . secundus + obj distance: %f \n", distanceBetween, (secundusSize + objSize + 50));
+
+		this->pContact = false;
+		return;
 	}
 
-	int missileSiteCollision(glm::vec3 objPos, float objSize, glm::vec3 unumSiteOM, float unumSiteSize, glm::vec3 secundusSiteOM, float secundusSiteSize){
+	int missileSiteCollision(glm::vec3 objPos, float objSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize){
 		//unumSite
 		float distanceBetween = distance(objPos, getPosition(unumSiteOM));
 		if (distanceBetween < (unumSiteSize + objSize + 50)) {
@@ -104,6 +109,7 @@ public:
 			return 1;
 		}
 
+		this->sContact = false;
 		return -1;
 	}
 

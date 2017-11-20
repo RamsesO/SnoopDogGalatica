@@ -37,7 +37,7 @@ Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0), 7, 1);
 MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
 MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
-Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f * 20);
+Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f*5);
 Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 25.0f);
 Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 25.0f);
 
@@ -296,7 +296,6 @@ void update(int i) {
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 
 	glm::mat4 ruberOM = ruber->getOrientationMatrix();
 	glm::mat4 unumOM = unum->getPlanetMatrix();
@@ -306,7 +305,9 @@ void update(int i) {
 	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unum->getHubMatrix());
 	glm::mat4 secundusSiteOM = secundusSite->getSiteMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
 	glm::mat4 warbirdOM = warbird->getOrientationMatrix();
-	
+
+
+	warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 	wbMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
 		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 	usMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 

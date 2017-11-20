@@ -28,12 +28,9 @@ private:
 	int target;
 	bool fired;
 	int hostId;
-	String hostName;
+	char * hostName;
 
 public:
-	bool isFired() {
-		return fired;
-	}
 	//missile's id should be used as following
 	//6 for from ship
 	//7 for from unum missilesite
@@ -145,6 +142,9 @@ public:
 			printf("chose unum\n");
 			return 1;
 		}
+	}
+	bool isFired() {
+		return fired;
 	}
 
 	void translateForward(){
