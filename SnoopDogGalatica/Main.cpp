@@ -279,17 +279,38 @@ void reshape(int width, int height) {
 
 // Use with Idle and intervalTimer functions 
 void update(int i) {
+	glm::mat4 ruberOM = ruber->getOrientationMatrix();
+	glm::mat4 unumOM = unum->getPlanetMatrix();
+	glm::mat4 duoOM = duo->getPlanetMatrix();
+	glm::mat4 primusOM = primus->getHubMatrix(duo->getPlanetMatrix());
+	glm::mat4 secundusOM = secundus->getHubMatrix(duo->getPlanetMatrix());
+	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unum->getHubMatrix());
+	glm::mat4 secundusSiteOM = secundusSite->getSiteMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
+	glm::mat4 warbirdOM = warbird->getOrientationMatrix();
+
+	float ruberSize = ruber->getSize()/2;
+	float unumSize = unum->getSize();
+	float duoSize = duo->getSize();
+	float primusSize = primus->getSize();
+	float secundusSize = secundus->getSize();
+	float unumSiteSize = unumSite->getSize();
+	float secundusSiteSize = secundusSite->getSize();
+	float warbirdSize = warbird->getSize();
+
+
 	glutTimerFunc(timeQuantum[timeQuantumIndex], update, 1);
 	ruber->update();
 	unum->update();
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update(ruber->getOrientationMatrix(), ruber->getSize()/2, unum->getPlanetMatrix(), unum->getSize(), duo->getPlanetMatrix(), duo->getSize(),
-		primus->getHubMatrix(duo->getPlanetMatrix()), primus->getSize(), secundus->getHubMatrix(duo->getPlanetMatrix()), secundus->getSize());
-	wbMissile->update(warbird->getOrientationMatrix(), unumSite->getSiteMatrix(unum->getHubMatrix()), secundusSite->getSiteMatrix(secundus->getHubMatrix(duo->getPlanetMatrix())));
-	usMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
-	ssMissile->update(warbird->getOrientationMatrix(), unum->getPlanetMatrix(), duo->getPlanetMatrix());
+	warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+	wbMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
+		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+	usMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
+		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+	ssMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
+		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 	unumCam->update();
 	duoCam->update();
 	

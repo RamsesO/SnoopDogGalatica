@@ -15,7 +15,7 @@
 
 # define __Missile__
 
-class Missile : public Shape {
+class Missile : public Shape, public Collision {
 
 private:
 	//update by target location and current position
@@ -28,6 +28,7 @@ private:
 	int target;
 	bool fired;
 	int hostId;
+	String hostName;
 
 public:
 	bool isFired() {
@@ -38,17 +39,37 @@ public:
 	//7 for from unum missilesite
 	//8 for from secundus missilesite
 	Missile(int id, int hostId, int numOfVert, char * fileName, float size) :
-		Shape(id, numOfVert, fileName, size) {
+		Shape(id, numOfVert, fileName, size){
 		hostId = hostId;
 		ttl = UTL;
 		activate = UTA;
 		fired = false;
 		step = 50;
+
 		if (fromMissileSites())
 			target = 0;
+
+		if(hostId == 1){
+			hostName = "Unum Site";
+		}
+		else if(hostId == 2){
+			hostName = "Secundus Site";
+		}
+		else{
+			hostName = "Warbird";
+		}
 	}
 
-	void update(glm::mat4 ship, glm::mat4 unum, glm::mat4 secundus) {
+	void update(glm::mat4 shipOM, float shipSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
+		glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM, 
+		float primusSize, glm::mat4 secundusOM, float secundusSize) {
+
+		bool missileDestroyed = false;
+		bool diedViaPlanet = false;
+		bool diedViaSite = false;
+		bool diedViaDistance = false;
+		int hit = -1;
+
 		if (fired) { //if not fired, no action needed
 
 			if (ttl > 0) { //translate all the time if there are time to live remaining
@@ -57,28 +78,56 @@ public:
 					activate--;//since not activated no rotation 
 					if (activate == 0) {//identify target
 						if(fromWarbird())
-							target = identify(unum, secundus);
+							target = identify(unumOM, secundusOM);
 						else if(fromMissileSites()){
 							target = 0;
 						}
 					}
 				}
 				else { //activated
-					rotateTowards(ship, unum, secundus);
+					rotateTowards(shipOM, unumOM, secundusOM);
 					translateForward();
 					ttl--;
 				}
-				
+
+				glm::vec3 missilePos = getPosition(getOrientationMatrix());
+				float missileSize = getSize();
+
+				//should check if you hit the target/obstacles whether or not smart aspect is activated
+				planetCollision(missilePos, missileSize, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+				diedViaPlanet = isInPContact();
+
+				//returns -1 if no, 0 if unumsite, 1 if secundussite
+				int hit = missileSiteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
+				diedViaSite = isInSContact();
+
 			}
 			else //if it's reached its max distance, then reset counters and position
 			{
-				printf("destroyed\n");
-				sendToCenter();
-				ttl = UTL;
-				activate = UTA;
-				fired = false;
+				diedViaDistance = true;
+				
+			}
+
+			if(diedViaPlanet){
+				printf("missile from %s died via planet hit\n", hostName);
+				resetMissile();
+			}
+			else if(diedViaSite){
+				printf("missile from %s died via site destruction\n", hostName);
+				resetMissile();
+			}
+			else if(diedViaDistance){
+				printf("missile from %s died via distance\n", hostName);
+				resetMissile();
 			}
 		}
+	}
+
+	void resetMissile(){
+		sendToCenter();
+		ttl = UTL;
+		activate = UTA;
+		fired = false;
 	}
 
 	float identify(glm::mat4 unum, glm::mat4 secundus) {

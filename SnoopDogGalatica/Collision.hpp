@@ -89,4 +89,22 @@ public:
 		//printf("distance between secundus and obj: %f . secundus + obj distance: %f \n", distanceBetween, (secundusSize + objSize + 50));
 	}
 
+	int missileSiteCollision(glm::vec3 objPos, float objSize, glm::vec3 unumSiteOM, float unumSiteSize, glm::vec3 secundusSiteOM, float secundusSiteSize){
+		//unumSite
+		float distanceBetween = distance(objPos, getPosition(unumSiteOM));
+		if (distanceBetween < (unumSiteSize + objSize + 50)) {
+			this->sContact = true;
+			return 0;
+		}
+
+		//secundusSite
+		distanceBetween = distance(objPos, getPosition(secundusSiteOM));
+		if (distanceBetween < (secundusSiteSize + objSize + 50)) {
+			this->sContact = true;
+			return 1;
+		}
+
+		return -1;
+	}
+
 };
