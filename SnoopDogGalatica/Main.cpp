@@ -23,7 +23,7 @@
 # include "MissileSite.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
-const int nModels = 11;
+const int nModels = Shape::nModels;
 Sun * ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0),
 	glm::vec3(0, 1, 0), 1.0f);
 Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0),
@@ -316,13 +316,19 @@ void keyboard(unsigned char key, int x, int y) {
 				}
 				warbird->warpTo(planetCamOM, planetOM);
 			}
+			else {
+				printf("Can't warp, ship is dead.\n");
+			}
 			break;
 		case 'f': case 'F': 
 			if (warbird->isItDead() == false) {
 
 			}
+			else {
+				printf("Can't fire, ship is dead.\n");
+			}
 			break;
-		case 'g': case 'G': // toggle gravity for ship
+		case 'g': case 'G':
 			warbird->toggleGravity();
 			break;
 		case 't': case 'T': // next TQ value
