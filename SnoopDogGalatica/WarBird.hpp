@@ -25,7 +25,6 @@ public:
 	float step;
 	int key; // 1-8 designates the kind of movement
 
-
 	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, int missile, int health) :
 		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health), Gravity() {
 		this->step = 10;

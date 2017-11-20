@@ -42,30 +42,36 @@ public:
 		return missile;
 	}
 
-	void fire(bool reloading) {
+	bool fire(bool launched) { //returns true if fired
 		if (this->missile > 0) {
-			if (reloading == false) {
+			if (launched == false) {
 				this->missile--;
-				//fire the missile
+				return true;
 			}
 			else {
-				printf("Still Reloading, Please Wait");
+				printf("Still Reloading, Please Wait.\n");
+				return false;
 			}
 		}
 		else {
 			printf("Out of Ammo!\n");
+			return false;
 		}
 	}
 
-	void onMissileHit() {
+	bool onMissileHit() {
 		if (this->isDead == false) {
 			this->health--;
 			if (this->health == 0) {
 				this->isDead == true;
+				return true;
+			}
+			else {
+				return false;
 			}
 		}
 		else {
-			printf("Already Dead");
+			return false;
 		}
 	}
 

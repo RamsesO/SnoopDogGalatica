@@ -27,7 +27,7 @@ private:
 	int ttl, activate;
 	int target;
 	int hostId;
-	bool fired;
+	bool launched;
 	char * hostName;
 
 public:
@@ -36,7 +36,7 @@ public:
 		this->hostId = hostId;
 		ttl = UTL;
 		activate = UTA;
-		fired = false;
+		launched = false;
 		step = 50;
 
 		if (fromMissileSites()) {
@@ -74,15 +74,15 @@ public:
 		return hostId == 2;
 	}
 
-	bool isFired() {
-		return fired;
+	bool hasLaunched() {
+		return launched;
 	}
 
-	void fire(glm::mat4 objOM) {
+	void launch(glm::mat4 objOM) {
 		printf("enter fire function\n");
 		printf("firing missile from %s \n", hostName);
 		spawn(objOM);
-		fired = true;
+		launched = true;
 	}
 
 	void spawn(glm::mat4 objOM) {
@@ -97,12 +97,12 @@ public:
 	void detectShip(glm::mat4 warbirdOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
 		float distanceBetween = distance(getPosition(warbirdOM), getPosition(unumSiteOM));
 		if ((distanceBetween <= detectionRange) && fromUnumSite()) {
-			fire(unumSiteOM);
+			launch(unumSiteOM);
 		}
 
 		distanceBetween = distance(getPosition(warbirdOM), getPosition(secundusSiteOM));
 		if ((distanceBetween <= detectionRange) && fromSecundusSite()) {
-			fire(secundusSiteOM);
+			launch(secundusSiteOM);
 		}
 	}
 
@@ -157,7 +157,7 @@ public:
 		sendToCenter();
 		ttl = UTL;
 		activate = UTA;
-		fired = false;
+		launched = false;
 	}
 
 	void update(glm::mat4 shipOM, float shipSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
@@ -168,7 +168,7 @@ public:
 		bool diedViaSite = false;
 		bool diedViaShip = false;
 
-		if (fired == true) { //if not fired, no action needed
+		if (launched == true) { //if not fired, no action needed
 
 			if (ttl > 0) { //translate all the time if there are time to live remaining
 				translateForward();
