@@ -49,7 +49,7 @@ public:
 		if (isItDead() == false) {
 			glm::vec3 sitePos = getPosition(this->translationMatrix * hubMatrix);
 			warbirdCollision(sitePos, this->size, warbirdOM, warbirdSize);
-			missileCollision(sitePos, this->size, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
+			missileCollision(sitePos, this->size, wbMissileOM, usMissileOM, ssMissileOM, missileSize + 500);
 			bool justDied = ( onWarbirdHit() || onMissileHit() );
 			if (justDied) {
 				sendToCenter();

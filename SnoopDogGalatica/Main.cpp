@@ -37,9 +37,9 @@ Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0), 7, 1);
 MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
 MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
-Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f);
-Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 25.0f);
-Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 25.0f);
+Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 100.0f);
+Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 100.0f);
+Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 100.0f);
 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
@@ -216,7 +216,7 @@ void update(int i) {
 	float unumSiteSize = unumSite->getSize();
 	float secundusSiteSize = secundusSite->getSize();
 	float warbirdSize = warbird->getSize();
-	float missileSize = wbMissile->getSize();
+	float missileSize = wbMissile->getSize() / 4;
 
 	glutTimerFunc(timeQuantum[timeQuantumIndex], update, 1);
 	ruber->update();
@@ -228,6 +228,12 @@ void update(int i) {
 		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
 	unumSite->update(unumOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
 	secundusSite->update(secundusOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
+	wbMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
+		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
+	usMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
+		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
+	ssMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
+		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
 	unumCam->update();
 	duoCam->update();
 
@@ -326,7 +332,10 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		case 'f': case 'F': 
 			if (warbird->isItDead() == false) {
-
+				bool justFired = warbird->fire(wbMissile->hasLaunched());
+				if (justFired == true) {
+					wbMissile->launch(warbird->getOrientationMatrix());
+				}
 			}
 			else {
 				printf("Can't fire, ship is dead.\n");

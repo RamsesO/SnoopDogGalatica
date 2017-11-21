@@ -20,9 +20,10 @@ class Missile : public Shape, public Collision {
 private:
 
 	const float UTL = 2000.0; //2000 updates to live
-	const float UTA = 200.0;  //200 updates to activate
+	const float UTA = 50.0;  //200 updates to activate
 	const int detectionRange = 3000;
 	float step;
+	float offset;
 	float rStep;
 	int ttl, activate;
 	int target;
@@ -37,7 +38,8 @@ public:
 		ttl = UTL;
 		activate = UTA;
 		launched = false;
-		step = 50;
+		step = 10;
+		offset = 250;
 
 		if (fromMissileSites()) {
 			this->target = 0;
@@ -86,12 +88,13 @@ public:
 	}
 
 	void spawn(glm::mat4 objOM) {
-		this->translationMatrix = glm::translate(glm::mat4(), getPosition(objOM));
-
 		float * tempRMValues = (float*)glm::value_ptr(objOM);
 
 		this->rotationMatrix = glm::mat4(tempRMValues[0], tempRMValues[1], tempRMValues[2], 0, tempRMValues[4],
 			tempRMValues[5], tempRMValues[6], 0, tempRMValues[8], tempRMValues[9], tempRMValues[10], 0, 0, 0, 0, 1);
+
+		this->translationMatrix = glm::translate(glm::mat4(), getPosition(objOM));
+		offsetForward();
 	}
 
 	void detectShip(glm::mat4 warbirdOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
@@ -129,6 +132,10 @@ public:
 
 	void translateForward() {
 		this->translationMatrix = glm::translate(this->translationMatrix, -step * getOut(this->rotationMatrix));
+	}
+
+	void offsetForward() {
+		this->translationMatrix = glm::translate(this->translationMatrix, -offset * getOut(this->rotationMatrix));
 	}
 
 	void rotateTowards(glm::mat4 shipOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
@@ -175,6 +182,7 @@ public:
 				if (activate > 0) {
 					activate--;//since not activated no rotation 
 					if (activate == 0) {//identify target
+						step = 100;
 						if (fromWarbird()) {
 							target = identifyTarget(unumSiteOM, secundusSiteOM);
 						}
@@ -191,11 +199,11 @@ public:
 				glm::vec3 missilePos = getPosition(this->translationMatrix);
 				float missileSize = this->size;
 
-				planetCollision(missilePos, missileSize, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+				planetCollision(missilePos, missileSize, sunOM, sunSize * 2, unumOM, unumSize - 50, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize - 50);
 				diedViaPlanet = isInPContact();
 				siteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
 				diedViaSite = isInSContact();
-				warbirdCollision(missilePos, missileSize, shipOM, shipSize);
+				warbirdCollision(missilePos, missileSize, shipOM, shipSize - 50);
 				diedViaShip = isInWContact();
 	
 				if (diedViaPlanet) {
@@ -217,9 +225,7 @@ public:
 			}
 		}
 		else { //hasnt been fired yet. must check if the ship is detection 
-			if (fromMissileSites()) {
-				detectShip(shipOM, unumSiteOM, secundusSiteOM);
-			}
+			step = 10;
 		}
 	}
 

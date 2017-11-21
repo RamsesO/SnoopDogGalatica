@@ -42,7 +42,7 @@ public:
 		return missile;
 	}
 
-	bool fire(bool launched) { //returns true if fired
+	bool fire(bool launched) { 
 		if (this->missile > 0) {
 			if (launched == false) {
 				this->missile--;
@@ -59,9 +59,9 @@ public:
 		}
 	}
 
-	bool onMissileHit() {
+	bool onHit() {
 		if (this->isDead == false) {
-			printf("Hit by missile.");
+			printf("Hit by missile.\n");
 			this->health--;
 			if (this->health == 0) {
 				this->isDead == true;
@@ -85,6 +85,13 @@ public:
 		else {
 			return false;
 		}
+	}
+
+	bool onMissileHit() {
+		if (isInMContact()) {
+			return onHit();
+		}
+		return false;
 	}
 
 	bool onPlanetHit() {

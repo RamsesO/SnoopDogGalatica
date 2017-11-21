@@ -57,14 +57,16 @@ public:
 	bool colliding(glm::vec3 objPos, float objSize, glm::mat4 targetOM, float targetSize) {
 		float distanceBetween = distance(objPos, getPosition(targetOM));
 		if (distanceBetween < (targetSize + objSize + 50)) {
+			printf("Distance Between: %f \n", distanceBetween);
+			printf("Target + Obj Size: %f \n", (targetSize + objSize + 50));
 			return true;
 		}
-		//printf("distance between sun and obj: %f . sun + obj distance: %f \n", distanceBetween, (sunSize + objSize + 50));
 		return false;
 	}
 
 	void planetCollision(glm::vec3 objPos, float objSize, glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize,
 		glm::mat4 primusOM, float primusSize, glm::mat4 secundusOM, float secundusSize) {
+
 		if (colliding(objPos, objSize, sunOM, sunSize) == true) {
 			this->pContact = true;
 		}
