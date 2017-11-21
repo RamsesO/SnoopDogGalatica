@@ -63,9 +63,6 @@ public:
 					this->isDead == true;
 				}
 			}
-			else {
-				printf("Already Dead");
-			}
 		}
 	}
 
@@ -77,7 +74,6 @@ public:
 				return true;
 			}
 			else {
-				printf("Already Dead");
 				return false;
 			}
 		}
@@ -86,6 +82,11 @@ public:
 
 	bool isItDead() {
 		return (this->health <= 0);
+	}
+
+	void kill(){
+		this->health = 0;
+		this->isDead = true;
 	}
 
 };

@@ -37,7 +37,7 @@ Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3
 WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0), 7, 1);
 MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
 MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
-Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f* 3);
+Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f*10);
 Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 25.0f * 10);
 Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 25.0f * 10);
 
@@ -316,15 +316,30 @@ void update(int i) {
 	bool secundusSiteIsDead = secundusSite->isItDead();
 
 
-	warbird->update(usMissileOM, usMissileSize, ssMissileOM, ssMissileSize, ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
-	wbMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
+	int hitObj = wbMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
 		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, shipIsDead, unumSiteIsDead, secundusSiteIsDead);
-	usMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
-		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, shipIsDead, unumSiteIsDead, secundusSiteIsDead);
-	ssMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
-		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, shipIsDead, unumSiteIsDead, secundusSiteIsDead);
-	
+	//warbird missile hit unumSite?
+	if(hitObj == 0)
+		unumSite->kill();
+	//warbird missile hit secundusSite?
+	else if(hitObj == 1)
+		secundusSite->kill();
 
+
+	hitObj = usMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
+		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, shipIsDead, unumSiteIsDead, secundusSiteIsDead);
+	//usMissile hit the warbird?
+	if(hitObj == 2)
+		warbird->kill();
+
+
+	hitObj = ssMissile->update(warbirdOM, warbirdSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, 
+		ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, shipIsDead, unumSiteIsDead, secundusSiteIsDead);
+	//ssMissile hit the warbird?
+	if(hitObj == 2)
+		warbird->kill();
+
+	warbird->update(usMissileOM, usMissileSize, ssMissileOM, ssMissileSize, ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 	unumSite->update(wbMissileOM, wbMissileSize, unumOM);
 	secundusSite->update(wbMissileOM, wbMissileSize, secundusOM);
 

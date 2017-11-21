@@ -22,7 +22,7 @@ private:
 	//
 	const float UTL = 2000.0; //2000 updates to live
 	const float UTA = 200.0;  //200 updates to activate
-	const int detectionRange = 3000;
+	const int detectionRange = 10000;
 	float step;
 	float rStep; 
 	int ttl, activate;
@@ -61,9 +61,12 @@ public:
 		}
 	}
 
-	void update(glm::mat4 shipOM, float shipSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
+	int update(glm::mat4 shipOM, float shipSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
 		glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM, 
 		float primusSize, glm::mat4 secundusOM, float secundusSize, bool shipIsDead, bool unumSiteIsDead, bool secundusSiteIsDead) {
+
+		if(shipIsDead && unumSiteIsDead && secundusSiteIsDead)
+			return -1;
 
 		bool diedViaPlanet = false;
 		bool diedViaSite = false;
@@ -83,7 +86,14 @@ public:
 						if(fromWarbird())
 							target = identify(unumSiteOM, secundusSiteOM, unumSiteIsDead, secundusSiteIsDead);
 						else if(fromMissileSites()){
-							target = 0;
+							if(shipIsDead){
+								printf("ship is dead\n");
+								target = -1;
+							}
+							else{
+								printf("ship is not dead \n");
+								target = 0;
+							}
 						}
 					}
 				}
@@ -112,16 +122,18 @@ public:
 				else
 					diedViaPlanet = isInPContact();
 
-				//specifically for WARBIRD MISSILE hitting missile sites
-				//returns -1 if no, 0 if unumsite, 1 if secundussite
+				//specifically for WARBIRD MISSILE hitting missile sites or warbird
+				//returns -1 if no, 0 if unumsite, 1 if secundussite, 2 if warbird 
 				if(fromWarbird()){
-					int hit = missileSiteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
-					diedViaSite = isInSContact();
+					hit = missileSiteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
+					
+					if(hit == 0 || hit == 1)
+						diedViaSite = true;
 				}
 
 				//specifically for MISSILE SITES hitting the ship
 				if(fromMissileSites()){
-					warbirdCollision(missilePos, missileSize, shipOM, shipSize);
+					warbirdCollision(missilePos, missileSize, shipOM, shipSize);			
 					diedViaShip = isInWContact();
 				}
 
@@ -132,6 +144,7 @@ public:
 				else if(diedViaShip){
 					printf("missile from %s died via hitting warbird\n", hostName);
 					resetMissile();
+					hit = 2;
 				}
 				else if(diedViaPlanet){
 					printf("missile from %s died via planet hit\n", hostName);
@@ -152,6 +165,8 @@ public:
 				detectShip(shipOM, unumSiteOM, secundusSiteOM);
 			}
 		}
+
+		return hit;
 	}
 
 	void detectShip(glm::mat4 warbirdOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM){
