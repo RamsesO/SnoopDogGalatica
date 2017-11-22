@@ -199,12 +199,12 @@ public:
 				glm::vec3 missilePos = getPosition(this->translationMatrix);
 				float missileSize = this->size;
 
-				planetCollision(missilePos, missileSize, sunOM, sunSize * 2, unumOM, unumSize - 50, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize - 50);
+				/*planetCollision(missilePos, missileSize, sunOM, sunSize * 2, unumOM, unumSize - 50, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize - 50);
 				diedViaPlanet = isInPContact();
 				siteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
 				diedViaSite = isInSContact();
 				warbirdCollision(missilePos, missileSize, shipOM, shipSize - 50);
-				diedViaShip = isInWContact();
+				diedViaShip = isInWContact();*/
 	
 				if (diedViaPlanet) {
 					printf("missile from %s died via planet hit\n", hostName);

@@ -111,7 +111,7 @@ public:
 		glm::vec3 at = getPosition(planetOM);
 
 		glm::mat4 tempRM = glm::inverse(glm::lookAt(getPosition(planetCamOM), at, glm::vec3(0, 1, 0)));
-		float * tempRMValues = (float*)glm::value_ptr(tempRM);
+		float *tempRMValues = (float*)glm::value_ptr(tempRM);
 
 		this->rotationMatrix = glm::mat4(tempRMValues[0], tempRMValues[1], tempRMValues[2], 0, tempRMValues[4],
 			tempRMValues[5], tempRMValues[6], 0, tempRMValues[8], tempRMValues[9], tempRMValues[10], 0, 0, 0, 0, 1);
@@ -122,52 +122,59 @@ public:
 		return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
 	}
 
-	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM, float primusSize,
-		glm::mat4 secundusOM, float secundusSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, float secundusSiteSize,
-		glm::mat4 wbMissileOM, glm::mat4 usMissileOM, glm::mat4 ssMissileOM, float missileSize) {
-		if (isItDead() == false) {
+	void sendSignals(MissileSite *unumSite, MissileSite *secundusSite) {
+		
+	}
+
+	void recieveSignals() {
+		bool justDied = onHit();
+		if (justDied) {
+			sendToCenter();
+			printf("Ship has Died.\n");
+		}
+		resetHitSignal();
+	}
+
+	void update(Sun *ruber, Planet *unum, Planet *duo, Moon *primus, Moon *secundus) {
+		if (isDead() == false) {
 			glm::vec3 shipPos = getPosition(this->translationMatrix);
+			glm::vec3 ruberPos = getPosition(ruber->getOrientationMatrix());
+			glm::vec3 unumPos = getPosition(unum->getHubMatrix());
+			glm::vec3 duoPos = getPosition(duo->getHubMatrix());
+			glm::vec3 primusPos = getPosition(primus->getHubMatrix(duo->getPlanetMatrix()));
+
 			if (gravity) {
 				setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
 			}
 
-			planetCollision(shipPos, this->size, sunOM, sunSize * 2, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
-			siteCollision(shipPos, this->size, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
-			missileCollision(shipPos, this->size, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
-			bool justDied = (onPlanetHit() || onSiteHit() || onMissileHit());
-			if (justDied) {
-				sendToCenter();
-				printf("Ship has Died.\n");
-			}
-
 			switch (key) {
-			case 0:
-				moveForward();
-				break;
-			case 1:
-				moveBackward();
-				break;
-			case 2:
-				yawLeft();
-				break;
-			case 3:
-				yawRight();
-				break;
-			case 4:
-				pitchDown();
-				break;
-			case 5:
-				pitchUp();
-				break;
-			case 6:
-				rollLeft();
-				break;
-			case 7:
-				rollRight();
-				break;
-			default:
-				this->translationMatrix = glm::translate(this->translationMatrix, gravityVec);
-				break;
+				case 0:
+					moveForward();
+					break;
+				case 1:
+					moveBackward();
+					break;
+				case 2:
+					yawLeft();
+					break;
+				case 3:
+					yawRight();
+					break;
+				case 4:
+					pitchDown();
+					break;
+				case 5:
+					pitchUp();
+					break;
+				case 6:
+					rollLeft();
+					break;
+				case 7:
+					rollRight();
+					break;
+				default:
+					this->translationMatrix = glm::translate(this->translationMatrix, gravityVec);
+					break;
 			}
 			key = -1;
 		}

@@ -46,15 +46,15 @@ public:
 
 	void update(glm::mat4 hubMatrix, glm::mat4 warbirdOM, float warbirdSize, glm::mat4 wbMissileOM, glm::mat4 usMissileOM, 
 		glm::mat4 ssMissileOM, float missileSize) {
-		if (isItDead() == false) {
-			glm::vec3 sitePos = getPosition(this->translationMatrix * hubMatrix);
-			warbirdCollision(sitePos, this->size, warbirdOM, warbirdSize);
-			missileCollision(sitePos, this->size, wbMissileOM, usMissileOM, ssMissileOM, missileSize + 500);
-			bool justDied = ( onWarbirdHit() || onMissileHit() );
-			if (justDied) {
-				sendToCenter();
-				printf("Missile Site %d has Died.\n", id);
-			}
+		if (isDead() == false) {
+			//glm::vec3 sitePos = getPosition(this->translationMatrix * hubMatrix);
+			//warbirdCollision(sitePos, this->size, warbirdOM, warbirdSize);
+			//missileCollision(sitePos, this->size, wbMissileOM, usMissileOM, ssMissileOM, missileSize + 500);
+			//bool justDied = ( onWarbirdHit() || onMissileHit() );
+			//if (justDied) {
+			//	sendToCenter();
+			//	printf("Missile Site %d has Died.\n", id);
+			//}
 		}
 	}
 

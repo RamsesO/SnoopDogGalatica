@@ -10,17 +10,18 @@
 # define __Windows__
 # include "../includes465/include465.hpp"
 # include "Shape.hpp"
+# include "Signal.hpp"
 # include "Collision.hpp"
 # include "Entity.hpp"
 # include "Gravity.hpp"
+# include "PlanetCam.hpp"
+# include "WarBirdCam.hpp"
+# include "MissileSite.hpp"
+# include "WarBird.hpp"
+# include "Missile.hpp"
 # include "Sun.hpp"
 # include "Planet.hpp"
 # include "Moon.hpp"
-# include "PlanetCam.hpp"
-# include "WarBird.hpp"
-# include "Missile.hpp"
-# include "WarBirdCam.hpp"
-# include "MissileSite.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
 const int nModels = Shape::nModels;
@@ -224,18 +225,20 @@ void update(int i) {
 	duo->update();
 	primus->update();
 	secundus->update();
-	warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize, 
-		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
-	unumSite->update(unumOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
-	secundusSite->update(secundusOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
-	wbMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
-		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
-	usMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
-		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
-	ssMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
-		unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
+	//warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+	//unumSite->update(unumOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
+	//secundusSite->update(secundusOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
+	//wbMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
+	//	unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
+	//usMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
+	//	unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
+	//ssMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
+	//	unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
 	unumCam->update();
 	duoCam->update();
+
+	bool test = unumSite->isDamaged();
+	printf(test ? "true\n" : "false\n");
 
 	//camera updates
 	switch (flag) {
@@ -314,7 +317,7 @@ void arrowInput(int key, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 		case 'w': case 'W': // warp ship
-			if (warbird->isItDead() == false) {
+			if (warbird->isDead() == false) {
 				warp++;
 				if (warp % 2 == 0) {
 					planetCamOM = unumCam->getOrientationMatrix();
@@ -331,7 +334,7 @@ void keyboard(unsigned char key, int x, int y) {
 			}
 			break;
 		case 'f': case 'F': 
-			if (warbird->isItDead() == false) {
+			if (warbird->isDead() == false) {
 				bool justFired = warbird->fire(wbMissile->hasLaunched());
 				if (justFired == true) {
 					wbMissile->launch(warbird->getOrientationMatrix());

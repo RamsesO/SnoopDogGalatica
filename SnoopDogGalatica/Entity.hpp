@@ -20,22 +20,26 @@ class Entity : public Collision {
 private:
 	int missile;
 	int health;
-	bool isEnemy;
-	bool isDead;
+	bool enemy;
+	bool dead;
 
 public:
 	Entity(int missile, int health) {
 		this->missile = missile;
 		this->health = health;
-		this->isEnemy = false;
-		this->isDead = false;
+		this->enemy = false;
+		this->dead = false;
 	}
 
 	Entity(int missile, int health, bool isEnemy) {
 		this->missile = missile;
 		this->health = health;
-		this->isEnemy = isEnemy;
-		this->isDead = false;
+		this->enemy = isEnemy;
+		this->dead = false;
+	}
+
+	bool isDead() {
+		return this->dead;
 	}
 
 	int getMissileCount() {
@@ -59,12 +63,11 @@ public:
 		}
 	}
 
-	bool onHit() {
-		if (this->isDead == false) {
-			printf("Hit by missile.\n");
+	bool onHitDamage() {
+		if (this->dead == false) {
 			this->health--;
 			if (this->health == 0) {
-				this->isDead == true;
+				this->dead == true;
 				return true;
 			}
 			else {
@@ -76,10 +79,10 @@ public:
 		}
 	}
 
-	bool oneHitKO() {
-		if (this->isDead == false) {
+	bool onHitKO() {
+		if (this->dead == false) {
 			this->health = 0;
-			this->isDead = true;
+			this->dead = true;
 			return true;
 		}
 		else {
@@ -87,37 +90,16 @@ public:
 		}
 	}
 
-	bool onMissileHit() {
-		if (isInMContact()) {
-			return onHit();
+	bool onHit() {
+		if (isDamaged() == true) {
+			return onHitDamage();
 		}
-		return false;
-	}
-
-	bool onPlanetHit() {
-		if (isInPContact()) {
-			return oneHitKO();
+		else if (isDestroyed() == true) {
+			return onHitKO();
 		}
-		return false;
-	}
-
-	bool onSiteHit() {
-		if (isInSContact()) {
-			return oneHitKO();
+		else {
+			return false;
 		}
-		return false;
 	}
-
-	bool onWarbirdHit() {
-		if (isInWContact()) {
-			return oneHitKO();
-		}
-		return false;
-	}
-
-	bool isItDead() {
-		return this->isDead;
-	}
-
 
 };
