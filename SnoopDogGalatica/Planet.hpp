@@ -49,7 +49,16 @@ public:
 		return (this->orbitalMatrix * this->translationMatrix * glm::inverse(this->orbitalMatrix) * this->axialTilt * this->rotationMatrix);
 	}
 
-	void update() {
+	void update(WarBird *warbird) {
+		glm::vec3 planetPos = getPosition(getHubMatrix());
+		float planetSize = this->size;
+
+		//Warbird Interactions
+		warbird->appendGravVec(planetPos, planetSize);
+		if (warbird->isColliding(planetPos, planetSize)) {
+			warbird->signalKOHit();
+		}
+
 		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
 		this->orbitalMatrix = glm::rotate(this->orbitalMatrix, this->orbitalRadians, this->orbitalAxis);
 	}

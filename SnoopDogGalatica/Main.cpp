@@ -14,39 +14,40 @@
 # include "Collision.hpp"
 # include "Entity.hpp"
 # include "Gravity.hpp"
-# include "PlanetCam.hpp"
-# include "WarBirdCam.hpp"
 # include "MissileSite.hpp"
 # include "WarBird.hpp"
 # include "Missile.hpp"
 # include "Sun.hpp"
 # include "Planet.hpp"
 # include "Moon.hpp"
+# include "PlanetCam.hpp"
+# include "WarBirdCam.hpp"
+# include "Models.hpp"
 
-// Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
+// Models
 const int nModels = Shape::nModels;
-Sun * ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0),
+Models *models = new Models();
+Sun *ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0),
 	glm::vec3(0, 1, 0), 1.0f);
-Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0),
+Planet *unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0),
 	glm::vec3(0, 1, 0), 9.0f, glm::vec3(0, 1, 0), 0.004f, glm::vec3(0, 0, 1), 0.5f);
-Planet * duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000, 0, 0),
+Planet *duo = new Planet(2, 16020 * 3, "assets/Duo.tri", 400.0f, glm::vec3(9000, 0, 0),
 	glm::vec3(0, 1, 0), 5.0f, glm::vec3(0, 1, 0), 0.002f, glm::vec3(0, 0, 1), -0.3f);
-Moon * primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(2000, 0, 0),
+Moon *primus = new Moon(3, 1740 * 3, "assets/Primus.tri", 100.0f, glm::vec3(2000, 0, 0),
 	glm::vec3(0, 1, 0), 22.0f, glm::vec3(0, -1, 0), 0.025f, glm::vec3(0, 0, 1), -0.4f);
-Moon * secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
+Moon *secundus = new Moon(4, 1740 * 3, "assets/Secundus.tri", 150.0f, glm::vec3(4000, 0, 0),
 	glm::vec3(0, 1, 0), 12.0f, glm::vec3(0, 1, 0), 0.012f, glm::vec3(0, 0, 1), 0.5f);
-WarBird * warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0), 7, 1);
-MissileSite * unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
-MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
-Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 100.0f);
-Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 100.0f);
-Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 100.0f);
+WarBird *warbird = new WarBird(5, 4852 * 3, "assets/WarBird.tri", 100.0f, glm::vec3(15000, 0, 0), 7, 1);
+MissileSite *unumSite = new MissileSite(6, 2048 * 3, "assets/MissileSite.tri", 100.0f, 5, 1, true);
+MissileSite *secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri", 75.5f, 5, 1, true);
+Missile *wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 100.0f);
+Missile *usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 100.0f);
+Missile *ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 100.0f);
 
-//Planetary Cameras
+//Cameras
+int camMode = 0;
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
 PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.002f);
-
-//Warbird Camera
 WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(0, 300, 1000));
 
 //Warp Variables
@@ -72,12 +73,14 @@ char viewStr[15] = " Front View, ";
 char sTypeStr[15] = " Ace ";
 char speedStr[15] = "Speed";
 
+//Shaders
 char * vertexShaderFile = "simpleVertex.glsl";
 char * fragmentShaderFile = "simpleFragment.glsl";
 GLuint shaderProgram;
 GLuint VAO[nModels];      // Vertex Array Objects
 GLuint buffer[nModels];   // Vertex Buffer Objects
 
+//Model View Projection
 GLuint MVP;
 glm::vec3 eye, at, up;
 glm::mat4 viewMatrix;                // set in init()
@@ -90,10 +93,6 @@ GLfloat aspectRatio;
 int timeQuantum[] = { 5, 40, 100, 500 };
 int timeQuantumIndex = 0;
 int frameCount = 0;
-
-int flag = 0;
-int currCam = 0;
-
 double currentTime;
 double lastTime;
 double timeInterval;
@@ -183,6 +182,7 @@ void init(void) {
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 
 	warbird->setGravityConst(gravityConstant);
+	models->setSizes(ruber, unum, duo, primus, secundus, warbird, unumSite, secundusSite, wbMissile);
 }
 
 // set viewport and projectionMatrix on window resize events
@@ -197,58 +197,23 @@ void reshape(int width, int height) {
 
 // Use with Idle and intervalTimer functions 
 void update(int i) {
-	glm::mat4 ruberOM = ruber->getOrientationMatrix();
-	glm::mat4 unumOM = unum->getHubMatrix();
-	glm::mat4 duoOM = duo->getHubMatrix();
-	glm::mat4 primusOM = primus->getHubMatrix(duo->getPlanetMatrix());
-	glm::mat4 secundusOM = secundus->getHubMatrix(duo->getPlanetMatrix());
-	glm::mat4 unumSiteOM = unumSite->getSiteMatrix(unumOM);
-	glm::mat4 secundusSiteOM = secundusSite->getSiteMatrix(secundusOM);
-	glm::mat4 warbirdOM = warbird->getOrientationMatrix();
-	glm::mat4 wbMissileOM = wbMissile->getOrientationMatrix();
-	glm::mat4 usMissileOM = usMissile->getOrientationMatrix();
-	glm::mat4 ssMissileOM = ssMissile->getOrientationMatrix();
-
-	float ruberSize = ruber->getSize() / 2;
-	float unumSize = unum->getSize();
-	float duoSize = duo->getSize();
-	float primusSize = primus->getSize();
-	float secundusSize = secundus->getSize();
-	float unumSiteSize = unumSite->getSize();
-	float secundusSiteSize = secundusSite->getSize();
-	float warbirdSize = warbird->getSize();
-	float missileSize = wbMissile->getSize() / 4;
-
 	glutTimerFunc(timeQuantum[timeQuantumIndex], update, 1);
-	ruber->update();
-	unum->update();
-	duo->update();
-	primus->update();
-	secundus->update();
-	//warbird->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
-	//unumSite->update(unumOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
-	//secundusSite->update(secundusOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
-	//wbMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
-	//	unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
-	//usMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
-	//	unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
-	//ssMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
-	//	unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
+	
+	//Model updates
+	models->setPositions(ruber, unum, duo, primus, secundus, warbird, unumSite, secundusSite, wbMissile, usMissile, ssMissile);
+	models->update(ruber, unum, duo, primus, secundus, warbird, unumSite, secundusSite, wbMissile, usMissile, ssMissile);
+	
+	//Camera updates
 	unumCam->update();
 	duoCam->update();
-
-	bool test = unumSite->isDamaged();
-	printf(test ? "true\n" : "false\n");
-
-	//camera updates
-	switch (flag) {
-		case 1:
+	switch (camMode) {
+		case 2:
 			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
 			break;
-		case 2:
+		case 3:
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
 			break;
-		case 3:
+		case 4:
 			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
 			break;
 		default:
@@ -356,20 +321,19 @@ void keyboard(unsigned char key, int x, int y) {
 			warbird->changeStep();
 			break;
 		case 'v': case 'V': // next camera
-			currCam++;
+			camMode++;
 			break;
 		case 'x': case 'X':// prev camera
-			currCam--;
-			if (currCam == -1)
-				currCam = 4;
+			camMode--;
+			if (camMode == -1)
+				camMode = 4;
 			break;
 		case 033: case 'q': case 'Q':
 			exit(EXIT_SUCCESS);
 	}
 
-	switch (currCam % 5) {
+	switch (camMode % 5) {
 		case 0:  // front view
-			flag = 0;
 			eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 2000 "out of screen" from origin
 			at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
 			up = glm::vec3(0.0f, 1.0f, 0.0f);   // camera'a up vector
@@ -377,7 +341,6 @@ void keyboard(unsigned char key, int x, int y) {
 			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 1:  // top view
-			flag = 0;
 			eye = glm::vec3(0.0f, 20000.0f, 0.0f);
 			at = glm::vec3(0.0f, 0.0f, 0.0f);
 			up = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -385,17 +348,14 @@ void keyboard(unsigned char key, int x, int y) {
 			viewMatrix = glm::lookAt(eye, at, up);
 			break;
 		case 2: // unum view
-			flag = 1;
 			strcpy(viewStr, " Unum view,");
 			viewMatrix = unumCam->getCamMatrix(unum->getModelMatrix());
 			break;
 		case 3: // duo view 
-			flag = 2;
 			strcpy(viewStr, " Duo View,");
 			viewMatrix = duoCam->getCamMatrix(duo->getModelMatrix());
 			break;
 		case 4:  // warbird view
-			flag = 3;
 			strcpy(viewStr, " WarBird View,");
 			viewMatrix = warbirdCam->getCamMatrix(warbird->getOrientationMatrix());
 			break;

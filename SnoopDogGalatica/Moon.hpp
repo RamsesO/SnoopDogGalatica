@@ -33,4 +33,18 @@ public:
 			this->axialTilt * this->rotationMatrix);
 	}
 
+	void update(Planet *hub, WarBird *warbird) {
+		glm::vec3 moonPos = getPosition(getHubMatrix(hub->getPlanetMatrix()));
+		float moonSize = this->size;
+
+		//Warbird Interactions
+		warbird->appendGravVec(moonPos, moonSize);
+		if (warbird->isColliding(moonPos, moonSize)) {
+			warbird->signalKOHit();
+		}
+
+		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
+		this->orbitalMatrix = glm::rotate(this->orbitalMatrix, this->orbitalRadians, this->orbitalAxis);
+	}
+
 };

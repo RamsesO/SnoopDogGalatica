@@ -27,7 +27,16 @@ public:
         return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
     }
 
-    void update() {
+    void update(WarBird *warbird) {
+		glm::vec3 sunPos = getPosition(this->translationMatrix);
+		float sunSize = this->size;
+
+		//Warbird Interactions
+		warbird->appendGravVec(sunPos, sunSize);
+		if (warbird->isColliding(sunPos, sunSize)) {
+			warbird->signalKOHit();
+		}
+
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
     }
 

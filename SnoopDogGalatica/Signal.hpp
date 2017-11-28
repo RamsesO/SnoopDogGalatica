@@ -1,5 +1,5 @@
 /*
-	Collision.hpp
+	Flag.hpp
 
 	Lemuel Dizon
 	Ramses Ordonez
@@ -13,7 +13,7 @@
 # define __INCLUDES465__
 # endif
 
-# define __Signal__
+# define __Flag__
 
 class Signal {
 
@@ -46,5 +46,7 @@ public:
 	void resetHitSignal() {
 		this->hit = 0;
 	}
+
+	void recieveSignals() {}
 
 };

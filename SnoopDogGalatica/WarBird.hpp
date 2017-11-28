@@ -22,25 +22,29 @@ public:
 
 	const float rotateRadians = 0.05f;
 	float rotateBy;
-	float step;
+	float accel;
+	float velocity;
+	int time;
 	int key; // 1-8 designates the kind of movement
 
 	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, int missile, int health) :
 		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health), Gravity() {
-		this->step = 10;
+		this->accel = 1;
 		this->rotateBy = 0;
+		this->velocity = 0;
+		this->time = 0;
 		this->key = -1;
 	}
 
 	void changeStep() {
-		if (step == 10) {
-			step = 50;
+		if (accel == 1) {
+			accel = 2;
 		}
-		else if (step == 50) {
-			step = 100;
+		else if (accel == 2) {
+			accel = 3;
 		}
 		else {
-			step = 10;
+			accel = 1;
 		}
 	}
 
@@ -48,19 +52,20 @@ public:
 		key = i;
 	}
 
-	void moveForward() {
-		if (gravity) {
-			this->translationMatrix = glm::translate(this->translationMatrix, (-step * getOut(this->rotationMatrix)) + this->gravityVec);
-		}
+	void move() {
+		velocity = accel * (time);
+		if (gravity)
+			this->translationMatrix = glm::translate(this->translationMatrix, (velocity * getOut(this->rotationMatrix)) + this->gravityVec);
 		else
-			this->translationMatrix = glm::translate(this->translationMatrix, (-step * getOut(this->rotationMatrix)));
+			this->translationMatrix = glm::translate(this->translationMatrix, (velocity * getOut(this->rotationMatrix)));
 	}
 
-	void moveBackward() {
-		if (gravity)
-			this->translationMatrix = glm::translate(this->translationMatrix, (step * getOut(this->rotationMatrix)) + this->gravityVec);
-		else
-			this->translationMatrix = glm::translate(this->translationMatrix, (step * getOut(this->rotationMatrix)));
+	void accelForward() {
+		time--;
+	}
+
+	void accelBackward() {
+		time++;
 	}
 
 	void yawLeft() {
@@ -106,6 +111,8 @@ public:
 	}
 
 	void warpTo(glm::mat4 planetCamOM, glm::mat4 planetOM) {
+		this->time = 0;
+
 		this->translationMatrix = glm::translate(glm::mat4(), getPosition(planetCamOM));
 		glm::vec3 pos = getPosition(this->translationMatrix);
 		glm::vec3 at = getPosition(planetOM);
@@ -115,15 +122,10 @@ public:
 
 		this->rotationMatrix = glm::mat4(tempRMValues[0], tempRMValues[1], tempRMValues[2], 0, tempRMValues[4],
 			tempRMValues[5], tempRMValues[6], 0, tempRMValues[8], tempRMValues[9], tempRMValues[10], 0, 0, 0, 0, 1);
-
 	}
 
 	glm::mat4 getModelMatrix() {
 		return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
-	}
-
-	void sendSignals(MissileSite *unumSite, MissileSite *secundusSite) {
-		
 	}
 
 	void recieveSignals() {
@@ -135,24 +137,32 @@ public:
 		resetHitSignal();
 	}
 
-	void update(Sun *ruber, Planet *unum, Planet *duo, Moon *primus, Moon *secundus) {
+	void appendGravVec(glm::vec3 targetPos, float targetSize) {
+		this->tempGravity += calculateGrav(getPosition(getOrientationMatrix()), this->size, targetPos, targetSize);
+	}
+
+	bool isColliding(glm::vec3 targetPos, float targetSize) {
+		float distanceBetween = distance(getPosition(getOrientationMatrix()), targetPos);
+		if (distanceBetween < (targetSize + this->size + 50)) {
+			return true;
+		}
+		return false;
+	}
+
+	void update() {
 		if (isDead() == false) {
-			glm::vec3 shipPos = getPosition(this->translationMatrix);
-			glm::vec3 ruberPos = getPosition(ruber->getOrientationMatrix());
-			glm::vec3 unumPos = getPosition(unum->getHubMatrix());
-			glm::vec3 duoPos = getPosition(duo->getHubMatrix());
-			glm::vec3 primusPos = getPosition(primus->getHubMatrix(duo->getPlanetMatrix()));
 
 			if (gravity) {
-				setGravDirection(shipPos, this->size, sunOM, sunSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize);
+				setGravDirection();
 			}
 
+			move();
 			switch (key) {
 				case 0:
-					moveForward();
+					accelForward();
 					break;
 				case 1:
-					moveBackward();
+					accelBackward();
 					break;
 				case 2:
 					yawLeft();

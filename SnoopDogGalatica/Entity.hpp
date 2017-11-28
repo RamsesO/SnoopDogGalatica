@@ -15,7 +15,7 @@
 
 # define __Entity__
 
-class Entity : public Collision {
+class Entity : public Signal, public Collision {
 
 private:
 	int missile;
@@ -24,14 +24,14 @@ private:
 	bool dead;
 
 public:
-	Entity(int missile, int health) {
+	Entity(int missile, int health) : Signal(), Collision() {
 		this->missile = missile;
 		this->health = health;
 		this->enemy = false;
 		this->dead = false;
 	}
 
-	Entity(int missile, int health, bool isEnemy) {
+	Entity(int missile, int health, bool isEnemy) : Signal(), Collision() {
 		this->missile = missile;
 		this->health = health;
 		this->enemy = isEnemy;
