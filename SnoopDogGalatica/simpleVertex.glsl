@@ -12,12 +12,22 @@ Mike Barnes
 
 in vec4 vPosition;
 in vec4 vColor;
-in vec3 vNormal;  // not used
+in vec3 vNormal;  
+
+out vec4 Position;
+out vec3 Normal;
+out vec4 Color;
+
 
 uniform mat4 ModelViewProjection;  // = projection * view * model
-out vec4 color;
+uniform mat4 ModelViewMatrix;
+mat3 NormalMatrix;
 
 void main() {
-  color = vColor;
+  Color = vColor;
   gl_Position = ModelViewProjection * vPosition;
+  Position = (ModelViewMatrix * vPosition);
+  NormalMatrix = mat3(ModelViewMatrix);
+  Normal = normalize(NormalMatrix * vNormal);
+
   }

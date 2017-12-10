@@ -5,7 +5,7 @@
 	Dizon, Lemuel
 	Ordonez, Ramses
 	Kim, Kelly
-*/
+*/ 
 
 # define __Mac__
 # include "../../includes465/include465.hpp"
@@ -71,6 +71,7 @@ char viewStr[15] = " Front View, ";
 char sTypeStr[15] = " Ace ";
 char speedStr[15] = "Speed";
 
+/*--------------------- SHADERS ----------------------*/
 char * vertexShaderFile = "simpleVertex.glsl";
 char * fragmentShaderFile = "simpleFragment.glsl";
 GLuint shaderProgram;
@@ -78,12 +79,51 @@ GLuint VAO[nModels];      // Vertex Array Objects
 GLuint buffer[nModels];   // Vertex Buffer Objects
 
 GLuint MVP;
+GLuint MV;
+//point light
+GLuint lightPos;
+GLuint lightCol;
+GLuint eyeDir;
+//ambient light
+GLuint AMBI;
+//spot lgiht
+GLuint ConeDirection;
+GLuint SpotCosCutoff;
+GLuint SpotExponent;
+GLuint SLightPosition;
+
+//light strengths
+GLuint SStrength;
+GLuint PStrength;
+GLuint DStrength;
+
+
 glm::vec3 eye, at, up;
 glm::mat4 viewMatrix;                // set in init()
 glm::mat4 modelMatrix;
 glm::mat4 projectionMatrix;          // set in reshape()
+glm::mat4 ModelViewMatrix;
 glm::mat4 ModelViewProjectionMatrix; // set in display();
 GLfloat aspectRatio;
+
+//pointlight position
+glm::vec3 pointLightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+const static glm::vec3 pointLightCol = glm::vec3(0.5f, 0.2f, 0.2f);
+
+//ambient 
+glm::vec3 Ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+bool isAmbiOn = false;
+
+//spot
+glm::vec3 spotDir = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 spotPos =	glm::vec3(0.0f, 0.0f, 0.0f);
+GLfloat spotcos = 0.2f;
+GLfloat spotexp = 1.0f;
+GLfloat pointStrength = 0.7f;
+GLfloat direcStrength = 0.3f;
+GLfloat spotStrength = 1.0f;
+
+/*--------------------------------------------------------*/
 
 //Time Keepers
 int timeQuantum[] = { 5, 40, 100, 500 };
@@ -119,69 +159,117 @@ void display(void) {
 
 	modelMatrix = ruber->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
+	pointLightPos = getPosition(ModelViewMatrix);
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[ruber->id]);
 	glDrawArrays(GL_TRIANGLES, 0, ruber->numOfVert);
 
 	modelMatrix = unum->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[unum->id]);
 	glDrawArrays(GL_TRIANGLES, 0, unum->numOfVert);
 
 	modelMatrix = duo->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[duo->id]);
 	glDrawArrays(GL_TRIANGLES, 0, duo->numOfVert);
 
 	modelMatrix = primus->getModelMatrix(duo->getPlanetMatrix());
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[primus->id]);
 	glDrawArrays(GL_TRIANGLES, 0, primus->numOfVert);
 
 	modelMatrix = secundus->getModelMatrix(duo->getPlanetMatrix());
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[secundus->id]);
 	glDrawArrays(GL_TRIANGLES, 0, secundus->numOfVert);
 
 	modelMatrix = warbird->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
+	spotPos = getPosition(warbird->getOrientationMatrix()); //light position matches warbird position
+	spotDir = getPosition(warbird->getTranslationMatrix()); // direction matches where the war bird is facing
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[warbird->id]);
 	glDrawArrays(GL_TRIANGLES, 0, warbird->numOfVert);
 
 	modelMatrix = unumSite->getModelMatrix(unum->getHubMatrix());
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[unumSite->id]);
 	glDrawArrays(GL_TRIANGLES, 0, unumSite->numOfVert);
 
 	modelMatrix = secundusSite->getModelMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[secundusSite->id]);
 	glDrawArrays(GL_TRIANGLES, 0, secundusSite->numOfVert);
 
 	modelMatrix = wbMissile->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[wbMissile->id]);
 	glDrawArrays(GL_TRIANGLES, 0, wbMissile->numOfVert);
 
 	modelMatrix = usMissile->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[usMissile->id]);
 	glDrawArrays(GL_TRIANGLES, 0, usMissile->numOfVert);
 
 	modelMatrix = ssMissile->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+	ModelViewMatrix = viewMatrix * modelMatrix;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+	glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 	glBindVertexArray(VAO[ssMissile->id]);
 	glDrawArrays(GL_TRIANGLES, 0, ssMissile->numOfVert);
+
+	/*--------------------------- SHADER light ---------------------------*/
+
+	glUniform3fv(lightPos, 1, glm::value_ptr(glm::vec3(pointLightPos)));
+	glUniform3fv(lightCol, 1, glm::value_ptr(glm::vec3(pointLightCol)));
+	glUniform3fv(eyeDir, 1, glm::value_ptr(glm::vec3(at)));
+
+	glUniform3fv(AMBI, 1, glm::value_ptr(glm::vec3(Ambient)));
+
+	glUniform1f(SpotCosCutoff, spotcos);
+	glUniform1f(SpotExponent, SpotExponent);
+	glUniform3fv(ConeDirection, 1, glm::value_ptr(glm::vec3(spotDir)));
+	glUniform3fv(SLightPosition, 1, glm::value_ptr(glm::vec3(spotPos)));
+
+	glUniform1f(PStrength, pointStrength);
+	glUniform1f(DStrength, direcStrength);
+	glUniform1f(SStrength, spotStrength);
+
+	//showVec3("Ambient : ", Ambient);
+
+	/*-------------------------------------------------------------------*/
+
+
 
 	glutSwapBuffers();
 	frameCount++;
@@ -252,7 +340,6 @@ void init(void) {
 		ssMissile->vPosition, ssMissile->vColor, ssMissile->vNormal, "vPosition", "vColor", "vNormal");
 	ssMissile->setScaleMatrix(modelSize);
 
-	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
 
 	eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 1000 "out of screen" from origin
 	at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
@@ -265,7 +352,25 @@ void init(void) {
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 
 	warbird->setGravityConst(gravityConstant);
-}
+
+	/*-------------- Shader - Uniforms link -----------------------*/
+	MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
+	MV = glGetUniformLocation(shaderProgram, "ModelViewMatrix");
+	lightPos = glGetUniformLocation(shaderProgram, "LightPosition");
+	lightCol = glGetUniformLocation(shaderProgram, "LightColor");
+	eyeDir = glGetUniformLocation(shaderProgram, "EyeDirection");
+
+	AMBI = glGetUniformLocation(shaderProgram, "Ambient");
+
+	ConeDirection = glGetUniformLocation(shaderProgram, "ConeDirection");
+	SpotCosCutoff = glGetUniformLocation(shaderProgram, "SpotCosCutoff");
+	SpotExponent = glGetUniformLocation(shaderProgram, "SpotExponent");
+
+	PStrength = glGetUniformLocation(shaderProgram, "PStrength");
+	DStrength = glGetUniformLocation(shaderProgram, "DStrength");
+	SStrength = glGetUniformLocation(shaderProgram, "SStrength");
+	/*-------------------------------------------------------------*/
+} 
 
 // set viewport and projectionMatrix on window resize events
 void reshape(int width, int height) {
@@ -468,6 +573,33 @@ void keyboard(unsigned char key, int x, int y) {
 			if (currCam == -1)
 				currCam = 4;
 			break;
+		case 'a': case 'A'://turn on & off ambient light
+			if(isAmbiOn){
+				Ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+				isAmbiOn = false;
+			}
+			else{
+				Ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+				isAmbiOn = true;
+			}
+			break;
+		case 'd': case 'D'://turn on & off ambient light
+			if(direcStrength == 0.0){
+				direcStrength = 0.3f;
+			}
+			else{
+				direcStrength = 0.0f;
+			}
+			break;
+		case 'p': case 'P'://turn on & off ambient light
+			if(pointStrength == 0.0){
+				pointStrength = 0.7f;
+			}
+			else{
+				pointStrength = 0.0f;
+			}
+			break;
+
 		case 033: case 'q': case 'Q':
 			exit(EXIT_SUCCESS);
 	}
