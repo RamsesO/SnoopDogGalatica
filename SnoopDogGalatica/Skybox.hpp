@@ -9,7 +9,7 @@
 */
 
 # ifndef __INCLUDES465__
-# include "../../includes465/include465.hpp"
+# include "../includes465/include465.hpp"
 # define __INCLUDES465__
 # endif
 
@@ -199,7 +199,7 @@ public:
         init();
 	}
 
-    void display(){
+    void display() {
         //vertex shader will push the texture out as far as possible
         //depth clamp will make sure it isn't clipped 
         glEnable(GL_DEPTH_CLAMP);
@@ -226,7 +226,7 @@ public:
         // free OpenGL resources
     void cleanUp (void) {
         glDeleteBuffers(1, &vbo);
-        freeTexture(textureID);   
+        //freeTexture(textureID);   
         printf("cleaned up Skybox class\n");
     }
 };

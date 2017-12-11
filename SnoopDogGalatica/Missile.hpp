@@ -22,7 +22,7 @@ private:
 	//Timers
 	const float ACTIVATE_TIME = 200.0;
 	const float LIFE_TIME = 2000.0;
-	const float ON_TIME = 10.0;
+	const float ON_TIME = 50.0;
 	int time;
 
 	//Movement
@@ -174,7 +174,7 @@ public:
 
 	bool isColliding(glm::vec3 targetPos, float targetSize) {
 		float distanceBetween = distance(getPosition(getOrientationMatrix()), targetPos);
-		if (distanceBetween < (targetSize + this->size + 50)) {
+		if (distanceBetween < (targetSize + this->size - 50)) {
 			return true;
 		}
 		return false;
