@@ -84,11 +84,11 @@ bool lose = false;
 /*--------------------- SKYBOX STUFF ----------------------*/
 int windowWidth = 800;
 int windowHeight = 600;
-int rawWidth = 512;
-int rawHeight = 512;
+int rawWidth = 256;
+int rawHeight = 256;
 char * file1 = "assets/1.raw";
 char * file2 = "assets/2.raw";
-char * file3 = "assets/3.raw";
+char * file3 = "assets/pepe.raw";
 char * file4 = "assets/4.raw";
 char * file5 = "assets/5.raw";
 char * file6 = "assets/6.raw";

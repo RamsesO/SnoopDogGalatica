@@ -2,7 +2,9 @@
 	* Warning
 
 		* Skybox does not work all the time
-		* You may need to comment the skybox out to make it work
+		* You may need to comment the skybox out since sometimes it doesn't work
+		* missiles show these weird fragment lines
+		* if first two missiles die, then everything is gucci
 	* Class Structure
 
 		* Shape
