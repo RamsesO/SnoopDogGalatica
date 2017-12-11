@@ -23,9 +23,11 @@
 # include "PlanetCam.hpp"
 # include "WarBirdCam.hpp"
 # include "Models.hpp"
+# include "Skybox.hpp"
+
 
 // Models
-const int nModels = Shape::nModels;
+const int nModels = Shape::nModels + 1;
 Models *models = new Models();
 Sun *ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0),
 	glm::vec3(0, 1, 0), 1.0f);
@@ -43,6 +45,7 @@ MissileSite *secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tri
 Missile *wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 100.0f);
 Missile *usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 100.0f);
 Missile *ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 100.0f);
+Skybox * skybox;
 
 //Cameras
 int camMode = 0;
@@ -77,21 +80,71 @@ char loseStr[15] = "You Have Lost!";
 bool win = false;
 bool lose = false;
 
-//Shaders
+/*--------------------- SKYBOX STUFF ----------------------*/
+int windowWidth = 800;
+int windowHeight = 600;
+int rawWidth = 512;
+int rawHeight = 512;
+char * file1 = "assets/1.raw";
+char * file2 = "assets/2.raw";
+char * file3 = "assets/3.raw";
+char * file4 = "assets/4.raw";
+char * file5 = "assets/5.raw";
+char * file6 = "assets/6.raw";
+
+/*--------------------- SHADERS ----------------------*/
 char * vertexShaderFile = "simpleVertex.glsl";
 char * fragmentShaderFile = "simpleFragment.glsl";
 GLuint shaderProgram;
 GLuint VAO[nModels];      // Vertex Array Objects
 GLuint buffer[nModels];   // Vertex Buffer Objects
 
-//Model View Projection
 GLuint MVP;
+GLuint MV;
+//point light
+GLuint lightPos;
+GLuint lightCol;
+GLuint eyeDir;
+//ambient light
+GLuint AMBI;
+//spot lgiht
+GLuint ConeDirection;
+GLuint SpotCosCutoff;
+GLuint SpotExponent;
+GLuint SLightPosition;
+
+//light strengths
+GLuint SStrength;
+GLuint PStrength;
+GLuint DStrength;
+
+
 glm::vec3 eye, at, up;
 glm::mat4 viewMatrix;                // set in init()
 glm::mat4 modelMatrix;
 glm::mat4 projectionMatrix;          // set in reshape()
+glm::mat4 ModelViewMatrix;
 glm::mat4 ModelViewProjectionMatrix; // set in display();
 GLfloat aspectRatio;
+
+//pointlight position
+glm::vec3 pointLightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+const static glm::vec3 pointLightCol = glm::vec3(0.5f, 0.2f, 0.2f);
+
+//ambient
+glm::vec3 Ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+bool isAmbiOn = false;
+
+//spot
+glm::vec3 spotDir = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 spotPos =    glm::vec3(0.0f, 0.0f, 0.0f);
+GLfloat spotcos = 0.2f;
+GLfloat spotexp = 1.0f;
+GLfloat pointStrength = 0.7f;
+GLfloat direcStrength = 0.3f;
+GLfloat spotStrength = 1.0f;
+
+/*--------------------------------------------------------*/
 
 //Time Keepers
 int timeQuantum[] = { 5, 40, 100, 500 };
@@ -120,18 +173,132 @@ void updateTitle() {
 
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    skybox->update(viewMatrix, projectionMatrix);
 
-	ruber->displayShape(projectionMatrix, viewMatrix, ruber->getModelMatrix(), MVP, VAO);
-	unum->displayShape(projectionMatrix, viewMatrix, unum->getModelMatrix(), MVP, VAO);
-	duo->displayShape(projectionMatrix, viewMatrix, duo->getModelMatrix(), MVP, VAO);
-	primus->displayShape(projectionMatrix, viewMatrix, primus->getModelMatrix(duo->getPlanetMatrix()), MVP, VAO);
-	secundus->displayShape(projectionMatrix, viewMatrix, secundus->getModelMatrix(duo->getPlanetMatrix()), MVP, VAO);
-	warbird->displayShape(projectionMatrix, viewMatrix, warbird->getModelMatrix(), MVP, VAO);
-	unumSite->displayShape(projectionMatrix, viewMatrix, unumSite->getModelMatrix(unum->getHubMatrix()), MVP, VAO);
-	secundusSite->displayShape(projectionMatrix, viewMatrix, secundusSite->getModelMatrix(secundus->getHubMatrix(duo->getPlanetMatrix())), MVP, VAO);
-	wbMissile->displayShape(projectionMatrix, viewMatrix, wbMissile->getModelMatrix(), MVP, VAO);
-	usMissile->displayShape(projectionMatrix, viewMatrix, usMissile->getModelMatrix(), MVP, VAO);
-	ssMissile->displayShape(projectionMatrix, viewMatrix, ssMissile->getModelMatrix(), MVP, VAO);
+//    ruber->displayShape(projectionMatrix, viewMatrix, ruber->getModelMatrix(), MVP, MV, VAO);
+//    unum->displayShape(projectionMatrix, viewMatrix, unum->getModelMatrix(), MVP, MV, VAO);
+//    duo->displayShape(projectionMatrix, viewMatrix, duo->getModelMatrix(), MVP, MV, VAO);
+//    primus->displayShape(projectionMatrix, viewMatrix, primus->getModelMatrix(duo->getPlanetMatrix()), MVP, MV, VAO);
+//    secundus->displayShape(projectionMatrix, viewMatrix, secundus->getModelMatrix(duo->getPlanetMatrix()), MVP, MV, VAO);
+//    warbird->displayShape(projectionMatrix, viewMatrix, warbird->getModelMatrix(), MVP, MV, VAO);
+//    unumSite->displayShape(projectionMatrix, viewMatrix, unumSite->getModelMatrix(unum->getHubMatrix()), MVP, MV, VAO);
+//    secundusSite->displayShape(projectionMatrix, viewMatrix, secundusSite->getModelMatrix(secundus->getHubMatrix(duo->getPlanetMatrix())), MVP, MV, VAO);
+//    wbMissile->displayShape(projectionMatrix, viewMatrix, wbMissile->getModelMatrix(), MVP, MV, VAO);
+//    usMissile->displayShape(projectionMatrix, viewMatrix, usMissile->getModelMatrix(), MVP, MV, VAO);
+//    ssMissile->displayShape(projectionMatrix, viewMatrix, ssMissile->getModelMatrix(), MVP, MV, VAO);
+    glUseProgram(shaderProgram);
+    
+    modelMatrix = ruber->getModelMatrix();
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    pointLightPos = getPosition(ModelViewMatrix);
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[ruber->id]);
+    glDrawArrays(GL_TRIANGLES, 0, ruber->numOfVert);
+    
+    modelMatrix = unum->getModelMatrix();
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[unum->id]);
+    glDrawArrays(GL_TRIANGLES, 0, unum->numOfVert);
+    
+    modelMatrix = duo->getModelMatrix();
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[duo->id]);
+    glDrawArrays(GL_TRIANGLES, 0, duo->numOfVert);
+    
+    modelMatrix = primus->getModelMatrix(duo->getPlanetMatrix());
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[primus->id]);
+    glDrawArrays(GL_TRIANGLES, 0, primus->numOfVert);
+    
+    modelMatrix = secundus->getModelMatrix(duo->getPlanetMatrix());
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[secundus->id]);
+    glDrawArrays(GL_TRIANGLES, 0, secundus->numOfVert);
+    
+    modelMatrix = warbird->getModelMatrix();
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    spotPos = getPosition(warbird->getOrientationMatrix()); //light position matches warbird position
+    spotDir = getPosition(warbird->getTranslationMatrix()); // direction matches where the war bird is facing
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[warbird->id]);
+    glDrawArrays(GL_TRIANGLES, 0, warbird->numOfVert);
+    
+    modelMatrix = unumSite->getModelMatrix(unum->getHubMatrix());
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[unumSite->id]);
+    glDrawArrays(GL_TRIANGLES, 0, unumSite->numOfVert);
+    
+    modelMatrix = secundusSite->getModelMatrix(secundus->getHubMatrix(duo->getPlanetMatrix()));
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[secundusSite->id]);
+    glDrawArrays(GL_TRIANGLES, 0, secundusSite->numOfVert);
+    
+    modelMatrix = wbMissile->getModelMatrix();
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[wbMissile->id]);
+    glDrawArrays(GL_TRIANGLES, 0, wbMissile->numOfVert);
+    
+    modelMatrix = usMissile->getModelMatrix();
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[usMissile->id]);
+    glDrawArrays(GL_TRIANGLES, 0, usMissile->numOfVert);
+    
+    modelMatrix = ssMissile->getModelMatrix();
+    ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+    ModelViewMatrix = viewMatrix * modelMatrix;
+    glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+    glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
+    glBindVertexArray(VAO[ssMissile->id]);
+    glDrawArrays(GL_TRIANGLES, 0, ssMissile->numOfVert);
+    
+    /*--------------------------- SHADER light ---------------------------*/
+    
+    glUniform3fv(lightPos, 1, glm::value_ptr(glm::vec3(pointLightPos)));
+    glUniform3fv(lightCol, 1, glm::value_ptr(glm::vec3(pointLightCol)));
+    glUniform3fv(eyeDir, 1, glm::value_ptr(glm::vec3(at)));
+    
+    glUniform3fv(AMBI, 1, glm::value_ptr(glm::vec3(Ambient)));
+    
+    glUniform1f(SpotCosCutoff, spotcos);
+    glUniform1f(SpotExponent, SpotExponent);
+    glUniform3fv(ConeDirection, 1, glm::value_ptr(glm::vec3(spotDir)));
+    glUniform3fv(SLightPosition, 1, glm::value_ptr(glm::vec3(spotPos)));
+    
+    glUniform1f(PStrength, pointStrength);
+    glUniform1f(DStrength, direcStrength);
+    glUniform1f(SStrength, spotStrength);
+    
+    //showVec3("Ambient : ", Ambient);
+    
+    /*-------------------------------------------------------------------*/
 
 	glutSwapBuffers();
 	frameCount++;
@@ -157,18 +324,67 @@ void init(void) {
 	glGenBuffers(nModels, buffer);
 
 	float modelSize = 0.0;
-
-	ruber->initializeShape(VAO, buffer, shaderProgram);
-	unum->initializeShape(VAO, buffer, shaderProgram);
-	duo->initializeShape(VAO, buffer, shaderProgram);
-	primus->initializeShape(VAO, buffer, shaderProgram);
-	secundus->initializeShape(VAO, buffer, shaderProgram);
-	warbird->initializeShape(VAO, buffer, shaderProgram);
-	unumSite->initializeShape(VAO, buffer, shaderProgram);
-	secundusSite->initializeShape(VAO, buffer, shaderProgram);
-	wbMissile->initializeShape(VAO, buffer, shaderProgram);
-	usMissile->initializeShape(VAO, buffer, shaderProgram);
-	ssMissile->initializeShape(VAO, buffer, shaderProgram);
+    modelSize = loadModelBuffer(ruber->fileName, ruber->numOfVert, VAO[ruber->id], buffer[ruber->id], shaderProgram,
+                                ruber->vPosition, ruber->vColor, ruber->vNormal, "vPosition", "vColor", "vNormal");
+    ruber->setScaleMatrix(modelSize);
+    
+    modelSize = loadModelBuffer(unum->fileName, unum->numOfVert, VAO[unum->id], buffer[unum->id], shaderProgram,
+                                unum->vPosition, unum->vColor, unum->vNormal, "vPosition", "vColor", "vNormal");
+    unum->setScaleMatrix(modelSize);
+    
+    modelSize = loadModelBuffer(duo->fileName, duo->numOfVert, VAO[duo->id], buffer[duo->id], shaderProgram,
+                                duo->vPosition, duo->vColor, duo->vNormal, "vPosition", "vColor", "vNormal");
+    duo->setScaleMatrix(modelSize);
+    
+    modelSize = loadModelBuffer(primus->fileName, primus->numOfVert, VAO[primus->id], buffer[primus->id], shaderProgram,
+                                primus->vPosition, primus->vColor, primus->vNormal, "vPosition", "vColor", "vNormal");
+    primus->setScaleMatrix(modelSize);
+    
+    modelSize = loadModelBuffer(secundus->fileName, secundus->numOfVert, VAO[secundus->id], buffer[secundus->id], shaderProgram,
+                                secundus->vPosition, secundus->vColor, secundus->vNormal, "vPosition", "vColor", "vNormal");
+    secundus->setScaleMatrix(modelSize);
+    
+    modelSize = loadModelBuffer(warbird->fileName, warbird->numOfVert, VAO[warbird->id], buffer[warbird->id], shaderProgram,
+                                warbird->vPosition, warbird->vColor, warbird->vNormal, "vPosition", "vColor", "vNormal");
+    warbird->setScaleMatrix(modelSize);
+    
+    modelSize = loadModelBuffer(unumSite->fileName, unumSite->numOfVert, VAO[unumSite->id], buffer[unumSite->id], shaderProgram,
+                                unumSite->vPosition, unumSite->vColor, unumSite->vNormal, "vPosition", "vColor", "vNormal");
+    unumSite->setScaleMatrix(modelSize);
+    unumSite->setSitePosition(unum->getModelMatrix(), unum->tiltAngle);
+    
+    modelSize = loadModelBuffer(secundusSite->fileName, secundusSite->numOfVert, VAO[secundusSite->id], buffer[secundusSite->id], shaderProgram,
+                                secundusSite->vPosition, secundusSite->vColor, secundusSite->vNormal, "vPosition", "vColor", "vNormal");
+    secundusSite->setScaleMatrix(modelSize);
+    secundusSite->setSitePosition(secundus->getModelMatrix(duo->getPlanetMatrix()), secundus->tiltAngle);
+    
+    modelSize = loadModelBuffer(wbMissile->fileName, wbMissile->numOfVert, VAO[wbMissile->id], buffer[wbMissile->id], shaderProgram,
+                                wbMissile->vPosition, wbMissile->vColor, wbMissile->vNormal, "vPosition", "vColor", "vNormal");
+    wbMissile->setScaleMatrix(modelSize);
+    
+    modelSize = loadModelBuffer(usMissile->fileName, usMissile->numOfVert, VAO[usMissile->id], buffer[usMissile->id], shaderProgram,
+                                usMissile->vPosition, usMissile->vColor, usMissile->vNormal, "vPosition", "vColor", "vNormal");
+    usMissile->setScaleMatrix(modelSize);
+    
+    modelSize = loadModelBuffer(ssMissile->fileName, ssMissile->numOfVert, VAO[ssMissile->id], buffer[ssMissile->id], shaderProgram,
+                                ssMissile->vPosition, ssMissile->vColor, ssMissile->vNormal, "vPosition", "vColor", "vNormal");
+    ssMissile->setScaleMatrix(modelSize);
+    
+    float aspectRatio = (GLfloat)windowWidth / (GLfloat)windowHeight;
+    projectionMatrix = glm::perspective(glm::radians(60.0f), aspectRatio, 1.0f, 100000.0f);
+    skybox = new Skybox(nModels - 1, VAO[nModels-1], buffer[nModels-1], file1, file2, file3, file4, file5, file6, rawWidth, rawHeight);
+//
+//    ruber->initializeShape(VAO, buffer, shaderProgram);
+//    unum->initializeShape(VAO, buffer, shaderProgram);
+//    duo->initializeShape(VAO, buffer, shaderProgram);
+//    primus->initializeShape(VAO, buffer, shaderProgram);
+//    secundus->initializeShape(VAO, buffer, shaderProgram);
+//    warbird->initializeShape(VAO, buffer, shaderProgram);
+//    unumSite->initializeShape(VAO, buffer, shaderProgram);
+//    secundusSite->initializeShape(VAO, buffer, shaderProgram);
+//    wbMissile->initializeShape(VAO, buffer, shaderProgram);
+//    usMissile->initializeShape(VAO, buffer, shaderProgram);
+//    ssMissile->initializeShape(VAO, buffer, shaderProgram);
 
 	unumSite->setSitePosition(unum->getModelMatrix(), unum->tiltAngle);
 	secundusSite->setSitePosition(secundus->getModelMatrix(duo->getPlanetMatrix()), secundus->tiltAngle);
@@ -186,6 +402,23 @@ void init(void) {
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 
 	warbird->setGravityConst(gravityConstant);
+    /*-------------- Shader - Uniforms link -----------------------*/
+    MVP = glGetUniformLocation(shaderProgram, "ModelViewProjection");
+    MV = glGetUniformLocation(shaderProgram, "ModelViewMatrix");
+    lightPos = glGetUniformLocation(shaderProgram, "LightPosition");
+    lightCol = glGetUniformLocation(shaderProgram, "LightColor");
+    eyeDir = glGetUniformLocation(shaderProgram, "EyeDirection");
+    
+    AMBI = glGetUniformLocation(shaderProgram, "Ambient");
+    
+    ConeDirection = glGetUniformLocation(shaderProgram, "ConeDirection");
+    SpotCosCutoff = glGetUniformLocation(shaderProgram, "SpotCosCutoff");
+    SpotExponent = glGetUniformLocation(shaderProgram, "SpotExponent");
+    
+    PStrength = glGetUniformLocation(shaderProgram, "PStrength");
+    DStrength = glGetUniformLocation(shaderProgram, "DStrength");
+    SStrength = glGetUniformLocation(shaderProgram, "SStrength");
+    /*-------------------------------------------------------------*/
 }
 
 // set viewport and projectionMatrix on window resize events
@@ -355,6 +588,32 @@ void keyboard(unsigned char key, int x, int y) {
 			if (camMode == -1)
 				camMode = 4;
 			break;
+        case 'a': case 'A'://turn on & off ambient light
+            if(isAmbiOn){
+                Ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+                isAmbiOn = false;
+            }
+            else{
+                Ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+                isAmbiOn = true;
+            }
+            break;
+        case 'd': case 'D'://turn on & off  Direction light
+            if(direcStrength == 0.0){
+                direcStrength = 0.3f;
+            }
+            else{
+                direcStrength = 0.0f;
+            }
+            break;
+        case 'p': case 'P'://turn on & off point light
+            if(pointStrength == 0.0){
+                pointStrength = 0.7f;
+            }
+            else{
+                pointStrength = 0.0f;
+            }
+            break;
 		case 033: case 'q': case 'Q':
 			exit(EXIT_SUCCESS);
 	}

@@ -80,9 +80,11 @@ public:
 		this->setScaleMatrix(modelSize);
 	}
 
-	void displayShape(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, glm::mat4 modelMatrix, GLuint &MVP, GLuint (&VAO)[nModels]) {
+	void displayShape(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, glm::mat4 modelMatrix, GLuint &MVP, GLuint &MV, GLuint (&VAO)[nModels]) {
 		glm::mat4 ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
+        glm::mat4 ModelViewMatrix = viewMatrix * modelMatrix;
 		glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(ModelViewProjectionMatrix));
+        glUniformMatrix4fv(MV, 1, GL_FALSE, glm::value_ptr(ModelViewMatrix));
 		glBindVertexArray(VAO[this->id]);
 		glDrawArrays(GL_TRIANGLES, 0, this->numOfVert);
 	}
