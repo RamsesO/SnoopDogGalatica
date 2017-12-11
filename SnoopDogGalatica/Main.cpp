@@ -7,8 +7,9 @@
 	Kim, Kelly
 */
 
-# define __Windows__
-# include "../includes465/include465.hpp"
+# define __Mac__
+# include "../../includes465/include465.hpp"
+# include "../../includes465/texture465.hpp"
 # include "Shape.hpp"
 # include "Signal.hpp"
 # include "Collision.hpp"
