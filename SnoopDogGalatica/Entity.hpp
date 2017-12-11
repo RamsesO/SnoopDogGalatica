@@ -53,12 +53,10 @@ public:
 				return true;
 			}
 			else {
-				printf("Still Reloading, Please Wait.\n");
 				return false;
 			}
 		}
 		else {
-			printf("Out of Ammo!\n");
 			return false;
 		}
 	}

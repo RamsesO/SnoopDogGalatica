@@ -22,9 +22,9 @@ public:
 
 	const float rotateRadians = 0.05f;
 	float rotateBy;
-	float accel;
 	float velocity;
 	float time;
+	int accel;
 	int key; // 1-8 designates the kind of movement
 
 	bool unumEntered;
@@ -32,7 +32,7 @@ public:
 
 	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, int missile, int health) :
 		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health), Gravity() {
-		this->accel = 1;
+		this->accel = 2;
 		this->rotateBy = 0;
 		this->velocity = 0;
 		this->time = 0;
@@ -43,14 +43,16 @@ public:
 	}
 
 	void changeStep() {
-		if (accel == 1) {
-			accel = 2;
-		}
-		else if (accel == 2) {
-			accel = 3;
-		}
-		else {
-			accel = 1;
+		switch (accel) {
+			case 2:
+				this->accel = 4;
+				break;
+			case 4:
+				this->accel = 6;
+				break;
+			case 6:
+				this->accel = 2;
+				break;
 		}
 	}
 
@@ -166,46 +168,51 @@ public:
 			float warbirdSize = this->size;
 
 			//UnumSite Interactions
-			if (unumSite->isColliding(unumSitePos, warbirdPos, warbirdSize)) {
-				printf("Warbird crashed into Unum Site.\n");
-				signalKOHit();
-				unumSite->signalKOHit();
-			}
-			if (unumSite->isColliding(unumSitePos, warbirdPos, warbirdSize + unumSite->DETECT_RANGE)) {
-				if (unumEntered == false) {
-					printf("Warbird has entered Unum Site's Detection Range.\n");
-					unumEntered = true;
+			if (unumSite->isDead() == false) {
+				if (unumSite->isColliding(unumSitePos, warbirdPos, warbirdSize)) {
+					printf("Warbird crashed into Unum Site.\n");
+					signalKOHit();
+					unumSite->signalKOHit();
 				}
-				unumSite->signalDetected();
-			}
-			else {
-				if (unumEntered == true) {
-					printf("Warbird has exited Unum Site's Detection Range.\n");
-					unumEntered = false;
+				if (unumSite->isColliding(unumSitePos, warbirdPos, warbirdSize + unumSite->DETECT_RANGE)) {
+					if (unumEntered == false) {
+						printf("Warbird has entered Unum Site's Detection Range.\n");
+						unumEntered = true;
+					}
+					unumSite->signalDetected();
 				}
-				unumSite->resetDetectedSignal();
+				else {
+					if (unumEntered == true) {
+						printf("Warbird has exited Unum Site's Detection Range.\n");
+						unumEntered = false;
+					}
+					unumSite->resetDetectedSignal();
+				}
 			}
 
 			//SecundusSite Interactions
-			if (secundusSite->isColliding(secundusSitePos, warbirdPos, warbirdSize)) {
-				printf("Warbird crashed into Secundus Site.\n");
-				signalKOHit();
-				secundusSite->signalKOHit();
-			}
-			if (secundusSite->isColliding(secundusSitePos, warbirdPos, warbirdSize + secundusSite->DETECT_RANGE)) {
-				if (secundusEntered == false) {
-					printf("Warbird has entered Secundus Site's Detection Range.\n");
-					secundusEntered = true;
+			if (secundusSite->isDead() == false) {
+				if (secundusSite->isColliding(secundusSitePos, warbirdPos, warbirdSize)) {
+					printf("Warbird crashed into Secundus Site.\n");
+					signalKOHit();
+					secundusSite->signalKOHit();
 				}
-				secundusSite->signalDetected();
-			}
-			else {
-				if (secundusEntered == true) {
-					printf("Warbird has exited Secundus Site's Detection Range.\n");
-					secundusEntered = false;
+				if (secundusSite->isColliding(secundusSitePos, warbirdPos, warbirdSize + secundusSite->DETECT_RANGE)) {
+					if (secundusEntered == false) {
+						printf("Warbird has entered Secundus Site's Detection Range.\n");
+						secundusEntered = true;
+					}
+					secundusSite->signalDetected();
 				}
-				secundusSite->resetDetectedSignal();
+				else {
+					if (secundusEntered == true) {
+						printf("Warbird has exited Secundus Site's Detection Range.\n");
+						secundusEntered = false;
+					}
+					secundusSite->resetDetectedSignal();
+				}
 			}
+
 
 			//Set gravity
 			if (gravity) {

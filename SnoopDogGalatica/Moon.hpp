@@ -33,16 +33,34 @@ public:
 			this->axialTilt * this->rotationMatrix);
 	}
 
-	void update(Planet *hub, WarBird *warbird) {
+	void setMissileInteraction(Missile *m, glm::vec3 moonPos, float moonSize) {
+		if (m->hasLaunched() == true) {
+			m->appendGravVec(moonPos, moonSize);
+			if (m->isColliding(moonPos, moonSize)) {
+				printf("%s missile crashed into the Moon.\n", m->getHostName());
+				m->signalKOHit();
+			}
+		}
+	}
+
+	void update(Planet *hub, WarBird *warbird, Missile *wbMissile, Missile *usMissile, Missile *ssMissile) {
 		glm::vec3 moonPos = getPosition(getHubMatrix(hub->getPlanetMatrix()));
 		float moonSize = this->size;
 
 		//Warbird Interactions
-		warbird->appendGravVec(moonPos, moonSize);
-		if (warbird->isColliding(moonPos, moonSize)) {
-			printf("Warbird crashed into the Moon.\n");
-			warbird->signalKOHit();
+		if (warbird->isDead() == false) {
+			warbird->appendGravVec(moonPos, moonSize);
+			if (warbird->isColliding(moonPos, moonSize)) {
+				printf("Warbird crashed into the Moon.\n");
+				warbird->signalKOHit();
+			}
 		}
+
+		//Missile Interactions
+		setMissileInteraction(wbMissile, moonPos, moonSize);
+		setMissileInteraction(usMissile, moonPos, moonSize);
+		setMissileInteraction(ssMissile, moonPos, moonSize);
+
 
 		this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
 		this->orbitalMatrix = glm::rotate(this->orbitalMatrix, this->orbitalRadians, this->orbitalAxis);

@@ -15,13 +15,14 @@
 
 # define __Missile__
 
-class Missile : public Shape, public Collision, public Signal {
+class Missile : public Shape, public Collision, public Signal, public Gravity {
 
 private:
 
 	//Timers
 	const float ACTIVATE_TIME = 200.0;
 	const float LIFE_TIME = 2000.0;
+	const float ON_TIME = 10.0;
 	int time;
 
 	//Movement
@@ -38,7 +39,7 @@ private:
 
 public:
 	Missile(int id, int hostId, int numOfVert, char * fileName, float size) :
-		Shape(id, numOfVert, fileName, size), Collision(), Signal() {
+		Shape(id, numOfVert, fileName, size), Collision(), Signal(), Gravity() {
 		this->hostId = hostId;
 		this->time = 0;
 		this->launched = false;
@@ -59,6 +60,10 @@ public:
 
 	glm::mat4 getModelMatrix() {
 		return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
+	}
+
+	char *getHostName() {
+		return hostName;
 	}
 
 	bool fromWarbird() {
@@ -124,7 +129,12 @@ public:
 	}
 
 	void translateForward() {
-		this->translationMatrix = glm::translate(this->translationMatrix, -step * getOut(this->rotationMatrix));
+		if (gravity && (this->time > ACTIVATE_TIME)) {
+			this->translationMatrix = glm::translate(this->translationMatrix, (-step * getOut(this->rotationMatrix)) + this->gravityVec);
+		}
+		else {
+			this->translationMatrix = glm::translate(this->translationMatrix, (-step * getOut(this->rotationMatrix)) );
+		}
 	}
 
 	void rotateTowards(glm::mat4 shipOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
@@ -158,8 +168,20 @@ public:
 		this->launched = false;
 	}
 
+	void appendGravVec(glm::vec3 targetPos, float targetSize) {
+		this->tempGravity += calculateGrav(getPosition(getOrientationMatrix()), this->size, targetPos, targetSize);
+	}
+
+	bool isColliding(glm::vec3 targetPos, float targetSize) {
+		float distanceBetween = distance(getPosition(getOrientationMatrix()), targetPos);
+		if (distanceBetween < (targetSize + this->size + 50)) {
+			return true;
+		}
+		return false;
+	}
+
 	void recieveSignals(MissileSite *unumSite, glm::mat4 unumSiteOM, MissileSite *secundusSite, glm::mat4 secundusSiteOM) {
-		if (this->launched == false) {
+		if (this->launched == true) {
 			if (isDestroyed() == true) {
 				resetMissile();
 				printf("%s missile has Died.\n", hostName);
@@ -171,6 +193,7 @@ public:
 				if (unumSite->isDetected() == true) {
 					bool justFired = unumSite->fire(hasLaunched());
 					if (justFired == true) {
+						printf("%s missile has fired.\n", hostName);
 						launch(unumSiteOM);
 					}
 					unumSite->resetDetectedSignal();
@@ -180,6 +203,7 @@ public:
 				if (secundusSite->isDetected() == true) {
 					bool justFired = secundusSite->fire(hasLaunched());
 					if (justFired == true) {
+						printf("%s missile has fired.\n", hostName);
 						launch(secundusSiteOM);
 					}
 					secundusSite->resetDetectedSignal();
@@ -188,15 +212,16 @@ public:
 		}
 	}
 
-	void update(WarBird *warbird, MissileSite *unumSite, glm::mat4 unumSiteOM, MissileSite *secundusSite, glm::mat4 secundusSiteOM) {
+	void update(WarBird *warbird, MissileSite *unumSite, glm::mat4 unumSiteOM, MissileSite *secundusSite, glm::mat4 secundusSiteOM, Missile *m1, Missile *m2) {
 
 		if (this->launched == true) { //if not fired, no action needed
 
 			if (this->time < LIFE_TIME) { //If missile is alive
 
+				//Missile Movement
 				translateForward();
 				if (this->time == ACTIVATE_TIME) {
-					this->step = 100;
+					this->step = 50;
 					if (fromWarbird()) {
 						this->target = identifyTarget(unumSite, unumSiteOM, secundusSite, secundusSiteOM);
 					}
@@ -215,11 +240,48 @@ public:
 				}
 				this->time++;
 
-				//Collision Check
-				glm::vec3 missilePos = getPosition(this->translationMatrix);
-				float missileSize = this->size;
+				//Set gravity
+				if (gravity && (this->time > ACTIVATE_TIME)) {
+					setGravDirection();
+				}
 
-				
+				//Collision Check
+				if (this->time > ON_TIME) {
+					glm::vec3 missilePos = getPosition(this->translationMatrix);
+					float missileSize = this->size;
+
+					//Warbird
+					if (warbird->isDead() == false && warbird->isColliding(missilePos, missileSize)) {
+						printf("%s missile hit Warbird.\n", hostName);
+						signalKOHit();
+						warbird->signalDamageHit();
+					}
+
+					//Sites
+					if (unumSite->isDead() == false && unumSite->isColliding(getPosition(unumSiteOM), missilePos, missileSize)) {
+						printf("%s missile hit Unum Site.\n", hostName);
+						signalKOHit();
+						unumSite->signalDamageHit();
+					}
+					if (secundusSite->isDead() == false && secundusSite->isColliding(getPosition(secundusSiteOM), missilePos, missileSize)) {
+						printf("%s missile hit Secundus Site.\n", hostName);
+						signalKOHit();
+						secundusSite->signalDamageHit();
+					}
+
+					//Other Missiles
+					if (m1->hasLaunched() == true && m1->isColliding(missilePos, missileSize)) {
+						printf("%s missile hit %s missile.\n", hostName, m1->hostName);
+						signalKOHit();
+						m1->signalKOHit();
+					}
+					if (m2->hasLaunched() == true && m2->isColliding(missilePos, missileSize)) {
+						printf("%s missile hit %s missile.\n", hostName, m2->hostName);
+						signalKOHit();
+						m2->signalKOHit();
+					}
+				}
+
 			}
 			else {
 				printf("%s missile ran out of fuel. Died.\n", hostName);

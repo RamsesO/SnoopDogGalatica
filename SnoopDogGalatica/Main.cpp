@@ -182,7 +182,6 @@ void init(void) {
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 
 	warbird->setGravityConst(gravityConstant);
-	models->setSizes(ruber, unum, duo, primus, secundus, warbird, unumSite, secundusSite, wbMissile);
 }
 
 // set viewport and projectionMatrix on window resize events
@@ -303,6 +302,14 @@ void keyboard(unsigned char key, int x, int y) {
 				bool justFired = warbird->fire(wbMissile->hasLaunched());
 				if (justFired == true) {
 					wbMissile->launch(warbird->getOrientationMatrix());
+				}
+				else {
+					if (warbird->getMissileCount() <= 0) {
+						printf("Out of Ammo!\n");
+					}
+					else {
+						printf("Still reloading, please wait.\n");
+					}
 				}
 			}
 			else {

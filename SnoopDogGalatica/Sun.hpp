@@ -27,18 +27,33 @@ public:
         return (this->translationMatrix * this->rotationMatrix * this->scaleMatrix);
     }
 
-    void update(WarBird *warbird) {
+	void setMissileInteraction(Missile *m, glm::vec3 sunPos, float sunSize) {
+		if (m->hasLaunched() == true) {
+			m->appendGravVec(sunPos, sunSize);
+			if (m->isColliding(sunPos, sunSize)) {
+				printf("%s missile crashed into the Sun.\n", m->getHostName());
+				m->signalKOHit();
+			}
+		}
+	}
+
+    void update(WarBird *warbird, Missile *wbMissile, Missile *usMissile, Missile *ssMissile) {
 		glm::vec3 sunPos = getPosition(this->translationMatrix);
 		float sunSize = this->size;
 
 		//Warbird Interactions
-		warbird->appendGravVec(sunPos, sunSize);
-		if (warbird->isColliding(sunPos, sunSize)) {
-			if (warbird->isDead() == false) {
+		if (warbird->isDead() == false) {
+			warbird->appendGravVec(sunPos, sunSize);
+			if (warbird->isColliding(sunPos, sunSize)) {
 				printf("Warbird crashed into the Sun.\n");
 				warbird->signalKOHit();
 			}
 		}
+
+		//Missile Interactions
+		setMissileInteraction(wbMissile, sunPos, sunSize);
+		setMissileInteraction(usMissile, sunPos, sunSize);
+		setMissileInteraction(ssMissile, sunPos, sunSize);
 
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
     }
