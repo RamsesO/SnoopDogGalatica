@@ -155,31 +155,17 @@ private:
 
     }
 
-    void display(){
-        //vertex shader will push the texture out as far as possible
-        //depth clamp will make sure it isn't clipped 
-        glEnable(GL_DEPTH_CLAMP);
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glDepthFunc(GL_LEQUAL);
-        glUseProgram(shaderProgram);
-
-        glUniformMatrix4fv(mvpID, 1, GL_FALSE, glm::value_ptr(projectionMatrix * viewMatrix));
-        
-        glBindVertexArray(vao);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-        glDepthFunc(GL_LESS);
-    }
 public:
     int id;
 
-    Skybox(int id, char * file1, char * file2, char * file3, char * file4, char * file5, char * file6,
+    Skybox(int id, GLuint vao, GLuint vbo, char * file1, char * file2, char * file3, char * file4, char * file5, char * file6,
         int rawWidth, int rawHeight) {
+
+        printf("%d %d \n", vao, vbo);
         this->id = id;
+        this->vao = vao;
+        this->vbo - vbo;
+
         this->rawWidth = rawWidth;
         this->rawHeight = rawHeight;
 
@@ -213,18 +199,29 @@ public:
         init();
 	}
 
+    void display(){
+        //vertex shader will push the texture out as far as possible
+        //depth clamp will make sure it isn't clipped 
+        glEnable(GL_DEPTH_CLAMP);
+
+        glDepthFunc(GL_LEQUAL);
+        glUseProgram(shaderProgram);
+
+        glUniformMatrix4fv(mvpID, 1, GL_FALSE, glm::value_ptr(projectionMatrix * viewMatrix));
+        
+        glBindVertexArray(vao);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS);
+    }
+
     void update(glm::mat4 viewMatrix, glm::mat4 projectionMatrix){
         this->viewMatrix = viewMatrix;
         this->projectionMatrix = projectionMatrix;
 
         display();
-    }
-
-    // free OpenGL resources
-    void cleanUp (void) {
-        glDeleteBuffers(1, &vbo);
-        freeTexture(textureID);   
-        printf("cleaned up Skybox class\n");
     }
 
 };

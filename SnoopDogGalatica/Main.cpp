@@ -21,9 +21,10 @@
 # include "Missile.hpp"
 # include "WarBirdCam.hpp"
 # include "MissileSite.hpp"
+# include "Skybox.hpp"
 
 // Model Files (0 = Ruber, 1 = Unum, 2 = Duo, 3 = Primus, 4 = Secundus, 5 = WarBird 6 = Missle
-const int nModels = 11;
+const int nModels = 11 + 1; //1 because of the skybox
 Sun * ruber = new Sun(0, 1740 * 3, "assets/Ruber.tri", 2000.0f, glm::vec3(0),
 	glm::vec3(0, 1, 0), 1.0f);
 Planet * unum = new Planet(1, 1740 * 3, "assets/Unum.tri", 200.0f, glm::vec3(4000, 0, 0),
@@ -40,6 +41,7 @@ MissileSite * secundusSite = new MissileSite(7, 2048 * 3, "assets/MissileSite.tr
 Missile * wbMissile = new Missile(8, 0, 918 * 3, "assets/Missle.tri", 25.0f*10);
 Missile * usMissile = new Missile(9, 1, 918 * 3, "assets/Missle.tri", 25.0f * 10);
 Missile * ssMissile = new Missile(10, 2, 918 * 3, "assets/Missle.tri", 25.0f * 10);
+Skybox * skybox;
 
 //Planetary Cameras
 PlanetCam * unumCam = new PlanetCam(glm::vec3(4000 - 4000, 0, -4000), glm::vec3(0, 1, 0), 0.004f);
@@ -47,6 +49,8 @@ PlanetCam * duoCam = new PlanetCam(glm::vec3(9000 - 4000, 0, -4000), glm::vec3(0
 
 //Warbird Camera
 WarBirdCam * warbirdCam = new WarBirdCam(glm::vec3(0, 300, 1000));
+
+
 
 //Warp Variables
 int warp = -1;
@@ -70,6 +74,18 @@ char fpsStr[15];
 char viewStr[15] = " Front View, ";
 char sTypeStr[15] = " Ace ";
 char speedStr[15] = "Speed";
+
+/*--------------------- SKYBOX STUFF ----------------------*/
+int windowWidth = 800;
+int windowHeight = 600;
+int rawWidth = 512;
+int rawHeight = 512;
+char * file1 = "assets/1.raw";
+char * file2 = "assets/2.raw";
+char * file3 = "assets/3.raw";
+char * file4 = "assets/4.raw";
+char * file5 = "assets/5.raw";
+char * file6 = "assets/6.raw";
 
 /*--------------------- SHADERS ----------------------*/
 char * vertexShaderFile = "simpleVertex.glsl";
@@ -155,7 +171,9 @@ void updateTitle() {
 }
 
 void display(void) {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(shaderProgram);
 
 	modelMatrix = ruber->getModelMatrix();
 	ModelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -267,9 +285,10 @@ void display(void) {
 
 	//showVec3("Ambient : ", Ambient);
 
+	skybox->update(viewMatrix, projectionMatrix);
+
+
 	/*-------------------------------------------------------------------*/
-
-
 
 	glutSwapBuffers();
 	frameCount++;
@@ -340,6 +359,9 @@ void init(void) {
 		ssMissile->vPosition, ssMissile->vColor, ssMissile->vNormal, "vPosition", "vColor", "vNormal");
 	ssMissile->setScaleMatrix(modelSize);
 
+	float aspectRatio = (GLfloat)windowWidth / (GLfloat)windowHeight;
+	projectionMatrix = glm::perspective(glm::radians(60.0f), aspectRatio, 1.0f, 100000.0f);
+	skybox = new Skybox(nModels - 1, VAO[nModels-1], buffer[nModels-1], file1, file2, file3, file4, file5, file6, rawWidth, rawHeight);
 
 	eye = glm::vec3(0.0f, 10000.0f, 20000.0f);   // eye is 1000 "out of screen" from origin
 	at = glm::vec3(0.0f, 0.0f, 0.0f);   // looking at origin
@@ -652,7 +674,7 @@ int main(int argc, char* argv[]) {
 	# ifndef __Mac__
 		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	# endif
-		glutInitWindowSize(800, 600);
+		glutInitWindowSize(windowWidth, windowHeight);
 		// set OpenGL and GLSL versions to 3.3 for Comp 465/L, comment to see highest versions
 	# ifndef __Mac__
 		glutInitContextVersion(3, 3);
