@@ -72,6 +72,10 @@ char fpsStr[15];
 char viewStr[15] = " Front View, ";
 char sTypeStr[15] = " Ace ";
 char speedStr[15] = "Speed";
+char winStr[15] = "You Have Won!";
+char loseStr[15] = "You Have Lost!";
+bool win = false;
+bool lose = false;
 
 //Shaders
 char * vertexShaderFile = "simpleVertex.glsl";
@@ -141,7 +145,7 @@ void display(void) {
 
 		lastTime = currentTime;
 		frameCount = 0;
-		updateTitle();
+		if (win == false && lose == false) updateTitle();
 	}
 }
 
@@ -237,6 +241,18 @@ void update(int i) {
 			strcpy(sTypeStr, " Debug ");
 			break;
 	}
+
+	//Check if you won
+	if (unumSite->isDead() && secundusSite->isDead() && win == false) {
+		strcpy(titleStr, winStr);
+		glutSetWindowTitle(titleStr);
+		printf("You Have Won!");
+	}
+	if (warbird->isDead() && lose == false) {
+		strcpy(titleStr, loseStr);
+		glutSetWindowTitle(titleStr);
+		printf("You Have Lost!");
+	}
 }
 
 void arrowInput(int key, int x, int y) {
@@ -327,6 +343,10 @@ void keyboard(unsigned char key, int x, int y) {
 		case 's': case 'S': // next ship speed
 			warbird->changeStep();
 			break;
+		case 'r': case 'R':
+			warbird->signalKOHit();
+			printf("You have given up.\n");
+			break;
 		case 'v': case 'V': // next camera
 			camMode++;
 			break;
@@ -370,7 +390,7 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 	}
 
-	updateTitle();
+	if (win == false && lose == false) updateTitle();
 }
 
 int main(int argc, char* argv[]) {
