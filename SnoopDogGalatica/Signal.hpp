@@ -18,11 +18,17 @@
 class Signal {
 
 private:
+	bool detected;
 	int hit; //0 = no hit, 1 = damage hit, 2 = KO hit
 
 public:
 	Signal() {
+		this->detected = false;
 		this->hit = 0;
+	}
+
+	void signalDetected() {
+		this->detected = true;
 	}
 
 	void signalKOHit() {
@@ -35,12 +41,20 @@ public:
 		}
 	}
 
+	bool isDetected() {
+		return this->detected;
+	}
+
 	bool isDestroyed() {
 		return (this->hit == 2);
 	}
 
 	bool isDamaged() {
 		return (this->hit == 1);
+	}
+
+	void resetDetectedSignal() {
+		this->detected = false;
 	}
 
 	void resetHitSignal() {

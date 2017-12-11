@@ -15,45 +15,46 @@
 
 # define __Missile__
 
-class Missile : public Shape, public Collision {
+class Missile : public Shape, public Collision, public Signal {
 
 private:
 
-	const float UTL = 2000.0; //2000 updates to live
-	const float UTA = 50.0;  //200 updates to activate
-	const int detectionRange = 3000;
+	//Timers
+	const float ACTIVATE_TIME = 200.0;
+	const float LIFE_TIME = 2000.0;
+	int time;
+
+	//Movement
 	float step;
 	float offset;
 	float rStep;
-	int ttl, activate;
+
+	//Other
+	const float DETECT_RANGE = 3000;
+	char *hostName;
+	bool launched;
 	int target;
 	int hostId;
-	bool launched;
-	char * hostName;
 
 public:
 	Missile(int id, int hostId, int numOfVert, char * fileName, float size) :
-		Shape(id, numOfVert, fileName, size) {
+		Shape(id, numOfVert, fileName, size), Collision(), Signal() {
 		this->hostId = hostId;
-		ttl = UTL;
-		activate = UTA;
-		launched = false;
-		step = 10;
-		offset = 250;
+		this->time = 0;
+		this->launched = false;
+		this->step = 10;
+		this->offset = 250;
 
 		if (fromMissileSites()) {
 			this->target = 0;
 		}
 
-		if (hostId == 1) {
-			hostName = "Unum Site";
-		}
-		else if (hostId == 2) {
-			hostName = "Secundus Site";
-		}
-		else {
-			hostName = "Warbird";
-		}
+		if (hostId == 1) 
+			this->hostName = "Unum Site";
+		else if (hostId == 2) 
+			this->hostName = "Secundus Site";
+		else 
+			this->hostName = "Warbird";
 	}
 
 	glm::mat4 getModelMatrix() {
@@ -80,11 +81,8 @@ public:
 		return launched;
 	}
 
-	void launch(glm::mat4 objOM) {
-		printf("Launching missile... \n");
-		printf("Launching missile from %s.\n", hostName);
-		spawn(objOM);
-		launched = true;
+	void offsetForward() {
+		this->translationMatrix = glm::translate(this->translationMatrix, -offset * getOut(this->rotationMatrix));
 	}
 
 	void spawn(glm::mat4 objOM) {
@@ -97,45 +95,36 @@ public:
 		offsetForward();
 	}
 
-	void detectShip(glm::mat4 warbirdOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
-		float distanceBetween = distance(getPosition(warbirdOM), getPosition(unumSiteOM));
-		if ((distanceBetween <= detectionRange) && fromUnumSite()) {
-			launch(unumSiteOM);
-		}
-
-		distanceBetween = distance(getPosition(warbirdOM), getPosition(secundusSiteOM));
-		if ((distanceBetween <= detectionRange) && fromSecundusSite()) {
-			launch(secundusSiteOM);
-		}
+	void launch(glm::mat4 objOM) {
+		printf("Launching missile... \n");
+		printf("Launching missile from %s.\n", hostName);
+		spawn(objOM);
+		launched = true;
 	}
 
-	int identifyTarget(glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
+	int identifyTarget(MissileSite *unumSite, glm::mat4 unumSiteOM, MissileSite *secundusSite, glm::mat4 secundusSiteOM) {
 		//here calculate distance
-
 		glm::vec3 missilePos = getPosition(getOrientationMatrix());
-		float disBetweenUSOM = distance(missilePos, getPosition(unumSiteOM));
-		float disBetweenSSOM = distance(missilePos, getPosition(secundusSiteOM));
+		float disUnumSiteOM = distance(missilePos, getPosition(unumSiteOM));
+		float disSecundusSiteOM = distance(missilePos, getPosition(secundusSiteOM));
 
 		//needs to be in detection range to be able to choose
-		if (disBetweenUSOM <= detectionRange || disBetweenSSOM <= detectionRange) {
-			if (disBetweenUSOM > disBetweenSSOM) {
-				printf("Chose secundus.\n");
-				return 2;
-			}
-			else {
-				printf("Chose unum.\n");
+		if (disUnumSiteOM <= DETECT_RANGE || disSecundusSiteOM <= DETECT_RANGE) {
+			if ((disUnumSiteOM < disSecundusSiteOM) && unumSite->isDead() == false) {
+				printf("Chose Unum Site.\n");
 				return 1;
 			}
+			else if ((disSecundusSiteOM < disUnumSiteOM) && secundusSite->isDead() == false) {
+				printf("Chose Secundus Site.\n");
+				return 2;
+			}
 		}
+		printf("No targets in range, %s missile tracking turned off.\n", hostName);
 		return -1;
 	}
 
 	void translateForward() {
 		this->translationMatrix = glm::translate(this->translationMatrix, -step * getOut(this->rotationMatrix));
-	}
-
-	void offsetForward() {
-		this->translationMatrix = glm::translate(this->translationMatrix, -offset * getOut(this->rotationMatrix));
 	}
 
 	void rotateTowards(glm::mat4 shipOM, glm::mat4 unumSiteOM, glm::mat4 secundusSiteOM) {
@@ -148,8 +137,11 @@ public:
 		else if (target == 1) {
 			targetPos = getPosition(unumSiteOM);
 		}
-		else {
+		else if (target == 2) {
 			targetPos = getPosition(secundusSiteOM);
+		}
+		else {
+			return;
 		}
 
 		//our up vector here might need to be changed
@@ -162,70 +154,81 @@ public:
 
 	void resetMissile() {
 		sendToCenter();
-		ttl = UTL;
-		activate = UTA;
-		launched = false;
+		this->time = 0;
+		this->launched = false;
 	}
 
-	void update(glm::mat4 sunOM, float sunSize, glm::mat4 unumOM, float unumSize, glm::mat4 duoOM, float duoSize, glm::mat4 primusOM,
-		float primusSize, glm::mat4 secundusOM, float secundusSize, glm::mat4 unumSiteOM, float unumSiteSize, glm::mat4 secundusSiteOM, 
-		float secundusSiteSize, glm::mat4 shipOM, float shipSize) {
+	void recieveSignals(MissileSite *unumSite, glm::mat4 unumSiteOM, MissileSite *secundusSite, glm::mat4 secundusSiteOM) {
+		if (this->launched == false) {
+			if (isDestroyed() == true) {
+				resetMissile();
+				printf("%s missile has Died.\n", hostName);
+			}
+			resetHitSignal();
+		}
+		else {
+			if (fromUnumSite() && unumSite->isDead() == false) {
+				if (unumSite->isDetected() == true) {
+					bool justFired = unumSite->fire(hasLaunched());
+					if (justFired == true) {
+						launch(unumSiteOM);
+					}
+					unumSite->resetDetectedSignal();
+				}
+			}
+			else if (fromSecundusSite() && secundusSite->isDead() == false) {
+				if (secundusSite->isDetected() == true) {
+					bool justFired = secundusSite->fire(hasLaunched());
+					if (justFired == true) {
+						launch(secundusSiteOM);
+					}
+					secundusSite->resetDetectedSignal();
+				}
+			}
+		}
+	}
 
-		bool diedViaPlanet = false;
-		bool diedViaSite = false;
-		bool diedViaShip = false;
+	void update(WarBird *warbird, MissileSite *unumSite, glm::mat4 unumSiteOM, MissileSite *secundusSite, glm::mat4 secundusSiteOM) {
 
-		if (launched == true) { //if not fired, no action needed
+		if (this->launched == true) { //if not fired, no action needed
 
-			if (ttl > 0) { //translate all the time if there are time to live remaining
+			if (this->time < LIFE_TIME) { //If missile is alive
+
 				translateForward();
-				if (activate > 0) {
-					activate--;//since not activated no rotation 
-					if (activate == 0) {//identify target
-						step = 100;
-						if (fromWarbird()) {
-							target = identifyTarget(unumSiteOM, secundusSiteOM);
+				if (this->time == ACTIVATE_TIME) {
+					this->step = 100;
+					if (fromWarbird()) {
+						this->target = identifyTarget(unumSite, unumSiteOM, secundusSite, secundusSiteOM);
+					}
+					else if (fromMissileSites()) {
+						if (warbird->isDead() == false) {
+							this->target = 0;
 						}
-						else if (fromMissileSites()) {
-							target = 0;
+						else {
+							printf("No targets in range, %s missile tracking turned off.\n", hostName);
+							this->target = -1;
 						}
 					}
 				}
-				else { //activated
-					rotateTowards(shipOM, unumSiteOM, secundusSiteOM);
-					ttl--;
+				else if (this->time > ACTIVATE_TIME) {
+					rotateTowards(warbird->getOrientationMatrix(), unumSiteOM, secundusSiteOM);
 				}
+				this->time++;
 
+				//Collision Check
 				glm::vec3 missilePos = getPosition(this->translationMatrix);
 				float missileSize = this->size;
 
-				/*planetCollision(missilePos, missileSize, sunOM, sunSize * 2, unumOM, unumSize - 50, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize - 50);
-				diedViaPlanet = isInPContact();
-				siteCollision(missilePos, missileSize, unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize);
-				diedViaSite = isInSContact();
-				warbirdCollision(missilePos, missileSize, shipOM, shipSize - 50);
-				diedViaShip = isInWContact();*/
-	
-				if (diedViaPlanet) {
-					printf("missile from %s died via planet hit\n", hostName);
-					resetMissile();
-				}
-				else if (diedViaShip) {
-					printf("missile from %s died via hitting warbird\n", hostName);
-					resetMissile();
-				}
-				else if (diedViaSite) {
-					printf("missile from %s died via site destruction\n", hostName);
-					resetMissile();
-				}
+				
 			}
 			else {
-				printf("missile from %s died via distance\n", hostName);
+				printf("%s missile ran out of fuel. Died.\n", hostName);
 				resetMissile();
 			}
+
 		}
 		else { //hasnt been fired yet. must check if the ship is detection 
-			step = 10;
+			this->step = 10;
 		}
 	}
 

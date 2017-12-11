@@ -67,7 +67,7 @@ public:
 		if (this->dead == false) {
 			this->health--;
 			if (this->health == 0) {
-				this->dead == true;
+				this->dead = true;
 				return true;
 			}
 			else {

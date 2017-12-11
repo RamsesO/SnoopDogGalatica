@@ -86,15 +86,16 @@ public:
 
 	void update(Sun *ruber, Planet *unum, Planet *duo, Moon *primus, Moon *secundus, WarBird *warbird, MissileSite *unumSite,
 		MissileSite *secundusSite, Missile *wbMissile, Missile *usMissile, Missile *ssMissile) {
-		
+
 		ruber->update(warbird);
 		unum->update(warbird);
 		duo->update(warbird);
 		primus->update(duo, warbird);
 		secundus->update(duo, warbird);
-		warbird->update();
-		//unumSite->update(unumOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
-		//secundusSite->update(secundusOM, warbirdOM, warbirdSize, wbMissileOM, usMissileOM, ssMissileOM, missileSize);
+		warbird->update(unumSite, unumSitePos, secundusSite, secundusSitePos);
+		unumSite->update();
+		secundusSite->update();
+
 		//wbMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
 		//	unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
 		//usMissile->update(ruberOM, ruberSize, unumOM, unumSize, duoOM, duoSize, primusOM, primusSize, secundusOM, secundusSize,
@@ -103,6 +104,8 @@ public:
 		//	unumSiteOM, unumSiteSize, secundusSiteOM, secundusSiteSize, warbirdOM, warbirdSize);
 
 		warbird->recieveSignals();
+		unumSite->recieveSignals();
+		secundusSite->recieveSignals();
 	}
 
 

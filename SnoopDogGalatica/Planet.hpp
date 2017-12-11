@@ -56,6 +56,7 @@ public:
 		//Warbird Interactions
 		warbird->appendGravVec(planetPos, planetSize);
 		if (warbird->isColliding(planetPos, planetSize)) {
+			printf("Warbird crashed into the Planet.\n");
 			warbird->signalKOHit();
 		}
 

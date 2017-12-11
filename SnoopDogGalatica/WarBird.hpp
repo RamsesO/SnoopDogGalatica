@@ -24,8 +24,11 @@ public:
 	float rotateBy;
 	float accel;
 	float velocity;
-	int time;
+	float time;
 	int key; // 1-8 designates the kind of movement
+
+	bool unumEntered;
+	bool secundusEntered;
 
 	WarBird(int id, int numOfVert, char * fileName, float size, glm::vec3 translationMatrix, int missile, int health) :
 		Shape(id, numOfVert, fileName, size, translationMatrix), Entity(missile, health), Gravity() {
@@ -34,6 +37,9 @@ public:
 		this->velocity = 0;
 		this->time = 0;
 		this->key = -1;
+
+		this->unumEntered = false;
+		this->secundusEntered = false;
 	}
 
 	void changeStep() {
@@ -58,6 +64,9 @@ public:
 			this->translationMatrix = glm::translate(this->translationMatrix, (velocity * getOut(this->rotationMatrix)) + this->gravityVec);
 		else
 			this->translationMatrix = glm::translate(this->translationMatrix, (velocity * getOut(this->rotationMatrix)));
+
+		if (time > 0) time -= 0.25;
+		else if (time < 0) time += 0.25;
 	}
 
 	void accelForward() {
@@ -129,12 +138,14 @@ public:
 	}
 
 	void recieveSignals() {
-		bool justDied = onHit();
-		if (justDied) {
-			sendToCenter();
-			printf("Ship has Died.\n");
+		if (isDead() == false) {
+			bool justDied = onHit();
+			if (justDied) {
+				sendToCenter();
+				printf("Ship has Died.\n");
+			}
+			resetHitSignal();
 		}
-		resetHitSignal();
 	}
 
 	void appendGravVec(glm::vec3 targetPos, float targetSize) {
@@ -143,19 +154,65 @@ public:
 
 	bool isColliding(glm::vec3 targetPos, float targetSize) {
 		float distanceBetween = distance(getPosition(getOrientationMatrix()), targetPos);
-		if (distanceBetween < (targetSize + this->size + 50)) {
+		if (distanceBetween < (targetSize + this->size - 50)) {
 			return true;
 		}
 		return false;
 	}
 
-	void update() {
+	void update(MissileSite *unumSite, glm::vec3 unumSitePos, MissileSite *secundusSite, glm::vec3 secundusSitePos) {
 		if (isDead() == false) {
+			glm::vec3 warbirdPos = getPosition(getOrientationMatrix());
+			float warbirdSize = this->size;
 
+			//UnumSite Interactions
+			if (unumSite->isColliding(unumSitePos, warbirdPos, warbirdSize)) {
+				printf("Warbird crashed into Unum Site.\n");
+				signalKOHit();
+				unumSite->signalKOHit();
+			}
+			if (unumSite->isColliding(unumSitePos, warbirdPos, warbirdSize + unumSite->DETECT_RANGE)) {
+				if (unumEntered == false) {
+					printf("Warbird has entered Unum Site's Detection Range.\n");
+					unumEntered = true;
+				}
+				unumSite->signalDetected();
+			}
+			else {
+				if (unumEntered == true) {
+					printf("Warbird has exited Unum Site's Detection Range.\n");
+					unumEntered = false;
+				}
+				unumSite->resetDetectedSignal();
+			}
+
+			//SecundusSite Interactions
+			if (secundusSite->isColliding(secundusSitePos, warbirdPos, warbirdSize)) {
+				printf("Warbird crashed into Secundus Site.\n");
+				signalKOHit();
+				secundusSite->signalKOHit();
+			}
+			if (secundusSite->isColliding(secundusSitePos, warbirdPos, warbirdSize + secundusSite->DETECT_RANGE)) {
+				if (secundusEntered == false) {
+					printf("Warbird has entered Secundus Site's Detection Range.\n");
+					secundusEntered = true;
+				}
+				secundusSite->signalDetected();
+			}
+			else {
+				if (secundusEntered == true) {
+					printf("Warbird has exited Secundus Site's Detection Range.\n");
+					secundusEntered = false;
+				}
+				secundusSite->resetDetectedSignal();
+			}
+
+			//Set gravity
 			if (gravity) {
 				setGravDirection();
 			}
 
+			//Ship movement
 			move();
 			switch (key) {
 				case 0:

@@ -18,6 +18,7 @@
 class MissileSite : public Shape, public Entity {
 
 public:
+	const int DETECT_RANGE = 3000;
 
 	MissileSite(int id, int numOfVert, char * fileName, float size, int missile, int health, bool isEnemy) :
 		Shape(id, numOfVert, fileName, size), Entity(missile, health, isEnemy) {
@@ -44,17 +45,28 @@ public:
 		return (this->translationMatrix * hubMatrix);
 	}
 
-	void update(glm::mat4 hubMatrix, glm::mat4 warbirdOM, float warbirdSize, glm::mat4 wbMissileOM, glm::mat4 usMissileOM, 
-		glm::mat4 ssMissileOM, float missileSize) {
+	void recieveSignals() {
 		if (isDead() == false) {
-			//glm::vec3 sitePos = getPosition(this->translationMatrix * hubMatrix);
-			//warbirdCollision(sitePos, this->size, warbirdOM, warbirdSize);
-			//missileCollision(sitePos, this->size, wbMissileOM, usMissileOM, ssMissileOM, missileSize + 500);
-			//bool justDied = ( onWarbirdHit() || onMissileHit() );
-			//if (justDied) {
-			//	sendToCenter();
-			//	printf("Missile Site %d has Died.\n", id);
-			//}
+			bool justDied = onHit();
+			if (justDied) {
+				sendToCenter();
+				printf("Missile Site Has Died.\n");
+			}
+			resetHitSignal();
+		}
+	}
+
+	bool isColliding(glm::vec3 sitePos, glm::vec3 targetPos, float targetSize) {
+		float distanceBetween = distance(sitePos, targetPos);
+		if (distanceBetween < (targetSize + this->size + 50)) {
+			return true;
+		}
+		return false;
+	}
+
+	void update() {
+		if (isDead() == false) {
+			
 		}
 	}
 

@@ -40,6 +40,7 @@ public:
 		//Warbird Interactions
 		warbird->appendGravVec(moonPos, moonSize);
 		if (warbird->isColliding(moonPos, moonSize)) {
+			printf("Warbird crashed into the Moon.\n");
 			warbird->signalKOHit();
 		}
 

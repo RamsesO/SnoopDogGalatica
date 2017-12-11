@@ -34,7 +34,10 @@ public:
 		//Warbird Interactions
 		warbird->appendGravVec(sunPos, sunSize);
 		if (warbird->isColliding(sunPos, sunSize)) {
-			warbird->signalKOHit();
+			if (warbird->isDead() == false) {
+				printf("Warbird crashed into the Sun.\n");
+				warbird->signalKOHit();
+			}
 		}
 
         this->rotationMatrix = glm::rotate(this->rotationMatrix, this->radians, this->rotationAxis);
