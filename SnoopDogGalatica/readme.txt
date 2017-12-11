@@ -172,13 +172,4 @@
 			* Impatient missiles
 
 				* Faster to activate and faster to die
-			* MORE missiles
-
-				* Ship have 20
-				* Sites have 15
-				* MOAR!!!!
-		* Everybody deserves a second chance, or three, or four, or five...
-
-			* Ships have 7 lives
-			* Sites have 5 lives
 
